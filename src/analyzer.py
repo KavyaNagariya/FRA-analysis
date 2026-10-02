@@ -81,34 +81,38 @@ def advanced_analysis(healthy_df, uploaded_df):
     overall_status = "Healthy"
     overall_severity = "Low"
     
-    for b_code, b_name, b_range in bands:
-        b_metrics = compute_subband_metrics(h_df, u_df, b_code)
-        if b_metrics.get("status") == "Insufficient Data":
-            per_band[b_name] = {
-                "range": b_range,
+    for band_code, band_name, band_range in bands:
+        band_metrics = compute_subband_metrics(h_df, u_df, band_code)
+        if band_metrics.get("status") == "Insufficient Data":
+            per_band[band_name] = {
+                "range": band_range,
                 "ccf": None,
                 "max_dev": None,
                 "status": "Insufficient Data"
             }
         else:
-            b_ccf = b_metrics.get("CCF", 0.0)
-            b_max_dev = b_metrics.get("MaxDev_dB", 0.0)
-            b_status, b_level, b_severity = evaluate_band(b_ccf)
+            band_ccf = band_metrics.get("CCF", 0.0)
+            band_max_dev = band_metrics.get("MaxDev_dB", 0.0)
+            band_status, band_level, band_severity = evaluate_band(band_ccf)
             
-            per_band[b_name] = {
-                "range": b_range,
-                "ccf": b_ccf,
-                "max_dev": b_max_dev,
-                "status": b_status
+            per_band[band_name] = {
+                "range": band_range,
+                "ccf": band_ccf,
+                "max_dev": band_max_dev,
+                "status": band_status
             }
-            band_ccfs.append(b_ccf)
+            band_ccfs.append(band_ccf)
             
-            if b_level > worst_sev_level:
-                worst_sev_level = b_level
-                overall_status = b_status
-                overall_severity = b_severity
+            if band_level > worst_sev_level:
+                worst_sev_level = band_level
+                overall_status = band_status
+                overall_severity = band_severity
 
     min_band_ccf = min(band_ccfs) if band_ccfs else corr
+    
+    if not band_ccfs:
+        overall_status = "Insufficient Data"
+        overall_severity = "Unknown"
     
     # Composite Score formula from SPEC-001
     ml_conf = ai_confidence if ai_confidence > 0 else (corr * 100)
@@ -119,6 +123,8 @@ def advanced_analysis(healthy_df, uploaded_df):
         recommendation = "Transformer operating within normal parameters. No action required."
     elif overall_status == "Warning":
         recommendation = "Minor deviation detected. Schedule a DGA (Dissolved Gas Analysis) to confirm internal state."
+    elif overall_status == "Insufficient Data":
+        recommendation = "Insufficient data points across all bands. Please perform a higher-resolution sweep."
     else: 
         recommendation = "Significant frequency response shift! Immediate internal inspection of windings recommended."
 
