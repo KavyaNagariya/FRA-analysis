@@ -75,7 +75,7 @@ def advanced_analysis(healthy_df, uploaded_df):
         if ccf >= 0.98: return "Healthy", 0, "Low"
         if ccf >= 0.90: return "Warning", 1, "Medium"
         if ccf >= 0.80: return "Danger", 2, "High"
-        return "Critical", 3, "Critical"
+        return "Critical", 3, "High"
 
     worst_sev_level = -1
     overall_status = "Healthy"
