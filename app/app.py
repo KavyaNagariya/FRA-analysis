@@ -70,28 +70,23 @@ def analyze():
             print(f"WARNING: Baseline missing at {baseline_path}. Using upload as temporary baseline.")
             baseline_path = file_path
 
-        # 3. Load Data
-        uploaded_df = load_fra_data(file_path)
-        healthy_df = load_fra_data(baseline_path)
-
-        if uploaded_df is None or healthy_df is None:
+        # 3. Run Diagnostic Pipeline
+        from src.pipeline import run_pipeline
+        pipeline_results = run_pipeline(file_path, baseline_path)
+        if not pipeline_results:
             return "Error: CSV parsing failed. Ensure columns are 'Frequency' and 'Magnitude'.", 500
 
-        # Preprocess the sweeps to align them to the 500-point standard grid
-        from src.preprocessor import preprocess_sweep
-        uploaded_df = preprocess_sweep(uploaded_df, file_path)
-        healthy_df = preprocess_sweep(healthy_df, baseline_path)
-
-        # 4. Run Analysis
-        result = advanced_analysis(healthy_df, uploaded_df)
+        result = pipeline_results[0] if isinstance(pipeline_results, list) else pipeline_results
 
         # Calculate a Confidence Score out of 100 based on correlation
         conf_score = int(result.get("correlation", 0) * 100)
+        transformer_id = result.get("transformer_id") or file.filename
+        date_str = result.get("test_date") or datetime.now().strftime("%b %d, %Y %I:%M %p")
 
         return render_template("index.html",
             status=result.get("status", "Warning"),
-            transformerId=file.filename,
-            date_now=datetime.now().strftime("%b %d, %Y %I:%M %p"),
+            transformerId=transformer_id,
+            date_now=date_str,
             corr=round(result.get("correlation", 0), 4),
             shift=round(result.get("shift", 0), 2),
             freq=result.get("frequencies", []),

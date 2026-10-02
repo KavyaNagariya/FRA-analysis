@@ -135,9 +135,10 @@ def advanced_analysis(healthy_df, uploaded_df):
     if ml_sev.level > overall_severity.level:
         overall_severity = ml_sev
     
-    # Composite Score formula from SPEC-001
-    ml_conf = ai_confidence if ai_confidence > 0 else (corr * 100)
-    composite_score = (0.6 * min_band_ccf * 100) + (0.4 * ml_conf)
+    # Composite Score formula from SPEC-001 (bounded in [0.0, 100.0])
+    ml_conf = max(0.0, min(100.0, ai_confidence if ai_confidence > 0 else (corr * 100)))
+    ccf_factor = max(0.0, min(1.0, min_band_ccf))
+    composite_score = max(0.0, min(100.0, (0.6 * ccf_factor * 100) + (0.4 * ml_conf)))
     
     # Recommendation logic (keep original simple logic based on worst status)
     if overall_severity.name == "Healthy":
