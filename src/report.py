@@ -38,7 +38,8 @@ def generate_report(result):
         ["Severity", str(result.get('severity', 'N/A'))],
         ["Correlation Index", f"{result.get('correlation', 0):.4f}"],
         ["Max Deviation", f"{result.get('shift', 0):.2f} dB"],
-        ["AI Confidence", f"{result.get('confidence', 0)}%"]
+        ["AI Confidence", f"{result.get('confidence', 0)}%"],
+        ["Health Integrity Score", f"{result.get('composite_score', 0)}%"]
     ]
 
     # Create the table object first

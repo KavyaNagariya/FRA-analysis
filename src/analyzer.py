@@ -113,6 +113,24 @@ def advanced_analysis(healthy_df, uploaded_df):
     if not band_ccfs:
         overall_status = "Insufficient Data"
         overall_severity = "Unknown"
+        worst_sev_level = -1
+        
+    # ML severity escalation
+    # The deterministic physics floor ensures that ML predictions can escalate severity but never downgrade it.
+    ml_level = 0
+    ml_status = "Healthy"
+    ml_severity_label = "Low"
+    
+    # If ML predicts a known fault, map it to a severity level (e.g., Danger = 2)
+    if ai_fault and ai_fault not in ["Healthy", "Analysis Pending"]:
+        ml_level = 2
+        ml_status = "Danger"
+        ml_severity_label = "High"
+
+    if worst_sev_level < ml_level:
+        worst_sev_level = ml_level
+        overall_status = ml_status
+        overall_severity = ml_severity_label
     
     # Composite Score formula from SPEC-001
     ml_conf = ai_confidence if ai_confidence > 0 else (corr * 100)
@@ -145,7 +163,7 @@ def advanced_analysis(healthy_df, uploaded_df):
         "severity": overall_severity,
         "fault_type": ai_fault,      # Displayed in "AI Fault Classification"
         "confidence": round(ml_conf, 1),
-        "composite_score": round(composite_score / 100, 2), # Typically output as 0-1 for PDF
+        "composite_score": round(composite_score, 2), # 0-100% composite value
         "per_band": per_band,
         "frequencies": freq,
         "magnitude_healthy": mag_h,
