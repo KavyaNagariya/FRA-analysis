@@ -59,22 +59,67 @@ def advanced_analysis(healthy_df, uploaded_df):
         print(f"AI Prediction failed, falling back to stats: {e}")
         ai_fault, ai_confidence = "Analysis Pending", 0.0
 
-    # 4. 🚨 Unified Logic (AI + Statistics)
-    fault_type = ai_fault
-    # Use AI confidence if available, otherwise use correlation %
-    confidence = ai_confidence if ai_confidence > 0 else (corr * 100)
+    # 4. 🚨 Unified Logic (AI + Statistics with IEEE Sub-Bands)
+    from src.preprocessor import compute_subband_metrics
+    
+    bands = [
+        ("LF", "Low (Core)", "< 2 kHz"),
+        ("MF", "Mid (Winding)", "2 - 100 kHz"),
+        ("HF", "High (Insulation)", "> 100 kHz")
+    ]
+    
+    per_band = {}
+    band_ccfs = []
+    
+    def evaluate_band(ccf):
+        if ccf >= 0.98: return "Healthy", 0, "Low"
+        if ccf >= 0.90: return "Warning", 1, "Medium"
+        if ccf >= 0.80: return "Danger", 2, "High"
+        return "Critical", 3, "Critical"
 
-    if corr > 0.98:
-        status = "Healthy"
-        severity = "Low"
+    worst_sev_level = -1
+    overall_status = "Healthy"
+    overall_severity = "Low"
+    
+    for b_code, b_name, b_range in bands:
+        b_metrics = compute_subband_metrics(h_df, u_df, b_code)
+        if b_metrics.get("status") == "Insufficient Data":
+            per_band[b_name] = {
+                "range": b_range,
+                "ccf": None,
+                "max_dev": None,
+                "status": "Insufficient Data"
+            }
+        else:
+            b_ccf = b_metrics.get("CCF", 0.0)
+            b_max_dev = b_metrics.get("MaxDev_dB", 0.0)
+            b_status, b_level, b_severity = evaluate_band(b_ccf)
+            
+            per_band[b_name] = {
+                "range": b_range,
+                "ccf": b_ccf,
+                "max_dev": b_max_dev,
+                "status": b_status
+            }
+            band_ccfs.append(b_ccf)
+            
+            if b_level > worst_sev_level:
+                worst_sev_level = b_level
+                overall_status = b_status
+                overall_severity = b_severity
+
+    min_band_ccf = min(band_ccfs) if band_ccfs else corr
+    
+    # Composite Score formula from SPEC-001
+    ml_conf = ai_confidence if ai_confidence > 0 else (corr * 100)
+    composite_score = (0.6 * min_band_ccf * 100) + (0.4 * ml_conf)
+    
+    # Recommendation logic (keep original simple logic based on worst status)
+    if overall_status == "Healthy":
         recommendation = "Transformer operating within normal parameters. No action required."
-    elif corr > 0.90:
-        status = "Warning"
-        severity = "Medium"
+    elif overall_status == "Warning":
         recommendation = "Minor deviation detected. Schedule a DGA (Dissolved Gas Analysis) to confirm internal state."
     else: 
-        status = "Danger"
-        severity = "High"
         recommendation = "Significant frequency response shift! Immediate internal inspection of windings recommended."
 
     # 5. 📊 Data Alignment for Chart.js
@@ -88,12 +133,14 @@ def advanced_analysis(healthy_df, uploaded_df):
         freq, mag_h, mag_u = [], [], []
 
     return {
-        "status": status,
+        "status": overall_status,
         "shift": max_dev,               # Displayed in "Max Deviation"
         "correlation": corr,           # Displayed in "Correlation"
-        "severity": severity,
-        "fault_type": fault_type,      # Displayed in "AI Fault Classification"
-        "confidence": round(confidence, 1),
+        "severity": overall_severity,
+        "fault_type": ai_fault,      # Displayed in "AI Fault Classification"
+        "confidence": round(ml_conf, 1),
+        "composite_score": round(composite_score / 100, 2), # Typically output as 0-1 for PDF
+        "per_band": per_band,
         "frequencies": freq,
         "magnitude_healthy": mag_h,
         "magnitude_uploaded": mag_u,
