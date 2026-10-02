@@ -1,210 +1,905 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRA Diagnostics | AI-Powered Transformer Analysis</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+{% extends "base.html" %}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap');
-        
-        :root {
-            --primary: #0ea5e9;
-            --background: #020617;
-            --card: #1e293b;
-        }
+{% block title %}FRA Diagnostics Workstation | High-Voltage Transformer SFRA Telemetry{% endblock %}
 
-        body {
-            background-color: var(--background);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-        }
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Precision Industrial Instrument Screen Styling */
+    .crt-grid {
+        background-image: 
+            linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+    .crt-screen {
+        background-color: #070a0f;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .upload-dropzone {
+        border: 1px dashed #334155;
+        transition: all 0.2s ease-in-out;
+    }
+    .upload-dropzone:hover, .upload-dropzone.drag-over {
+        border-color: #06b6d4;
+        background-color: rgba(6, 182, 212, 0.04);
+    }
+    .subband-band-low { background-color: rgba(245, 158, 11, 0.06); border-right: 1px dashed rgba(245, 158, 11, 0.3); }
+    .subband-band-mid { background-color: rgba(6, 182, 212, 0.06); border-right: 1px dashed rgba(6, 182, 212, 0.3); }
+    .subband-band-high { background-color: rgba(139, 92, 246, 0.06); }
+</style>
+{% endblock %}
 
-        .bg-card { background-color: #0f172a; border: 1px solid #1e293b; }
-        .text-primary { color: var(--primary); }
-        
-        .glow-active {
-            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-        }
+{% block content %}
+{% set active_page = 'landing' %}
+<div class="space-y-6">
 
-        .btn-glow {
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
-        }
+    <!-- SUB-HEADER CONTEXT & STANDARDS CLASSIFICATION STRIP -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
+        <div>
+            <div class="flex items-center gap-2 font-mono text-[10px] text-telemetry-cyan tracking-wider uppercase">
+                <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                <span>PLATFORM OVERVIEW // SFRA PRECISION INSTRUMENTATION WORKSTATION</span>
+            </div>
+            <h1 class="text-xl lg:text-2xl font-bold text-white tracking-tight mt-1">
+                Substation Transformer Diagnostic Workstation
+            </h1>
+            <p class="text-xs text-slate-400 mt-0.5 max-w-4xl">
+                High-voltage apparatus Sweep Frequency Response Analysis with deterministic IEEE Std C57.149 & IEC 60076-18 physics floors, distributed RLC ladder parameter decomposition, and multi-vendor telemetry ingestion.
+            </p>
+        </div>
 
-        .btn-glow:hover {
-            box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
-            transform: translateY(-1px);
-        }
+        <!-- Standards Spec Badges -->
+        <div class="flex flex-wrap items-center gap-2 font-mono text-[10px]">
+            <span class="px-2.5 py-1 bg-panel border border-telemetry-cyan/40 text-telemetry-cyan rounded-sm flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-3 h-3"></i>
+                IEEE Std C57.149-2012
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-telemetry-emerald/40 text-telemetry-emerald rounded-sm flex items-center gap-1.5">
+                <i data-lucide="award" class="w-3 h-3"></i>
+                IEC 60076-18 ED.1
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-border-interactive text-slate-300 rounded-sm">
+                CIGRE TB 342
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-border-interactive text-slate-300 rounded-sm">
+                500-PT LOG GRID
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-border-interactive text-telemetry-emerald rounded-sm flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald beacon-active"></span>
+                SYSTEM ONLINE
+            </span>
+        </div>
+    </div>
 
-        .pulse-dot {
-            animation: pulse 2s infinite;
-        }
+    <!-- DUAL-BAY PRECISION INSTRUMENT HERO CONSOLE -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-    </style>
-</head>
-<body>
+        <!-- LEFT BAY: DIRECT OPERATIONAL INGEST & MISSION COMMAND (5 COLS) -->
+        <div class="xl:col-span-5 bg-panel border border-border-subtle rounded-sm p-5 tactile-inset flex flex-col justify-between space-y-5">
+            <div>
+                <div class="flex items-center justify-between border-b border-border-subtle pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-telemetry-cyan beacon-active"></span>
+                        <h2 class="font-mono text-xs font-bold uppercase tracking-wider text-white">
+                            01 // SFRA SCAN INGESTION TERMINAL
+                        </h2>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-400 bg-surface px-2 py-0.5 rounded-sm border border-border-subtle">
+                        READY FOR INGEST
+                    </span>
+                </div>
 
-    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-sky-500/20 flex items-center justify-center glow-active">
-                    <span class="text-sky-400 text-xl">⚡</span>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                    Upload raw frequency response sweep files from field test sets. The multi-vendor ingestion parser normalizes tabular sweeps into standardized 500-point logarithmic grids for IEEE C57.149 sub-band evaluation.
+                </p>
+
+                <!-- Direct Ingestion Upload Form -->
+                <form action="/analyze" method="POST" enctype="multipart/form-data" class="space-y-3">
+                    <label for="landingFileInput" class="upload-dropzone block p-4 rounded-sm cursor-pointer text-center group bg-surface/50 border border-dashed border-border-interactive hover:border-telemetry-cyan transition">
+                        <input type="file" name="file" id="landingFileInput" required class="hidden" aria-describedby="landingFormatHint"
+                               onchange="handleLandingFileSelect(this)">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <div class="w-10 h-10 rounded-sm bg-panel border border-border-interactive flex items-center justify-center text-slate-400 group-hover:text-telemetry-cyan group-hover:border-telemetry-cyan transition">
+                                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                            </div>
+                            <div class="space-y-0.5">
+                                <div id="landingFileName" class="text-xs font-mono font-semibold text-slate-200 group-hover:text-telemetry-cyan transition" aria-live="polite">
+                                    Drop CSV scan or click to browse
+                                </div>
+                                <div id="landingFormatHint" class="text-[10px] font-mono text-slate-500">
+                                    Supports OMICRON, Doble, Megger, and Generic CSV formats
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <div class="flex items-center justify-between gap-3 pt-1">
+                        <div class="flex items-center gap-1.5 font-mono text-[10px] text-slate-500">
+                            <i data-lucide="cpu" class="w-3 h-3 text-telemetry-cyan"></i>
+                            <span>DETERMINISTIC PHYSICS FLOOR</span>
+                        </div>
+                        <button type="submit" class="px-4 py-2 bg-telemetry-cyan text-chassis hover:bg-cyan-300 font-mono font-bold text-xs rounded-sm transition flex items-center gap-2 shadow-sm">
+                            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                            <span>EXECUTE ANALYSIS</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Quick Preset Datasets (1-Click Inspection) -->
+                <div class="mt-5 pt-4 border-t border-border-subtle">
+                    <div class="font-mono text-[10px] text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span>OR LOAD VERIFIED FIELD PRESET</span>
+                        <span class="text-slate-500">FAST WORKBENCH LAUNCH</span>
+                    </div>
+                    <div class="space-y-1.5">
+                        <a href="/inspect/TX-220KV-AUTO-03" class="flex items-center justify-between p-2 rounded-sm bg-surface/70 border border-border-subtle hover:border-telemetry-emerald/50 hover:bg-surface transition group">
+                            <div class="flex items-center gap-2 font-mono text-xs truncate">
+                                <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald"></span>
+                                <span class="font-bold text-slate-200 group-hover:text-telemetry-emerald transition">TX-220KV-AUTO-03</span>
+                                <span class="text-[10px] text-slate-500">| Nominal Baseline</span>
+                            </div>
+                            <div class="font-mono text-[11px] text-telemetry-emerald font-semibold">
+                                R² 0.9890
+                            </div>
+                        </a>
+                        <a href="/inspect/TX-400KV-GSU-02" class="flex items-center justify-between p-2 rounded-sm bg-surface/70 border border-border-subtle hover:border-telemetry-amber/50 hover:bg-surface transition group">
+                            <div class="flex items-center gap-2 font-mono text-xs truncate">
+                                <span class="w-1.5 h-1.5 rounded-full bg-telemetry-amber"></span>
+                                <span class="font-bold text-slate-200 group-hover:text-telemetry-amber transition">TX-400KV-GSU-02</span>
+                                <span class="text-[10px] text-slate-500">| Core Lamination Shift</span>
+                            </div>
+                            <div class="font-mono text-[11px] text-telemetry-amber font-semibold">
+                                R² 0.8842
+                            </div>
+                        </a>
+                        <a href="/inspect/TX-765KV-MAIN-01" class="flex items-center justify-between p-2 rounded-sm bg-surface/70 border border-border-subtle hover:border-telemetry-rose/50 hover:bg-surface transition group">
+                            <div class="flex items-center gap-2 font-mono text-xs truncate">
+                                <span class="w-1.5 h-1.5 rounded-full bg-telemetry-rose"></span>
+                                <span class="font-bold text-slate-200 group-hover:text-telemetry-rose transition">TX-765KV-MAIN-01</span>
+                                <span class="text-[10px] text-slate-500">| Axial Winding Displacement</span>
+                            </div>
+                            <div class="font-mono text-[11px] text-telemetry-rose font-semibold">
+                                R² 0.7420
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fast Navigation Matrix -->
+            <div class="pt-3 border-t border-border-subtle grid grid-cols-3 gap-2 font-mono text-[11px]">
+                <a href="/analysis" class="p-2 bg-panel-elevated border border-border-interactive hover:border-telemetry-cyan rounded-sm text-center text-slate-300 hover:text-white transition">
+                    <i data-lucide="cpu" class="w-4 h-4 mx-auto mb-1 text-telemetry-cyan"></i>
+                    WORKBENCH
+                </a>
+                <a href="/history" class="p-2 bg-panel-elevated border border-border-interactive hover:border-telemetry-cyan rounded-sm text-center text-slate-300 hover:text-white transition">
+                    <i data-lucide="database" class="w-4 h-4 mx-auto mb-1 text-telemetry-emerald"></i>
+                    FLEET DATA
+                </a>
+                <a href="/about" class="p-2 bg-panel-elevated border border-border-interactive hover:border-telemetry-cyan rounded-sm text-center text-slate-300 hover:text-white transition">
+                    <i data-lucide="book-open" class="w-4 h-4 mx-auto mb-1 text-telemetry-amber"></i>
+                    STANDARDS
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT BAY: INTERACTIVE HERO TELEMETRY OSCILLOSCOPE & BODE DISPLAY (7 COLS) -->
+        <div class="xl:col-span-7 bg-panel border border-border-subtle rounded-sm p-5 tactile-inset flex flex-col justify-between">
+            <div>
+                <!-- Oscilloscope Top Channel Strip -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border-subtle pb-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5 font-mono text-xs font-bold text-white">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>
+                            <span>CH1: REF (50Ω)</span>
+                            <span class="text-slate-600">/</span>
+                            <span class="w-2 h-2 rounded-full bg-telemetry-cyan" id="ch2Indicator"></span>
+                            <span id="ch2Label">CH2: MEASURED SWEEP</span>
+                        </div>
+                    </div>
+
+                    <!-- Preset Selector Tabs -->
+                    <div class="flex items-center gap-1 font-mono text-[10px] bg-surface p-1 rounded-sm border border-border-subtle">
+                        <span class="text-slate-500 px-1.5 hidden md:inline">PRESET:</span>
+                        <button type="button" onclick="switchHeroPreset('nominal')" id="btnPresetNominal"
+                                class="px-2 py-0.5 rounded-sm bg-panel-elevated text-telemetry-emerald font-semibold border border-telemetry-emerald/40 transition">
+                            NOMINAL
+                        </button>
+                        <button type="button" onclick="switchHeroPreset('winding')" id="btnPresetWinding"
+                                class="px-2 py-0.5 rounded-sm text-slate-400 hover:text-white transition">
+                            WINDING FAULT
+                        </button>
+                        <button type="button" onclick="switchHeroPreset('core')" id="btnPresetCore"
+                                class="px-2 py-0.5 rounded-sm text-slate-400 hover:text-white transition">
+                            CORE SHIFT
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CRT Oscilloscope Screen Frame -->
+                <div class="crt-screen crt-grid border border-border-interactive rounded-sm p-3 relative overflow-hidden">
+                    <!-- Frequency Sub-band Markers Header -->
+                    <div class="grid grid-cols-3 font-mono text-[9px] text-center border-b border-slate-800 pb-1 mb-2">
+                        <div class="text-telemetry-amber font-semibold subband-band-low py-0.5 rounded-sm">
+                            SUB-BAND 1: CORE (< 2 kHz)
+                        </div>
+                        <div class="text-telemetry-cyan font-semibold subband-band-mid py-0.5 rounded-sm">
+                            SUB-BAND 2: WINDING (2k - 100 kHz)
+                        </div>
+                        <div class="text-telemetry-violet font-semibold subband-band-high py-0.5 rounded-sm">
+                            SUB-BAND 3: BUSHINGS / LEADS (> 100 kHz)
+                        </div>
+                    </div>
+
+                    <!-- High-Resolution Canvas -->
+                    <div class="relative h-[280px] w-full">
+                        <canvas id="heroBodeCanvas" role="img" aria-label="Interactive oscilloscope preview of nominal baseline and fault Bode signatures across IEEE C57.149 sub-bands"></canvas>
+                    </div>
+
+                    <!-- Real-time HUD Telemetry Readout Strip -->
+                    <div class="mt-2 pt-2 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[10px]">
+                        <div class="bg-surface/90 px-2 py-1 rounded-sm border border-slate-800">
+                            <span class="text-slate-500">CURSOR FREQ:</span>
+                            <span id="hudFreq" class="text-white font-semibold ml-1">45.2 kHz</span>
+                        </div>
+                        <div class="bg-surface/90 px-2 py-1 rounded-sm border border-slate-800">
+                            <span class="text-slate-500">CORRELATION R²:</span>
+                            <span id="hudCorr" class="text-telemetry-emerald font-semibold ml-1">0.9890</span>
+                        </div>
+                        <div class="bg-surface/90 px-2 py-1 rounded-sm border border-slate-800">
+                            <span class="text-slate-500">MAX SHIFT:</span>
+                            <span id="hudShift" class="text-slate-200 font-semibold ml-1">1.4 dB</span>
+                        </div>
+                        <div class="bg-surface/90 px-2 py-1 rounded-sm border border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-500">IEEE VERDICT:</span>
+                            <span id="hudVerdict" class="text-telemetry-emerald font-bold">NOMINAL (PASS)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trace Telemetry Footnote -->
+            <div class="mt-3 flex items-center justify-between font-mono text-[10px] text-slate-500">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-slate-400 inline-block"></span>
+                        <span class="text-slate-400">CH1 Baseline Reference</span>
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-telemetry-cyan inline-block" id="legendCh2Bar"></span>
+                        <span class="text-slate-300" id="legendCh2Text">CH2 Monitored Test Trace</span>
+                    </span>
+                </div>
+                <div class="text-slate-400">
+                    <span class="text-slate-500">SWEEP POINTS:</span> 500 LOG-INTERPOLATED
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-COLUMN HIGH-DENSITY INSTRUMENT TELEMETRY RIBBON -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <!-- Metric 1: Bandwidth -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-border-interactive transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>BANDWIDTH SPECTRUM</span>
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-xl font-bold font-mono text-white">20 Hz – 2 MHz</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>DYNAMIC RANGE</span>
+                <span class="text-slate-300">5 DECADES (500 PTS)</span>
+            </div>
+        </div>
+
+        <!-- Metric 2: Standards -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-border-interactive transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>STANDARDS CRITERIA</span>
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-telemetry-emerald"></i>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-xl font-bold font-mono text-telemetry-emerald">IEEE C57.149</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>COMPLIANCE</span>
+                <span class="text-slate-300">IEC 60076-18 ED.1</span>
+            </div>
+        </div>
+
+        <!-- Metric 3: Multi-Vendor Ingestion -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-border-interactive transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>INGESTION FORMATS</span>
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-telemetry-amber"></i>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-xl font-bold font-mono text-white">4+ VENDORS</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>COMPATIBILITY</span>
+                <span class="text-slate-300">OMICRON / DOBLE / MEGGER</span>
+            </div>
+        </div>
+
+        <!-- Metric 4: Fleet Telemetry -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-border-interactive transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>MONITORED FLEET</span>
+                <i data-lucide="database" class="w-3.5 h-3.5 text-telemetry-violet"></i>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-xl font-bold font-mono text-white">{{ stats.total }} UNITS</span>
+                <span class="text-[10px] font-mono text-slate-400">({{ stats.healthy }} NOMINAL)</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>CRITICAL ALERTS</span>
+                <span class="{% if stats.critical > 0 %}text-telemetry-rose font-bold{% else %}text-slate-300{% endif %}">
+                    {{ stats.critical }} UNITS
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORE TECHNICAL ARCHITECTURE & PROCESSING PIPELINE (4-STAGE SEAM) -->
+    <div class="bg-panel border border-border-subtle rounded-sm p-5 tactile-inset space-y-4">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-cyan"></span>
+                <h2 class="font-mono text-xs font-bold uppercase tracking-wider text-white">
+                    02 // DETERMINISTIC ANALYTICAL PROCESSING PIPELINE
+                </h2>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400 bg-surface px-2 py-0.5 rounded-sm border border-border-subtle">
+                END-TO-END VERIFICATION SEAM
+            </span>
+        </div>
+
+        <p class="text-xs text-slate-400 max-w-4xl leading-relaxed">
+            The platform executes a rigorous four-phase signal processing and diagnostic workflow. Physics thresholds operate as an uncompromisable baseline floor, preventing machine learning from under-reporting mechanical degradation.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+            <!-- Stage 1 -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-2 hover:border-telemetry-cyan/50 transition">
+                <div class="flex items-center justify-between font-mono text-[10px]">
+                    <span class="text-telemetry-cyan font-bold">PHASE 01</span>
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 text-slate-500"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white tracking-tight">Multi-Vendor Ingestion</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Detects measurement headers, decodes multi-asset CSV files, and isolates individual phase sweeps without cross-contamination.
+                </p>
+                <div class="font-mono text-[10px] text-slate-500 pt-1">
+                    OMICRON / Doble / Megger
+                </div>
+            </div>
+
+            <!-- Stage 2 -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-2 hover:border-telemetry-cyan/50 transition">
+                <div class="flex items-center justify-between font-mono text-[10px]">
+                    <span class="text-telemetry-cyan font-bold">PHASE 02</span>
+                    <i data-lucide="sliders" class="w-4 h-4 text-slate-500"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white tracking-tight">Logarithmic Grid Interpolation</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Maps raw non-uniform sweeps to a standardized 500-point logarithmic grid (20 Hz - 2 MHz) using cubic dB-space splines.
+                </p>
+                <div class="font-mono text-[10px] text-slate-500 pt-1">
+                    Standardized Grid Uniformity
+                </div>
+            </div>
+
+            <!-- Stage 3 -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-2 hover:border-telemetry-cyan/50 transition">
+                <div class="flex items-center justify-between font-mono text-[10px]">
+                    <span class="text-telemetry-cyan font-bold">PHASE 03</span>
+                    <i data-lucide="git-merge" class="w-4 h-4 text-slate-500"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white tracking-tight">Physics Floor + Classifier</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Computes IEEE C57.149 metrics ($R^2$, ASLE, $|\Delta\text{dB}|$). Worst sub-band governs severity; ML model cannot downgrade physical defects.
+                </p>
+                <div class="font-mono text-[10px] text-slate-500 pt-1">
+                    Zero False Reassurance
+                </div>
+            </div>
+
+            <!-- Stage 4 -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-2 hover:border-telemetry-cyan/50 transition">
+                <div class="flex items-center justify-between font-mono text-[10px]">
+                    <span class="text-telemetry-cyan font-bold">PHASE 04</span>
+                    <i data-lucide="file-text" class="w-4 h-4 text-slate-500"></i>
+                </div>
+                <h3 class="text-sm font-bold text-white tracking-tight">Normative PDF Reporting</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Automatically renders publication-grade ReportLab PDF engineering reports containing high-resolution Bode plots and audit tables.
+                </p>
+                <div class="font-mono text-[10px] text-slate-500 pt-1">
+                    Direct Utility Handoff
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IEEE C57.149 PHYSICAL SUB-BAND DECOMPOSITION MATRIX -->
+    <div class="bg-panel border border-border-subtle rounded-sm p-5 tactile-inset space-y-4">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-amber"></span>
+                <h2 class="font-mono text-xs font-bold uppercase tracking-wider text-white">
+                    03 // IEEE STD C57.149 & IEC 60076-18 PHYSICAL SUB-BAND PARTITIONING
+                </h2>
+            </div>
+            <a href="/about" class="text-[10px] font-mono text-telemetry-cyan hover:underline flex items-center gap-1">
+                <span>VIEW COMPLETE MANUAL</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            <!-- Band 1: Core -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-3 relative overflow-hidden">
+                <div class="flex items-center justify-between border-b border-border-subtle pb-2">
+                    <span class="font-mono text-xs font-bold text-telemetry-amber">SUB-BAND 1: LOW FREQUENCY</span>
+                    <span class="font-mono text-[10px] text-slate-400">< 2 kHz</span>
                 </div>
                 <div>
-                    <h1 class="text-base font-bold tracking-tight text-white uppercase">FRA Diagnostics</h1>
-                    <p class="text-[10px] text-slate-400 tracking-widest uppercase font-mono">AI-Powered Transformer Analysis</p>
+                    <div class="text-[11px] font-mono text-slate-300 font-semibold mb-1">DOMINANT CIRCUIT PARAMETERS</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Governed by core magnetizing inductance ($L_m$) and bulk winding resistance ($R_s$). Resonances dictated by magnetic core geometry.
+                    </p>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono text-slate-300 font-semibold mb-1">DETECTABLE DEFECTS</div>
+                    <ul class="text-xs text-slate-400 space-y-1 list-disc list-inside">
+                        <li>Core lamination short circuits</li>
+                        <li>Residual magnetization / DC bias</li>
+                        <li>Core grounding strap detachment</li>
+                        <li>Main magnetic frame displacement</li>
+                    </ul>
+                </div>
+                <div class="pt-2 border-t border-border-subtle font-mono text-[10px] flex items-center justify-between text-slate-400">
+                    <span>NORM THRESHOLD:</span>
+                    <span class="text-telemetry-amber font-semibold">R² ≥ 0.95 | ΔdB < 1.0</span>
                 </div>
             </div>
-            
-            <nav class="flex items-center gap-2">
-                <a href="/" class="px-5 py-2 rounded-full text-xs font-semibold bg-sky-600 text-white">HOME</a>
-                <a href="/analysis" class="px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all">DIAGNOSTICS</a>
-                <a href="/history" class="px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all">HISTORY</a>
-                <a href="/about" class="px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all">ABOUT</a>
-            </nav>
 
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800">
-                <div class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></div>
-                <span class="text-xs text-slate-300">System Online</span>
+            <!-- Band 2: Winding -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-3 relative overflow-hidden">
+                <div class="flex items-center justify-between border-b border-border-subtle pb-2">
+                    <span class="font-mono text-xs font-bold text-telemetry-cyan">SUB-BAND 2: MID FREQUENCY</span>
+                    <span class="font-mono text-[10px] text-slate-400">2 kHz – 100 kHz</span>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono text-slate-300 font-semibold mb-1">DOMINANT CIRCUIT PARAMETERS</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Governed by winding leakage inductance ($L_\sigma$) and inter-disk / series capacitances ($C_s, C_g$). Multiple sharp anti-resonance poles.
+                    </p>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono text-slate-300 font-semibold mb-1">DETECTABLE DEFECTS</div>
+                    <ul class="text-xs text-slate-400 space-y-1 list-disc list-inside">
+                        <li>Radial winding buckling (hoop stress)</li>
+                        <li>Axial winding displacement / collapse</li>
+                        <li>Clamping pressure loss & disk tilt</li>
+                        <li>Inter-turn insulation breakdown</li>
+                    </ul>
+                </div>
+                <div class="pt-2 border-t border-border-subtle font-mono text-[10px] flex items-center justify-between text-slate-400">
+                    <span>NORM THRESHOLD:</span>
+                    <span class="text-telemetry-cyan font-semibold">R² ≥ 0.95 | Δf < 2.0%</span>
+                </div>
+            </div>
+
+            <!-- Band 3: Bushings & Leads -->
+            <div class="bg-surface/80 border border-border-subtle p-4 rounded-sm space-y-3 relative overflow-hidden">
+                <div class="flex items-center justify-between border-b border-border-subtle pb-2">
+                    <span class="font-mono text-xs font-bold text-telemetry-violet">SUB-BAND 3: HIGH FREQUENCY</span>
+                    <span class="font-mono text-[10px] text-slate-400">> 100 kHz (to 2 MHz)</span>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono text-slate-300 font-semibold mb-1">DOMINANT CIRCUIT PARAMETERS</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Governed by internal tap leads, bushing capacitance ($C_b$), external grounding braid inductance, and terminal connections.
+                    </p>
+                </div>
+                <div>
+                    <div class="text-[11px] font-mono text-slate-300 font-semibold mb-1">DETECTABLE DEFECTS</div>
+                    <ul class="text-xs text-slate-400 space-y-1 list-disc list-inside">
+                        <li>De-energized Tap Changer (DETC) misalignment</li>
+                        <li>Bushing turret lead shift</li>
+                        <li>Field test grounding braid loops</li>
+                        <li>External terminal lead damage</li>
+                    </ul>
+                </div>
+                <div class="pt-2 border-t border-border-subtle font-mono text-[10px] flex items-center justify-between text-slate-400">
+                    <span>NORM THRESHOLD:</span>
+                    <span class="text-telemetry-violet font-semibold">R² ≥ 0.90 | ΔdB < 2.0</span>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <section class="max-w-7xl mx-auto px-6 pt-24 pb-16 text-center border-b border-slate-900">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 mb-10">
-            <i data-lucide="brain-circuit" class="w-4 h-4 text-sky-400"></i>
-            <span class="text-xs font-bold text-sky-400 tracking-wider uppercase font-mono">AI-POWERED DIAGNOSTICS</span>
-        </div>
-        <h2 class="text-5xl font-extrabold text-white tracking-tighter leading-tight max-w-4xl mx-auto mb-6">
-            Intelligent Transformer <span class="text-primary">FRA Analysis</span>
-        </h2>
-        <p class="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
-            Automated processing and interpretation of Frequency Response Analysis data from multiple vendors. Detect winding deformation, core displacement, and insulation degradation with machine learning precision.
-        </p>
-        
-        <div class="flex gap-4 justify-center">
-            <a href="/analysis" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm px-8 py-3 rounded-lg btn-glow transition-all">START ANALYSIS</a>
-            <a href="/about" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm px-8 py-3 rounded-lg transition-all border border-slate-700">LEARN MORE</a>
-        </div>
-    </section>
-
-    <section class="border-b border-slate-900">
-        <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-slate-800">
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white">20Hz – 2MHz</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">FREQUENCY RANGE</p>
+    <!-- ACTIVE MONITORED FLEET APPARATUS SURVEILLANCE STRIP -->
+    <div class="bg-panel border border-border-subtle rounded-sm p-5 tactile-inset space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>
+                <h2 class="font-mono text-xs font-bold uppercase tracking-wider text-white">
+                    04 // MONITORED FLEET APPARATUS AUDIT TRAIL
+                </h2>
             </div>
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white">4+</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">VENDOR FORMATS</p>
-            </div>
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white"><3s</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">ANALYSIS TIME</p>
-            </div>
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white">95%+</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">DETECTION ACCURACY</p>
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] font-mono text-slate-400">
+                    SHOWING {{ records|length }} MONITORED ASSETS
+                </span>
+                <a href="/history" class="px-3 py-1 bg-surface border border-border-interactive hover:border-telemetry-cyan text-telemetry-cyan font-mono text-[10px] rounded-sm transition">
+                    VIEW COMPLETE FLEET ({{ stats.total }}) →
+                </a>
             </div>
         </div>
-    </section>
 
-    <section class="max-w-7xl mx-auto px-6 py-20 text-center">
-        <p class="text-[10px] text-sky-500 font-bold uppercase tracking-widest mb-2 font-mono">CAPABILITIES</p>
-        <h3 class="text-3xl font-bold text-white mb-16 tracking-tight">Platform Features</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="refresh-ccw" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Universal Data Parser</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Automatically process FRA data from OMICRON, Megger, Doble, and generic CSV formats into a standardized structure.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="brain" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">AI Fault Detection</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">CNN-based models and anomaly detection algorithms trained on curated FRA signatures to classify fault types with high accuracy.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="presentation" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Interactive Visualization</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Compare reference and test frequency response curves with logarithmic scaling, overlay analysis, and deviation highlighting.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="settings" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Expert System Logic</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Automated interpretation of results with severity-based maintenance recommendations and actionable insights.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="bar-chart-3" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Health Scoring</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Composite health index combining correlation coefficients, spectral deviation, and fault probability into a single score.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="server-crash" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Multi-Vendor Support</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Seamless compatibility with major FRA test equipment manufactures, eliminating vendor lock-in.</p>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs border-collapse">
+                <thead>
+                    <tr class="border-b border-border-interactive text-[10px] text-slate-400 bg-surface/60">
+                        <th class="py-2.5 px-3">ASSET ID</th>
+                        <th class="py-2.5 px-3">SUBSTATION</th>
+                        <th class="py-2.5 px-3">VOLTAGE / RATING</th>
+                        <th class="py-2.5 px-3 text-center">HEALTH INDEX</th>
+                        <th class="py-2.5 px-3">PRIMARY STATUS</th>
+                        <th class="py-2.5 px-3">GOVERNING SUB-BAND</th>
+                        <th class="py-2.5 px-3 text-right">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border-subtle">
+                    {% for rec in records[:5] %}
+                    <tr class="hover:bg-surface/80 transition group">
+                        <td class="py-2.5 px-3 font-bold text-white">
+                            <a href="/inspect/{{ rec.id }}" class="hover:text-telemetry-cyan flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full {% if rec.status == 'Healthy' %}bg-telemetry-emerald{% elif rec.status == 'Warning' %}bg-telemetry-amber{% else %}bg-telemetry-rose{% endif %}"></span>
+                                {{ rec.id }}
+                            </a>
+                        </td>
+                        <td class="py-2.5 px-3 text-slate-300">{{ rec.substation }}</td>
+                        <td class="py-2.5 px-3 text-slate-400 text-[11px]">{{ rec.voltage }}</td>
+                        <td class="py-2.5 px-3 text-center">
+                            <span class="px-2 py-0.5 rounded-sm text-[11px] font-bold {% if rec.health >= 85 %}bg-telemetry-emerald/10 text-telemetry-emerald border border-telemetry-emerald/30{% elif rec.health >= 65 %}bg-telemetry-amber/10 text-telemetry-amber border border-telemetry-amber/30{% else %}bg-telemetry-rose/10 text-telemetry-rose border border-telemetry-rose/30{% endif %}">
+                                {{ rec.health }}%
+                            </span>
+                        </td>
+                        <td class="py-2.5 px-3">
+                            <span class="font-semibold {% if rec.status == 'Healthy' %}text-telemetry-emerald{% elif rec.status == 'Warning' %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %}">
+                                {{ rec.status | upper }}
+                            </span>
+                        </td>
+                        <td class="py-2.5 px-3 text-slate-300 text-[11px]">
+                            {{ rec.fault_type }}
+                        </td>
+                        <td class="py-2.5 px-3 text-right">
+                            <a href="/inspect/{{ rec.id }}" class="px-2.5 py-1 bg-panel-elevated border border-border-interactive hover:border-telemetry-cyan text-telemetry-cyan rounded-sm text-[10px] font-semibold transition">
+                                INSPECT →
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </section>
+    </div>
 
-    <section class="max-w-7xl mx-auto px-6 py-20 text-center bg-slate-900 border border-slate-800 rounded-3xl mb-12">
-        <p class="text-[10px] text-sky-500 font-bold uppercase tracking-widest mb-2 font-mono">DETECTION</p>
-        <h3 class="text-3xl font-bold text-white mb-16 tracking-tight leading-normal max-w-3xl mx-auto">Analyze mechanical faults in seconds</h3>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="rotate-3d" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Winding Deformation</h4>
-                <p class="text-xs text-slate-500 font-mono">Mid-frequency (10kHz-500kHz)</p>
+    <!-- ENGINEERING WORKFLOW & ACTION DECK -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="/analysis" class="bg-panel border border-border-subtle hover:border-telemetry-cyan p-5 rounded-sm tactile-inset transition group block">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-[10px] text-telemetry-cyan uppercase tracking-wider font-semibold">WORKFLOW A</span>
+                <i data-lucide="cpu" class="w-4 h-4 text-telemetry-cyan group-hover:translate-x-0.5 transition"></i>
             </div>
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="radio" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Core Displacement</h4>
-                <p class="text-xs text-slate-500 font-mono">Low-frequency (20Hz-2kHz)</p>
-            </div>
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="zap-off" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Insulation Degradation</h4>
-                <p class="text-xs text-slate-500 font-mono">High-frequency (500kHz-2MHz)</p>
-            </div>
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="server" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Loose Clamping</h4>
-                <p class="text-xs text-slate-500 font-mono">Broad spectrum deviation</p>
-            </div>
-        </div>
-    </section>
+            <h3 class="text-base font-bold text-white mb-1 group-hover:text-telemetry-cyan transition">SFRA Diagnostic Workbench</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Ingest field test data, inspect logarithmic Bode overlays, interact with cursor crosshairs, and download PDF engineering reports.
+            </p>
+        </a>
 
-    <section class="max-w-xl mx-auto px-6 py-20 text-center">
-        <h3 class="text-3xl font-bold text-white tracking-tight leading-normal mb-6 mx-auto">Ready to Analyze?</h3>
-        <p class="text-sm text-slate-400 max-w-sm mx-auto leading-relaxed mb-12">
-            Upload your FRA data and get AI-powered fault detection results in seconds.
-        </p>
-        
-        <div class="flex flex-col gap-6 items-center">
-            <a href="/analysis" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm px-10 py-4 rounded-lg btn-glow transition-all tracking-wider uppercase font-mono">
-                UPLOAD FRA DATA
-            </a>
-            <div class="flex gap-10">
-                <a href="/history" class="text-slate-500 hover:text-sky-400 text-xs font-bold uppercase tracking-widest transition-all">ANALYSIS HISTORY</a>
-                <a href="/about" class="text-slate-500 hover:text-sky-400 text-xs font-bold uppercase tracking-widest transition-all">SYSTEM ABOUT</a>
+        <a href="/history" class="bg-panel border border-border-subtle hover:border-telemetry-emerald p-5 rounded-sm tactile-inset transition group block">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-[10px] text-telemetry-emerald uppercase tracking-wider font-semibold">WORKFLOW B</span>
+                <i data-lucide="database" class="w-4 h-4 text-telemetry-emerald group-hover:translate-x-0.5 transition"></i>
             </div>
-        </div>
-    </section>
+            <h3 class="text-base font-bold text-white mb-1 group-hover:text-telemetry-emerald transition">Fleet Records & Historical Telemetry</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Query substation transformer historical sweeps, filter by IEEE sub-band severity, and export fleet-wide CSV compliance audits.
+            </p>
+        </a>
 
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+        <a href="/about" class="bg-panel border border-border-subtle hover:border-telemetry-amber p-5 rounded-sm tactile-inset transition group block">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-[10px] text-telemetry-amber uppercase tracking-wider font-semibold">WORKFLOW C</span>
+                <i data-lucide="book-open" class="w-4 h-4 text-telemetry-amber group-hover:translate-x-0.5 transition"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-1 group-hover:text-telemetry-amber transition">IEEE C57.149 Engineering Manual</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Study distributed RLC ladder circuits, mathematical formulations ($R^2$, ASLE), and test the live client-side sub-band criteria simulator.
+            </p>
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // --- Ingestion File Label Handler ---
+    function handleLandingFileSelect(input) {
+        if (input.files && input.files[0]) {
+            const fileName = input.files[0].name;
+            const label = document.getElementById('landingFileName');
+            if (label) {
+                label.textContent = 'Selected: ' + fileName;
+                label.classList.add('text-telemetry-cyan');
+            }
+        }
+    }
+
+    // Drag and drop visual feedback
+    const dropzone = document.querySelector('.upload-dropzone');
+    if (dropzone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.add('drag-over');
+            }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-over');
+            }, false);
+        });
+    }
+
+    // --- Interactive Hero Telemetry Oscilloscope (Chart.js) ---
+    // Frequency grid: 20 Hz to 2 MHz
+    const heroFrequencies = [
+        20, 30, 50, 80, 100, 200, 300, 500, 800, 1000, 1500, 2000,
+        3000, 5000, 8000, 10000, 15000, 20000, 30000, 45000, 60000, 80000, 100000,
+        150000, 200000, 300000, 500000, 800000, 1000000, 1500000, 2000000
+    ];
+
+    // Reference Baseline Curve (50 ohm terminal response)
+    const baselineMags = [
+        -48.2, -45.0, -41.2, -37.8, -35.2, -28.4, -24.1, -20.5, -18.2, -19.0, -22.4, -25.8,
+        -30.1, -38.4, -48.2, -34.5, -22.1, -44.2, -32.4, -25.8, -36.2, -42.8, -31.5,
+        -28.4, -36.0, -45.2, -54.0, -42.1, -48.5, -56.2, -62.0
+    ];
+
+    // Presets definitions
+    const heroPresets = {
+        nominal: {
+            title: "CH2: TX-220KV-AUTO-03 [NOMINAL]",
+            corr: "0.9890",
+            shift: "1.4 dB",
+            verdict: "NOMINAL (PASS)",
+            verdictClass: "text-telemetry-emerald",
+            color: "#10b981",
+            data: baselineMags.map((v, i) => v + (Math.sin(i * 0.4) * 0.6))
+        },
+        winding: {
+            title: "CH2: TX-765KV-MAIN-01 [AXIAL DISPLACEMENT]",
+            corr: "0.7420",
+            shift: "14.8 dB",
+            verdict: "CRITICAL (ALARM)",
+            verdictClass: "text-telemetry-rose",
+            color: "#f43f5e",
+            data: baselineMags.map((v, i) => {
+                // Significant resonance dip and shift in 2k-100k zone (indices 11 to 22)
+                if (i >= 12 && i <= 21) {
+                    return v - 14.8 + Math.cos(i) * 3.5;
+                }
+                return v - 0.8;
+            })
+        },
+        core: {
+            title: "CH2: TX-400KV-GSU-02 [CORE SHIFT]",
+            corr: "0.8842",
+            shift: "6.2 dB",
+            verdict: "ADVISORY (MONITOR)",
+            verdictClass: "text-telemetry-amber",
+            color: "#f59e0b",
+            data: baselineMags.map((v, i) => {
+                // Low-frequency magnetizing inductance deviation (<2kHz, indices 0 to 11)
+                if (i <= 11) {
+                    return v - 6.2 + Math.sin(i * 0.5) * 1.8;
+                }
+                return v + 0.3;
+            })
+        }
+    };
+
+    let heroChartInstance = null;
+    let currentPreset = 'nominal';
+
+    function initHeroBodePlot() {
+        const ctx = document.getElementById('heroBodeCanvas');
+        if (!ctx) return;
+
+        const preset = heroPresets[currentPreset];
+
+        heroChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: heroFrequencies,
+                datasets: [
+                    {
+                        label: 'CH1: Reference Baseline (50Ω)',
+                        data: baselineMags,
+                        borderColor: '#64748b',
+                        borderWidth: 1.75,
+                        borderDash: [4, 4],
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        pointHoverBackgroundColor: '#94a3b8',
+                        tension: 0.25,
+                        fill: false
+                    },
+                    {
+                        label: preset.title,
+                        data: preset.data,
+                        borderColor: preset.color,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: preset.color,
+                        tension: 0.25,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#0c1017',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        titleFont: { family: 'JetBrains Mono', size: 11 },
+                        bodyFont: { family: 'JetBrains Mono', size: 11 },
+                        padding: 8,
+                        callbacks: {
+                            title: (items) => {
+                                const f = items[0].label;
+                                let fStr = f >= 1e6 ? (f / 1e6).toFixed(1) + ' MHz' : (f >= 1e3 ? (f / 1e3).toFixed(1) + ' kHz' : f + ' Hz');
+                                let band = f < 2000 ? 'Low Core' : (f <= 100000 ? 'Mid Winding' : 'High Leads');
+                                return `${fStr} (${band})`;
+                            },
+                            label: (item) => {
+                                return ` ${item.dataset.label.split(':')[0]}: ${item.parsed.y.toFixed(2)} dB`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        grid: {
+                            color: 'rgba(30, 41, 59, 0.4)',
+                            borderColor: '#334155'
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: { family: 'JetBrains Mono', size: 9 },
+                            callback: function(val) {
+                                if ([20, 100, 1000, 10000, 100000, 1000000, 2000000].includes(Number(val))) {
+                                    if (val >= 1e6) return (val / 1e6) + 'M';
+                                    if (val >= 1e3) return (val / 1e3) + 'k';
+                                    return val + 'Hz';
+                                }
+                                return null;
+                            }
+                        }
+                    },
+                    y: {
+                        min: -70,
+                        max: -10,
+                        grid: {
+                            color: 'rgba(30, 41, 59, 0.4)',
+                            borderColor: '#334155'
+                        },
+                        ticks: {
+                            stepSize: 10,
+                            color: '#64748b',
+                            font: { family: 'JetBrains Mono', size: 9 },
+                            callback: function(val) {
+                                return val + ' dB';
+                            }
+                        }
+                    }
+                },
+                onHover: (event, activeElements) => {
+                    if (activeElements && activeElements.length > 0) {
+                        const idx = activeElements[0].index;
+                        updateHud(idx);
+                    }
+                }
+            }
+        });
+    }
+
+    function updateHud(idx) {
+        const f = heroFrequencies[idx];
+        const fStr = f >= 1e6 ? (f / 1e6).toFixed(1) + ' MHz' : (f >= 1e3 ? (f / 1e3).toFixed(1) + ' kHz' : f + ' Hz');
+        const refY = baselineMags[idx];
+        const measY = heroPresets[currentPreset].data[idx];
+        const delta = Math.abs(measY - refY).toFixed(1);
+
+        document.getElementById('hudFreq').textContent = fStr;
+        document.getElementById('hudShift').textContent = delta + ' dB';
+    }
+
+    function switchHeroPreset(presetKey) {
+        if (!heroPresets[presetKey] || !heroChartInstance) return;
+        currentPreset = presetKey;
+        const preset = heroPresets[presetKey];
+
+        // Update button tabs
+        ['btnPresetNominal', 'btnPresetWinding', 'btnPresetCore'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.className = "px-2 py-0.5 rounded-sm text-slate-400 hover:text-white transition";
+            }
+        });
+
+        const activeBtn = document.getElementById(
+            presetKey === 'nominal' ? 'btnPresetNominal' :
+            (presetKey === 'winding' ? 'btnPresetWinding' : 'btnPresetCore')
+        );
+        if (activeBtn) {
+            activeBtn.className = `px-2 py-0.5 rounded-sm bg-panel-elevated font-semibold border transition ${
+                presetKey === 'nominal' ? 'text-telemetry-emerald border-telemetry-emerald/40' :
+                (presetKey === 'winding' ? 'text-telemetry-rose border-telemetry-rose/40' : 'text-telemetry-amber border-telemetry-amber/40')
+            }`;
+        }
+
+        // Update indicators
+        const ch2Ind = document.getElementById('ch2Indicator');
+        const ch2Lbl = document.getElementById('ch2Label');
+        const legendCh2Bar = document.getElementById('legendCh2Bar');
+        const legendCh2Text = document.getElementById('legendCh2Text');
+
+        if (ch2Ind) ch2Ind.style.backgroundColor = preset.color;
+        if (ch2Lbl) ch2Lbl.textContent = preset.title;
+        if (legendCh2Bar) legendCh2Bar.style.backgroundColor = preset.color;
+        if (legendCh2Text) legendCh2Text.textContent = preset.title;
+
+        // Update HUD
+        document.getElementById('hudCorr').textContent = preset.corr;
+        document.getElementById('hudShift').textContent = preset.shift;
+        const hudVerdict = document.getElementById('hudVerdict');
+        hudVerdict.textContent = preset.verdict;
+        hudVerdict.className = `font-bold ${preset.verdictClass}`;
+
+        // Update chart data
+        heroChartInstance.data.datasets[1].label = preset.title;
+        heroChartInstance.data.datasets[1].data = preset.data;
+        heroChartInstance.data.datasets[1].borderColor = preset.color;
+        heroChartInstance.data.datasets[1].pointHoverBackgroundColor = preset.color;
+        heroChartInstance.update();
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        initHeroBodePlot();
+    });
+</script>
+{% endblock %}

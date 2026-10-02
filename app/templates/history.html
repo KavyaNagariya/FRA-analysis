@@ -1,133 +1,545 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRA | Analysis History</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+{% extends "base.html" %}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap');
-        
-        body { background-color: #020617; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass-card { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.5); backdrop-filter: blur(10px); }
-        .text-mono { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; }
-        
-        /* Fixed colors from the image (sky, emerald, red, amber) */
-        .text-primary { color: #0ea5e9; } 
-    </style>
-</head>
-<body class="p-8 md:p-16">
-    <div class="max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-16 p-4 glass-card rounded-full px-8">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
-                    <span class="text-sky-400 text-sm">⚡</span>
-                </div>
-                <div>
-                    <h1 class="text-xs font-bold text-white uppercase tracking-tight">FRA Diagnostics</h1>
-                    <p class="text-[9px] text-slate-500 font-mono tracking-widest">AI Platform</p>
-                </div>
-            </div>
-            <nav class="flex gap-4 text-xs font-semibold">
-                <a href="/" class="text-slate-400 hover:text-white transition">Home</a>
-                <a href="/analysis" class="text-slate-400 hover:text-white transition">Analysis</a>
-                <a href="/history" class="text-white bg-sky-600 px-3 py-1 rounded-full">History</a>
-            </nav>
-            <a href="/about" class="text-xs font-mono text-slate-400 hover:text-white">ABOUT SYSTEM</a>
-        </header>
+{% block title %}Fleet Records & Historical Telemetry | FRA Diagnostics Workstation{% endblock %}
 
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <div>
-                <p class="text-mono text-sky-500 mb-1">RECORDS</p>
-                <h1 class="text-4xl font-extrabold text-white tracking-tighter leading-tight">Analysis History</h1>
+{% block content %}
+<div class="space-y-6">
+
+    <!-- SUB-HEADER CONTEXT & ACTION BAR -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
+        <div>
+            <div class="flex items-center gap-2 font-mono text-[10px] text-telemetry-cyan tracking-wider uppercase">
+                <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                <span>FLEET ASSET REGISTRY // IEEE C57.149 HISTORICAL TELEMETRY AUDIT TRAIL</span>
             </div>
-            <a href="/analysis" class="tech-font inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 rounded-lg hover:bg-sky-500 transition text-sm font-bold text-white shadow-lg shadow-sky-900/40">
-                <i data-lucide="plus" class="w-4 h-4"></i> NEW ANALYSIS
+            <h1 class="text-xl lg:text-2xl font-bold text-white tracking-tight mt-1">
+                Analysis History & Fleet Records Console
+            </h1>
+            <p class="text-xs text-slate-400 mt-0.5">
+                Fleet-wide frequency response surveillance across monitored substation apparatus with IEEE C57.149 sub-band correlation audit trails.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3 font-mono text-xs">
+            <button onclick="exportFleetCSV()" class="flex items-center gap-1.5 px-3 py-1.5 bg-panel border border-border-interactive text-slate-300 rounded-sm hover:border-slate-400 hover:text-white transition tactile-inset">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+                <span>EXPORT CSV</span>
+            </button>
+            <a href="/analysis" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-panel-elevated border border-telemetry-cyan/50 text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-semibold tactile-inset">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                <span>INGEST NEW SCAN</span>
             </a>
-        </header>
+        </div>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center">
-                <h2 class="text-4xl font-extrabold text-white">5</h2>
-                <p class="text-mono text-slate-500 mt-2">TOTAL ANALYSES</p>
+    <!-- 5-COLUMN HIGH-DENSITY FLEET TELEMETRY RIBBON -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <!-- Metric 1: Total Fleet Units -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-border-interactive transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>TOTAL ASSETS</span>
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-slate-500"></i>
             </div>
-            
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center border-b-2 border-emerald-500">
-                <h2 class="text-4xl font-extrabold text-emerald-400">2</h2>
-                <p class="text-mono text-emerald-500 mt-2">HEALTHY</p>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-white">{{ stats.total }}</span>
+                <span class="text-[10px] font-mono text-slate-500">UNITS</span>
             </div>
-
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center border-b-2 border-amber-500">
-                <h2 class="text-4xl font-extrabold text-amber-400">2</h2>
-                <p class="text-mono text-amber-500 mt-2">WARNINGS</p>
-            </div>
-
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center border-b-2 border-red-500">
-                <h2 class="text-4xl font-extrabold text-red-400">1</h2>
-                <p class="text-mono text-red-500 mt-2">FAULTS DETECTED</p>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>REGISTRY</span>
+                <span class="text-slate-300">8 SUBSTATIONS</span>
             </div>
         </div>
 
-        <div class="glass-card rounded-xl overflow-hidden mb-20 shadow-xl shadow-black/30">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-900/50 text-mono text-slate-500">
-                    <tr>
-                        <th class="p-5 border-b border-slate-800">Transformer</th>
-                        <th class="p-5 border-b border-slate-800">Date</th>
-                        <th class="p-5 border-b border-slate-800">Health</th>
-                        <th class="p-5 border-b border-slate-800">Status</th>
-                        <th class="p-5 border-b border-slate-800">Faults</th>
+        <!-- Metric 2: Nominal / Healthy -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-emerald/40 transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>NOMINAL BASELINE</span>
+                <span class="w-2 h-2 rounded-full bg-telemetry-emerald beacon-active"></span>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-telemetry-emerald">{{ stats.healthy }}</span>
+                <span class="text-[10px] font-mono text-slate-500">VERIFIED</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>BENCHMARK</span>
+                <span class="text-telemetry-emerald">R² ≥ 0.95</span>
+            </div>
+        </div>
+
+        <!-- Metric 3: Warning / Advisory -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-amber/40 transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>ADVISORY WARNING</span>
+                <span class="w-2 h-2 rounded-full bg-telemetry-amber"></span>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-telemetry-amber">{{ stats.warning }}</span>
+                <span class="text-[10px] font-mono text-slate-500">WATCHLIST</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>THRESHOLD</span>
+                <span class="text-telemetry-amber">0.85 ≤ R² &lt; 0.95</span>
+            </div>
+        </div>
+
+        <!-- Metric 4: Critical / Urgent -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-rose/40 transition">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>CRITICAL ALARM</span>
+                <span class="w-2 h-2 rounded-full bg-telemetry-rose beacon-active"></span>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-telemetry-rose">{{ stats.critical }}</span>
+                <span class="text-[10px] font-mono text-slate-500">ACTION REQ</span>
+            </div>
+            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>SEVERITY</span>
+                <span class="text-telemetry-rose">R² &lt; 0.85</span>
+            </div>
+        </div>
+
+        <!-- Metric 5: Fleet Mean Health & Correlation -->
+        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-cyan/40 transition col-span-2 sm:col-span-1">
+            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                <span>FLEET MEAN R²</span>
+                <i data-lucide="gauge" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+            </div>
+            <div class="mt-1 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-white">{{ stats.mean_corr }}</span>
+                <span class="text-[10px] font-mono text-telemetry-cyan">{{ stats.mean_health }}% HII</span>
+            </div>
+            <div class="mt-2 border-t border-border-subtle pt-1.5">
+                <div class="w-full bg-surface h-1 rounded-sm overflow-hidden">
+                    <div class="bg-telemetry-cyan h-1 rounded-sm" style="width: {{ stats.mean_health }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER, SEARCH & SELECTION TOOLBAR -->
+    <div class="bg-panel border border-border-subtle p-3 rounded-sm space-y-3">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <!-- Search Input -->
+            <div class="relative flex-1 max-w-md">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input 
+                    type="text" 
+                    id="tableSearch" 
+                    aria-label="Search fleet records by asset ID, substation, or fault mechanism"
+                    placeholder="Search by Asset ID, Substation, or Mechanism..." 
+                    class="w-full bg-surface border border-border-subtle rounded-sm pl-9 pr-3 py-1.5 text-xs font-mono text-slate-200 placeholder-slate-400 focus:outline-none focus:border-telemetry-cyan transition"
+                    oninput="filterTable()"
+                >
+            </div>
+
+            <!-- Severity Filter Pills -->
+            <div class="flex items-center gap-1.5 font-mono text-xs overflow-x-auto pb-1 lg:pb-0">
+                <span class="text-slate-500 text-[10px] uppercase mr-1 hidden sm:inline">STATE:</span>
+                <button onclick="setStatusFilter('ALL')" id="filter-status-ALL" class="filter-status-btn active px-2.5 py-1 rounded-sm bg-panel-elevated border border-telemetry-cyan text-telemetry-cyan font-semibold transition text-[11px]">
+                    ALL ({{ stats.total }})
+                </button>
+                <button onclick="setStatusFilter('Healthy')" id="filter-status-Healthy" class="filter-status-btn px-2.5 py-1 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-telemetry-emerald hover:border-telemetry-emerald/40 transition text-[11px]">
+                    NOMINAL ({{ stats.healthy }})
+                </button>
+                <button onclick="setStatusFilter('Warning')" id="filter-status-Warning" class="filter-status-btn px-2.5 py-1 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-telemetry-amber hover:border-telemetry-amber/40 transition text-[11px]">
+                    WARNING ({{ stats.warning }})
+                </button>
+                <button onclick="setStatusFilter('Critical')" id="filter-status-Critical" class="filter-status-btn px-2.5 py-1 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-telemetry-rose hover:border-telemetry-rose/40 transition text-[11px]">
+                    CRITICAL ({{ stats.critical }})
+                </button>
+            </div>
+        </div>
+
+        <!-- Secondary Toolbar: Sub-band Filter & Stats Counter -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-border-subtle/60 text-[11px] font-mono">
+            <div class="flex items-center gap-2">
+                <span class="text-slate-500 uppercase text-[10px]">SUB-BAND:</span>
+                <button onclick="setSubbandFilter('ALL')" id="filter-band-ALL" class="filter-band-btn active px-2 py-0.5 rounded-sm bg-panel-elevated border border-border-interactive text-white">ALL BANDS</button>
+                <button onclick="setSubbandFilter('low')" id="filter-band-low" class="filter-band-btn px-2 py-0.5 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-slate-200">CORE &lt;2kHz</button>
+                <button onclick="setSubbandFilter('mid')" id="filter-band-mid" class="filter-band-btn px-2 py-0.5 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-slate-200">WINDING 2k-100k</button>
+                <button onclick="setSubbandFilter('high')" id="filter-band-high" class="filter-band-btn px-2 py-0.5 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-slate-200">LEADS &gt;100k</button>
+            </div>
+
+            <div class="text-slate-400 flex items-center gap-2" aria-live="polite" aria-atomic="true">
+                <span>SHOWING:</span>
+                <span id="counterDisplay" class="text-white font-bold">{{ records|length }}</span>
+                <span class="text-slate-500">/ {{ stats.total }} RECORDS</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIGH-DENSITY FLEET RECORDS TABLE CONTAINER -->
+    <div class="bg-panel border border-border-subtle rounded-sm overflow-hidden tactile-inset">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[980px]" id="fleetTable">
+                <thead>
+                    <tr class="bg-surface border-b border-border-subtle font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                        <th class="py-2.5 px-3 font-semibold">ASSET / SUBSTATION</th>
+                        <th class="py-2.5 px-3 font-semibold">TIMESTAMP</th>
+                        <th class="py-2.5 px-3 font-semibold">HEALTH</th>
+                        <th class="py-2.5 px-3 font-semibold">STATUS</th>
+                        <th class="py-2.5 px-3 font-semibold">IDENTIFIED MECHANISM</th>
+                        <th class="py-2.5 px-3 font-semibold">SUB-BAND</th>
+                        <th class="py-2.5 px-3 font-semibold text-right">R² / |ΔdB|</th>
+                        <th class="py-2.5 px-3 font-semibold text-center">ACTIONS</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm font-medium">
-                    <tr class="hover:bg-slate-800/30 transition">
-                        <td class="p-5 border-b border-slate-800 text-white font-bold">TX-2024-0847</td>
-                        <td class="p-5 border-b border-slate-800 font-mono text-slate-400">2026-03-25</td>
-                        <td class="p-5 border-b border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-20 bg-slate-800 h-1 rounded-full"><div class="bg-amber-500 h-1 rounded-full" style="width: 72%"></div></div>
-                                <span class="font-bold text-amber-400 font-mono">72</span>
+                <tbody class="divide-y divide-border-subtle text-xs">
+                    {% for r in records %}
+                    <tr 
+                        class="fleet-row hover:bg-panel-elevated/60 transition-colors group cursor-pointer"
+                        data-id="{{ r.id }}"
+                        data-status="{{ r.status }}"
+                        data-subband="{{ r.subband_code }}"
+                        data-text="{{ r.id }} {{ r.substation }} {{ r.fault_type }} {{ r.voltage }}"
+                        data-fleet-row="drawer-{{ loop.index }}"
+                        tabindex="0"
+                        aria-expanded="false"
+                        title="Press Enter to toggle audit details for {{ r.id }}"
+                        onclick="toggleDrawer('drawer-{{ loop.index }}', event)"
+                        onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleDrawer('drawer-{{ loop.index }}', event); }"
+                    >
+                        <!-- Column 1: Asset Identifier & Substation -->
+                        <td class="py-2.5 px-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-sm bg-surface border border-border-subtle flex items-center justify-center text-slate-400 group-hover:border-telemetry-cyan group-hover:text-telemetry-cyan transition shrink-0">
+                                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div>
+                                    <div class="font-mono font-bold text-white group-hover:text-telemetry-cyan transition tracking-wide flex items-center gap-2">
+                                        <span>{{ r.id }}</span>
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                                        <span class="text-slate-300">{{ r.substation }}</span>
+                                        <span class="text-slate-600">•</span>
+                                        <span class="text-slate-500">{{ r.voltage }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </td>
-                        <td class="p-5 border-b border-slate-800"><span class="px-2 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono">Warning</span></td>
-                        <td class="p-5 border-b border-slate-800 text-amber-400 font-bold">3</td>
-                    </tr>
-                    <tr class="hover:bg-slate-800/30 transition">
-                        <td class="p-5 border-b border-slate-800 text-white font-bold">TX-2024-0612</td>
-                        <td class="p-5 border-b border-slate-800 font-mono text-slate-400">2026-03-20</td>
-                        <td class="p-5 border-b border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-20 bg-slate-800 h-1 rounded-full"><div class="bg-emerald-500 h-1 rounded-full" style="width: 94%"></div></div>
-                                <span class="font-bold text-emerald-400 font-mono">94</span>
+
+                        <!-- Column 2: Timestamp -->
+                        <td class="py-2.5 px-3 font-mono text-[11px] text-slate-300 whitespace-nowrap">
+                            <div>{{ r.date }}</div>
+                            <div class="text-[9px] text-slate-500 uppercase">IEEE STANDARD SWEEP</div>
+                        </td>
+
+                        <!-- Column 3: Health Integrity Index Gauge -->
+                        <td class="py-2.5 px-3 whitespace-nowrap">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-mono font-bold text-xs {% if r.health >= 85 %}text-telemetry-emerald{% elif r.health >= 60 %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %} w-7">
+                                    {{ r.health }}%
+                                </span>
+                                <div class="w-16 bg-surface h-1.5 rounded-sm overflow-hidden border border-border-subtle">
+                                    <div class="h-full rounded-sm {% if r.health >= 85 %}bg-telemetry-emerald{% elif r.health >= 60 %}bg-telemetry-amber{% else %}bg-telemetry-rose{% endif %}" style="width: {{ r.health }}%"></div>
+                                </div>
                             </div>
                         </td>
-                        <td class="p-5 border-b border-slate-800"><span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono">Healthy</span></td>
-                        <td class="p-5 border-b border-slate-800 text-emerald-400 font-bold">0</td>
-                    </tr>
-                    <tr class="hover:bg-slate-800/30 transition">
-                        <td class="p-5 border-b border-slate-800 text-white font-bold">TX-2023-1134</td>
-                        <td class="p-5 border-b border-slate-800 font-mono text-slate-400">2026-03-15</td>
-                        <td class="p-5 border-b border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-20 bg-slate-800 h-1 rounded-full"><div class="bg-red-500 h-1 rounded-full" style="width: 45%"></div></div>
-                                <span class="font-bold text-red-400 font-mono">45</span>
+
+                        <!-- Column 4: Diagnostic Verdict Badge -->
+                        <td class="py-2.5 px-3 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] font-mono text-[10px] font-semibold uppercase tracking-wider
+                                {% if r.status == 'Healthy' %}
+                                    bg-telemetry-emerald/10 text-telemetry-emerald border border-telemetry-emerald/30
+                                {% elif r.status == 'Warning' %}
+                                    bg-telemetry-amber/10 text-telemetry-amber border border-telemetry-amber/30
+                                {% else %}
+                                    bg-telemetry-rose/10 text-telemetry-rose border border-telemetry-rose/30
+                                {% endif %}
+                            ">
+                                <span class="w-1.5 h-1.5 rounded-full {% if r.status == 'Healthy' %}bg-telemetry-emerald{% elif r.status == 'Warning' %}bg-telemetry-amber{% else %}bg-telemetry-rose beacon-active{% endif %}"></span>
+                                {{ r.status | upper }}
+                            </span>
+                        </td>
+
+                        <!-- Column 5: Multi-class Identified Mechanism -->
+                        <td class="py-2.5 px-3">
+                            <div class="font-medium text-slate-200">{{ r.fault_type }}</div>
+                            <div class="text-[10px] text-slate-400 font-mono truncate max-w-xs">{{ r.action }}</div>
+                        </td>
+
+                        <!-- Column 6: Affected Sub-band -->
+                        <td class="py-2.5 px-3 whitespace-nowrap">
+                            <span class="inline-block px-2 py-0.5 rounded-[2px] font-mono text-[10px] border
+                                {% if r.subband_code == 'low' %}
+                                    bg-amber-500/10 text-amber-300 border-amber-500/30
+                                {% elif r.subband_code == 'mid' %}
+                                    bg-cyan-500/10 text-cyan-300 border-cyan-500/30
+                                {% elif r.subband_code == 'high' %}
+                                    bg-purple-500/10 text-purple-300 border-purple-500/30
+                                {% else %}
+                                    bg-emerald-500/10 text-emerald-300 border-emerald-500/30
+                                {% endif %}
+                            ">
+                                {{ r.subband }}
+                            </span>
+                        </td>
+
+                        <!-- Column 7: Dual Telemetry Readout (R² & Shift) -->
+                        <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">
+                            <div class="text-xs text-white font-bold">R² {{ r.corr }}</div>
+                            <div class="text-[10px] {% if r.shift > 6.0 %}text-telemetry-rose{% elif r.shift > 3.0 %}text-telemetry-amber{% else %}text-slate-400{% endif %}">
+                                Δ {{ r.shift }} dB
                             </div>
                         </td>
-                        <td class="p-5 border-b border-slate-800"><span class="px-2 py-1 bg-red-500/10 text-red-400 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono">Fault</span></td>
-                        <td class="p-5 border-b border-slate-800 text-red-400 font-bold">5</td>
+
+                        <!-- Column 8: Action Deck -->
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap" onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-center gap-1.5 font-mono">
+                                <a 
+                                    href="/inspect/{{ r.id }}" 
+                                    class="inline-flex items-center gap-1 px-2.5 py-1 bg-surface border border-border-interactive hover:border-telemetry-cyan text-telemetry-cyan rounded-sm text-[11px] font-semibold transition"
+                                    title="Open interactive SFRA workbench for this asset"
+                                >
+                                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                                    <span>INSPECT</span>
+                                </a>
+                                <button 
+                                    type="button"
+                                    onclick="toggleDrawer('drawer-{{ loop.index }}', event)"
+                                    aria-label="Toggle audit details for {{ r.id }}"
+                                    aria-expanded="false"
+                                    aria-controls="drawer-{{ loop.index }}"
+                                    data-drawer-btn="drawer-{{ loop.index }}"
+                                    class="p-1 text-slate-400 hover:text-white rounded-sm hover:bg-surface border border-transparent hover:border-border-subtle transition"
+                                    title="View Audit Details Drawer"
+                                >
+                                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" id="icon-drawer-{{ loop.index }}"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
+
+                    <!-- EXPANDABLE AUDIT & REASONING DRAWER -->
+                    <tr id="drawer-{{ loop.index }}" class="hidden bg-surface/90 border-b border-border-subtle font-mono text-xs">
+                        <td colspan="8" class="p-4 lg:p-5">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-l {% if r.status == 'Healthy' %}border-telemetry-emerald{% elif r.status == 'Warning' %}border-telemetry-amber{% else %}border-telemetry-rose{% endif %} pl-4">
+                                <!-- Bay A: Mechanical Diagnosis & Recommendation -->
+                                <div class="space-y-2">
+                                    <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">DIAGNOSTIC ASSESSMENT & RECOMMENDED ACTION</div>
+                                    <p class="font-sans text-xs text-slate-200 leading-relaxed">
+                                        {{ r.action }}
+                                    </p>
+                                    <div class="text-[10px] text-slate-400 pt-1">
+                                        AUTHORITY: <span class="text-slate-200">{{ r.engineer }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Bay B: IEEE C57.149 Sub-band Boundary Correlation -->
+                                <div class="space-y-1.5 text-[11px]">
+                                    <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">SUB-BAND CORRELATION MATRIX</div>
+                                    <div class="flex items-center justify-between bg-panel p-1.5 rounded-sm border border-border-subtle">
+                                        <span class="text-slate-400">LOW CORE (&lt;2 kHz):</span>
+                                        <span class="{% if r.subband_code == 'low' %}text-telemetry-amber font-bold{% else %}text-telemetry-emerald{% endif %}">
+                                            {% if r.subband_code == 'low' %}R² 0.8124 (Anomaly){% else %}R² 0.9912 (Nominal){% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-panel p-1.5 rounded-sm border border-border-subtle">
+                                        <span class="text-slate-400">MID WINDING (2k–100 kHz):</span>
+                                        <span class="{% if r.subband_code == 'mid' %}text-telemetry-rose font-bold{% else %}text-telemetry-emerald{% endif %}">
+                                            {% if r.subband_code == 'mid' %}R² {{ r.corr }} (Shift Peak){% else %}R² 0.9850 (Nominal){% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-panel p-1.5 rounded-sm border border-border-subtle">
+                                        <span class="text-slate-400">HIGH LEADS (&gt;100 kHz):</span>
+                                        <span class="{% if r.subband_code == 'high' %}text-telemetry-amber font-bold{% else %}text-telemetry-emerald{% endif %}">
+                                            {% if r.subband_code == 'high' %}R² 0.8710 (Deviation){% else %}R² 0.9780 (Nominal){% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Bay C: Audit Trace & Instant Operations -->
+                                <div class="space-y-2 flex flex-col justify-between">
+                                    <div class="space-y-1 text-[11px]">
+                                        <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">AUDIT ARTIFACTS</div>
+                                        <div class="text-slate-400 flex items-center justify-between">
+                                            <span>BASELINE FILE:</span>
+                                            <span class="text-slate-200">fra_healthy.csv</span>
+                                        </div>
+                                        <div class="text-slate-400 flex items-center justify-between">
+                                            <span>SOURCE SWEEP:</span>
+                                            <span class="text-slate-200 truncate max-w-[150px]">{{ r.filename }}</span>
+                                        </div>
+                                        <div class="text-slate-400 flex items-center justify-between">
+                                            <span>COMPLIANCE:</span>
+                                            <span class="text-telemetry-cyan">IEEE C57.149 / IEC 60076</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 pt-2 border-t border-border-subtle">
+                                        <a href="/inspect/{{ r.id }}" class="flex-1 text-center py-1.5 bg-panel-elevated border border-telemetry-cyan text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-bold text-[11px]">
+                                            LOAD IN WORKBENCH
+                                        </a>
+                                        <a href="/download-report" class="flex items-center justify-center gap-1 px-3 py-1.5 bg-panel border border-border-interactive hover:border-slate-300 text-slate-200 rounded-sm transition text-[11px]">
+                                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                            <span>PDF REPORT</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <footer class="mt-20 pt-8 border-t border-slate-900 text-center">
-            <p class="text-mono text-slate-700 font-semibold uppercase">FRA Diagnostics • industrial secure records v1.2</p>
-        </footer>
+        <!-- Zero State Fallback -->
+        <div id="noRecordsRow" class="hidden p-12 text-center">
+            <div class="w-12 h-12 rounded-sm bg-surface border border-border-subtle flex items-center justify-center text-slate-500 mx-auto mb-3">
+                <i data-lucide="filter-x" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-mono text-sm font-bold text-white uppercase tracking-wider">No matching fleet records</h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                No transformer records matched your search query or filter criteria. Try adjusting the status filter or clearing search text.
+            </p>
+            <button onclick="resetFilters()" class="mt-4 px-3 py-1.5 bg-panel-elevated border border-border-interactive text-telemetry-cyan text-xs font-mono rounded-sm hover:border-telemetry-cyan transition">
+                RESET FILTERS
+            </button>
+        </div>
     </div>
-    
-    <script>lucide.createIcons();</script>
-</body>
-</html>
+
+    <!-- QUICK FIELD INGESTION DROPZONE STRIP -->
+    <div class="border border-dashed border-border-interactive bg-surface/50 p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-sm bg-panel border border-border-subtle flex items-center justify-center text-telemetry-cyan shrink-0">
+                <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <div class="font-mono font-bold text-xs text-white uppercase tracking-wider">Direct Substation Data Ingestion</div>
+                <div class="text-xs text-slate-400">Have a raw Omicron or Doble CSV frequency sweep file? Ingest directly into the SFRA Diagnostic Workbench.</div>
+            </div>
+        </div>
+        <a href="/analysis" class="shrink-0 flex items-center gap-2 px-4 py-2 bg-panel-elevated border border-telemetry-cyan text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-mono font-semibold text-xs tracking-wider">
+            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            <span>OPEN WORKBENCH DROPZONE</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentStatusFilter = 'ALL';
+    let currentSubbandFilter = 'ALL';
+
+    function setStatusFilter(status) {
+        currentStatusFilter = status;
+        document.querySelectorAll('.filter-status-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-panel-elevated', 'border-telemetry-cyan', 'text-telemetry-cyan', 'font-semibold');
+            btn.classList.add('bg-surface', 'border-border-subtle', 'text-slate-400');
+        });
+        const activeBtn = document.getElementById(`filter-status-${status}`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'bg-panel-elevated', 'border-telemetry-cyan', 'text-telemetry-cyan', 'font-semibold');
+            activeBtn.classList.remove('bg-surface', 'border-border-subtle', 'text-slate-400');
+        }
+        filterTable();
+    }
+
+    function setSubbandFilter(band) {
+        currentSubbandFilter = band;
+        document.querySelectorAll('.filter-band-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-panel-elevated', 'border-border-interactive', 'text-white');
+            btn.classList.add('bg-surface', 'border-border-subtle', 'text-slate-400');
+        });
+        const activeBtn = document.getElementById(`filter-band-${band}`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'bg-panel-elevated', 'border-border-interactive', 'text-white');
+            activeBtn.classList.remove('bg-surface', 'border-border-subtle', 'text-slate-400');
+        }
+        filterTable();
+    }
+
+    function filterTable() {
+        const query = (document.getElementById('tableSearch').value || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('.fleet-row');
+        let visible = 0;
+
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            const rowSubband = row.getAttribute('data-subband');
+            const rowText = (row.getAttribute('data-text') || '').toLowerCase();
+
+            const matchSearch = !query || rowText.includes(query);
+            const matchStatus = currentStatusFilter === 'ALL' || rowStatus.toLowerCase() === currentStatusFilter.toLowerCase();
+            const matchSubband = currentSubbandFilter === 'ALL' || rowSubband.toLowerCase() === currentSubbandFilter.toLowerCase();
+
+            if (matchSearch && matchStatus && matchSubband) {
+                row.classList.remove('hidden');
+                visible++;
+            } else {
+                row.classList.add('hidden');
+                // Also close corresponding drawer
+                const drawerId = row.getAttribute('onclick')?.match(/drawer-\d+/)?.[0];
+                if (drawerId) {
+                    const drawer = document.getElementById(drawerId);
+                    if (drawer) drawer.classList.add('hidden');
+                }
+            }
+        });
+
+        document.getElementById('counterDisplay').innerText = visible;
+        const noRecords = document.getElementById('noRecordsRow');
+        if (visible === 0) {
+            noRecords.classList.remove('hidden');
+        } else {
+            noRecords.classList.add('hidden');
+        }
+    }
+
+    function resetFilters() {
+        document.getElementById('tableSearch').value = '';
+        setStatusFilter('ALL');
+        setSubbandFilter('ALL');
+    }
+
+    function toggleDrawer(drawerId, evt) {
+        if (evt) evt.stopPropagation();
+        const drawer = document.getElementById(drawerId);
+        const icon = document.getElementById(`icon-${drawerId}`);
+        if (!drawer) return;
+
+        const isHidden = drawer.classList.contains('hidden');
+        // Close all other open drawers first for clean inspection
+        document.querySelectorAll('[id^="drawer-"]').forEach(d => d.classList.add('hidden'));
+        document.querySelectorAll('[id^="icon-drawer-"]').forEach(i => i.classList.remove('rotate-180'));
+        document.querySelectorAll('[data-drawer-btn]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+        document.querySelectorAll('[data-fleet-row]').forEach(r => r.setAttribute('aria-expanded', 'false'));
+
+        if (isHidden) {
+            drawer.classList.remove('hidden');
+            if (icon) icon.classList.add('rotate-180');
+            const btn = document.querySelector(`[data-drawer-btn="${drawerId}"]`);
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+            const row = document.querySelector(`[data-fleet-row="${drawerId}"]`);
+            if (row) row.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    function exportFleetCSV() {
+        const rows = [];
+        rows.push(["Asset ID", "Substation", "Voltage Rating", "Timestamp", "Health Index (%)", "Diagnostic Status", "Identified Fault", "Affected Sub-band", "Correlation (R2)", "Max Shift (dB)"]);
+        
+        document.querySelectorAll('.fleet-row').forEach(row => {
+            if (!row.classList.contains('hidden')) {
+                const cols = row.querySelectorAll('td');
+                const id = row.getAttribute('data-id');
+                const status = row.getAttribute('data-status');
+                const textCols = Array.from(cols).map(c => `"${c.innerText.replace(/"/g, '""').replace(/\n+/g, ' ').trim()}"`);
+                rows.push(textCols);
+            }
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `FRA_Fleet_Records_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+{% endblock %}

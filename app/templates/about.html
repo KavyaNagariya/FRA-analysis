@@ -1,136 +1,1043 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <title>About | Intelligent Diagnostic System</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap');
-        
-        body { 
-            background-color: #020617; /* Matches the image's dark bg */
-            color: #e2e8f0; /* Soft white/slate */
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+{% extends "base.html" %}
 
-        /* Futuristic font styles used for labels and technical terms */
-        .tech-font { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.65rem; font-weight: bold; }
-        .text-primary { color: #0ea5e9; } /* Blue/Sky accent color */
-        
-        /* The Card design (mid-slate background with subtle border) */
-        .glass-card { 
-            background-color: rgba(15, 23, 42, 0.6); 
-            border: 1px solid rgba(51, 65, 85, 0.5); 
-            border-radius: 12px;
-            backdrop-filter: blur(8px);
-        }
-    </style>
-</head>
-<body class="p-8 md:p-16">
-    <div class="max-w-7xl mx-auto">
-        <a href="/" class="tech-font inline-flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition mb-12 text-slate-400">
-            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Dashboard
-        </a>
+{% block title %}IEEE C57.149 Reference & SFRA Diagnostic Guide | Precision Industrial Instrument{% endblock %}
 
-        <header class="text-center mb-16">
-            <p class="tech-font text-sky-500 mb-2">ABOUT THE PLATFORM</p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tighter leading-tight mb-4">
-                AI-Based Intelligent <span class="text-primary">Diagnostic</span> System
+{% block content %}
+{% set active_page = 'standards' %}
+<div class="space-y-6">
+
+    <!-- SUB-HEADER CONTEXT & STANDARDS SPECIFICATION STRIP -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
+        <div>
+            <div class="flex items-center gap-2 font-mono text-[10px] text-telemetry-cyan tracking-wider uppercase">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                <span>TECHNICAL MANUAL // IEEE STD C57.149 & IEC 60076-18 PHYSICAL FOUNDATIONS</span>
+            </div>
+            <h1 class="text-xl lg:text-2xl font-bold text-white tracking-tight mt-1">
+                IEEE C57.149 Reference & SFRA Diagnostic Guide
             </h1>
-            <p class="text-slate-400 max-w-2xl mx-auto leading-relaxed text-sm md:text-base">
-                Automated analysis of Frequency Response Analysis (FRA) data in power transformers using advanced machine learning and expert system logic.
+            <p class="text-xs text-slate-400 mt-0.5 max-w-4xl">
+                Definitive engineering reference manual for Sweep Frequency Response Analysis (SFRA): physical distributed RLC ladder networks, standardized frequency sub-band partitioning, mathematical cross-correlation formulations, and mechanical fault signature mechanics.
             </p>
-        </header>
-
-        <div class="space-y-12 mb-20">
-            <section class="glass-card p-8">
-                <h2 class="tech-font text-sky-400 mb-4">WHAT IS FRA?</h2>
-                <div class="text-sm text-slate-300 space-y-4 leading-relaxed">
-                    <p>Frequency Response Analysis (FRA) is a widely used diagnostic technique for assessing the internal mechanical and electrical condition of power transformers. A low-voltage signal is injected into transformer windings across a wide frequency range (typically 20 Hz to 2 MHz), and the resulting frequency response is recorded.</p>
-                    <p>Any deviation in the response pattern from expected behavior can indicate internal faults such as winding deformation, core displacement, insulation degradation, or structural changes from transportation stresses, short-circuit forces, or aging.</p>
-                </div>
-            </section>
-
-            <section class="glass-card p-8 border-l-4 border-amber-500">
-                <h2 class="tech-font text-amber-400 mb-6">THE CHALLENGE</h2>
-                <ul class="text-sm text-slate-300 space-y-3 list-inside list-disc">
-                    <li>FRA interpretation requires highly experienced engineers to identify subtle curve variations.</li>
-                    <li>Equipment from OMICRON, Megger, and Doble generate data in incompatible formats.</li>
-                    <li>Lack of standardization causes inefficiencies and delayed fault identification.</li>
-                    <li>Manual analysis leads to inconsistencies in maintenance decision-making.</li>
-                </ul>
-            </section>
-
-            <section class="glass-card p-8 border-l-4 border-emerald-500">
-                <h2 class="tech-font text-emerald-400 mb-6">OUR SOLUTION</h2>
-                <p class="text-sm text-slate-300 leading-relaxed mb-6">An AI-powered diagnostic platform that automatically processes and interprets FRA data from multiple vendors. The system uses a universal data parser, CNN-based classification models, and expert system logic to deliver accurate fault detection with actionable maintenance recommendations.</p>
-                <div class="grid grid-cols-2 gap-4 text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-                    <div class="p-3 bg-slate-900 rounded-lg">• Universal Multi-Format Data Ingestion</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• ML-powered Fault Classification</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Real-time Health Scoring</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Automated Maintenance Recommendations</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Interactive Curve Visualization</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Historical Trend Analysis</div>
-                </div>
-            </section>
         </div>
 
-        <section class="mb-20">
-            <h2 class="text-2xl font-bold text-center mb-10 text-white tracking-tight">Technology Stack</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div class="glass-card p-6">
-                    <h4 class="tech-font text-sky-400 mb-4">AI / ML</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>Convolutional Neural Networks (CNNs)</li>
-                        <li>Anomaly Detection Algorithms</li>
-                        <li>Pattern Recognition</li>
-                        <li>Transfer Learning</li>
-                    </ul>
-                </div>
-                
-                <div class="glass-card p-6">
-                    <h4 class="tech-font text-sky-400 mb-4">SIGNAL PROCESSING</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>FFT Analysis</li>
-                        <li>Correlation Coefficients</li>
-                        <li>Spectral Deviation Metrics</li>
-                        <li>Cross-Correlation</li>
-                    </ul>
-                </div>
-
-                <div class="glass-card p-6">
-                    <h4 class="tech-font text-sky-400 mb-4">DATA HANDLING</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>Universal Format Parser</li>
-                        <li>Multi-Vendor Support</li>
-                        <li>Standardized Data Pipeline</li>
-                        <li>Batch Processing</li>
-                    </ul>
-                </div>
-
-                <div class="glass-card p-6 border-l-4 border-sky-500">
-                    <h4 class="tech-font text-sky-400 mb-4">EXPERT SYSTEM</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>Rule-Based Inference</li>
-                        <li>Severity Classification</li>
-                        <li>Maintenance Recommendations</li>
-                        <li>Historical Trending</li>
-                    </ul>
-                </div>
-
-            </div>
-        </section>
-
-        <footer class="mt-20 pt-8 border-t border-slate-900 text-center">
-            <p class="tech-font text-slate-600 tracking-widest uppercase">FRA DIAGNOSTICS • SECURE INDUSTRIAL INTELLIGENCE</p>
-        </footer>
+        <!-- Standards Spec Badges -->
+        <div class="flex flex-wrap items-center gap-2 font-mono text-[10px]">
+            <span class="px-2.5 py-1 bg-panel border border-telemetry-cyan/40 text-telemetry-cyan rounded-sm flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-3 h-3"></i>
+                IEEE Std C57.149-2012
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-telemetry-emerald/40 text-telemetry-emerald rounded-sm flex items-center gap-1.5">
+                <i data-lucide="award" class="w-3 h-3"></i>
+                IEC 60076-18:2012
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-border-interactive text-slate-300 rounded-sm">
+                CIGRE WG A2.26 / TB 342
+            </span>
+            <span class="px-2.5 py-1 bg-panel border border-border-interactive text-slate-300 rounded-sm">
+                DL/T 911-2016
+            </span>
+        </div>
     </div>
-    
-    <script>lucide.createIcons();</script>
-</body>
-</html>
+
+    <!-- QUICK JUMP SUB-NAV STICKY BAR -->
+    <div class="bg-surface/90 backdrop-blur border border-border-subtle p-1.5 rounded-sm flex items-center gap-1 overflow-x-auto text-[11px] font-mono sticky top-14 z-20 tactile-inset">
+        <a href="#rlc-model" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-panel rounded-sm transition whitespace-nowrap flex items-center gap-1.5">
+            <i data-lucide="git-commit" class="w-3 h-3 text-telemetry-cyan"></i>
+            <span>§1 RLC LADDER MODEL</span>
+        </a>
+        <a href="#subbands" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-panel rounded-sm transition whitespace-nowrap flex items-center gap-1.5">
+            <i data-lucide="layers" class="w-3 h-3 text-telemetry-amber"></i>
+            <span>§2 SUB-BAND CRITERIA</span>
+        </a>
+        <a href="#math-formulations" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-panel rounded-sm transition whitespace-nowrap flex items-center gap-1.5">
+            <i data-lucide="variable" class="w-3 h-3 text-telemetry-emerald"></i>
+            <span>§3 MATHEMATICAL FORMULATIONS</span>
+        </a>
+        <a href="#fault-matrix" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-panel rounded-sm transition whitespace-nowrap flex items-center gap-1.5">
+            <i data-lucide="table" class="w-3 h-3 text-telemetry-rose"></i>
+            <span>§4 FAULT SIGNATURE MATRIX</span>
+        </a>
+        <a href="#test-protocols" class="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-panel rounded-sm transition whitespace-nowrap flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3 h-3 text-telemetry-violet"></i>
+            <span>§5 FIELD TEST PROTOCOLS</span>
+        </a>
+        <a href="#interactive-calc" class="px-3 py-1.5 bg-panel-elevated text-telemetry-cyan border border-telemetry-cyan/40 font-semibold rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition whitespace-nowrap flex items-center gap-1.5 ml-auto">
+            <i data-lucide="calculator" class="w-3 h-3"></i>
+            <span>§6 SUB-BAND SIMULATOR</span>
+        </a>
+    </div>
+
+    <!-- SECTION 1: PHYSICAL PRINCIPLES & DISTRIBUTED RLC NETWORK -->
+    <section id="rlc-model" class="bg-panel border border-border-subtle p-5 rounded-sm space-y-5 tactile-inset scroll-mt-28">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-cyan"></span>
+                <span class="font-mono text-xs font-bold text-telemetry-cyan uppercase tracking-wider">SECTION 01</span>
+                <span class="text-slate-600 font-mono">|</span>
+                <h2 class="text-base font-bold text-white tracking-tight">Physical Principles & Distributed RLC Circuit Model</h2>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500">IEEE Std C57.149 Clause 4.2</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 space-y-3.5 text-xs text-slate-300 leading-relaxed">
+                <p>
+                    Sweep Frequency Response Analysis (SFRA) evaluates power transformer mechanical integrity by treating each winding as a passive, distributed parameter linear electrical network. Unlike low-frequency impedance measurements, high-frequency signals experience the winding not as a lumped coil, but as a complex ladder of series and mutual inductances coupled with distributed series and ground capacitances.
+                </p>
+                <p>
+                    Because physical dimensions—such as coil disk spacing, distance to core legs, radial distance to outer windings, and tank clearance—dictate the capacitive and inductive field geometry, any mechanical deformation directly alters the localized circuit parameters:
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div class="bg-surface border border-border-subtle p-3 rounded-sm">
+                        <div class="font-mono font-semibold text-telemetry-cyan text-[11px] flex items-center gap-1.5 mb-1">
+                            <i data-lucide="cpu" class="w-3 h-3"></i>
+                            Inductive Topology ($L_s, M, L_m$)
+                        </div>
+                        <div class="text-[11px] text-slate-400">
+                            Determined by magnetic core geometry, iron permeability ($\mu_r$), turn count, and mutual coupling ($M_{ij}$) between adjacent disk sections. Shifts low-to-mid frequency resonance zeros.
+                        </div>
+                    </div>
+                    <div class="bg-surface border border-border-subtle p-3 rounded-sm">
+                        <div class="font-mono font-semibold text-telemetry-amber text-[11px] flex items-center gap-1.5 mb-1">
+                            <i data-lucide="zap" class="w-3 h-3"></i>
+                            Capacitive Topology ($C_s, C_g, C_b$)
+                        </div>
+                        <div class="text-[11px] text-slate-400">
+                            Determined by physical insulation thickness, oil permittivity ($\varepsilon_r$), disk-to-disk axial clearance ($C_s$), and winding-to-ground radial distance ($C_g$). Governs high-frequency resonance poles.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border-subtle p-3.5 rounded-sm font-mono text-[11px] space-y-1.5">
+                    <div class="text-slate-400 font-semibold flex items-center justify-between">
+                        <span>TRANSFER FUNCTION FORMULATION:</span>
+                        <span class="text-telemetry-cyan">IEEE C57.149 EQ (1)</span>
+                    </div>
+                    <div class="text-white py-1 bg-chassis px-3 rounded-sm border border-border-subtle text-center text-xs">
+                        $$H(j\omega) = \frac{V_{\text{response}}(j\omega)}{V_{\text{source}}(j\omega)} = \frac{Z_{\text{load}}}{Z_{\text{winding}}(j\omega) + Z_{\text{load}}}$$
+                    </div>
+                    <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1">
+                        <span>Magnitude Spectrum: $20 \log_{10} |H(j\omega)| \text{ [dB]}$</span>
+                        <span>Phase Spectrum: $\angle H(j\omega) = \arctan\left(\frac{\text{Im}(H)}{\text{Re}(H)}\right) \text{ [deg]}$</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG Schematic of Distributed RLC Network -->
+            <div class="lg:col-span-5 bg-surface border border-border-subtle p-4 rounded-sm space-y-3">
+                <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 border-b border-border-subtle pb-2">
+                    <span class="text-telemetry-cyan font-bold">WINDING RLC EQUIVALENT LADDER</span>
+                    <span>DISTRIBUTED MODEL</span>
+                </div>
+                
+                <!-- Circuit Diagram SVG -->
+                <div class="w-full bg-chassis p-2 rounded-sm border border-border-subtle flex justify-center items-center">
+                    <svg viewBox="0 0 460 220" class="w-full h-auto text-slate-300 font-mono text-[10px]">
+                        <!-- Input source -->
+                        <circle cx="35" cy="50" r="14" fill="#121824" stroke="#06b6d4" stroke-width="1.5"/>
+                        <text x="35" y="54" text-anchor="middle" fill="#06b6d4" font-size="11" font-weight="bold">Vin</text>
+                        <line x1="35" y1="64" x2="35" y2="180" stroke="#334155" stroke-width="1.5"/>
+                        <line x1="25" y1="180" x2="45" y2="180" stroke="#334155" stroke-width="1.5"/>
+                        <line x1="29" y1="185" x2="41" y2="185" stroke="#334155" stroke-width="1.5"/>
+                        <line x1="33" y1="190" x2="37" y2="190" stroke="#334155" stroke-width="1.5"/>
+
+                        <!-- Lead from Vin to Node 1 -->
+                        <line x1="49" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+                        <circle cx="80" cy="50" r="3" fill="#06b6d4"/>
+                        <text x="80" y="40" text-anchor="middle" fill="#94a3b8" font-size="9">Node 1</text>
+
+                        <!-- Section 1 Inductance & Resistance (Top series branch) -->
+                        <!-- Resistor R1 -->
+                        <rect x="95" y="44" width="28" height="12" fill="#172030" stroke="#e2e8f0" stroke-width="1.2"/>
+                        <line x1="80" y1="50" x2="95" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text x="109" y="53" text-anchor="middle" fill="#94a3b8" font-size="8">Rs</text>
+                        <line x1="123" y1="50" x2="135" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+
+                        <!-- Inductor Ls1 (Arcs) -->
+                        <path d="M 135 50 Q 142 35 150 50 Q 157 35 165 50 Q 172 35 180 50" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+                        <text x="157" y="32" text-anchor="middle" fill="#06b6d4" font-size="9">Ls1</text>
+                        <line x1="180" y1="50" x2="200" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+                        
+                        <!-- Shunt inter-turn Cap Cs1 across R-L -->
+                        <path d="M 80 50 L 80 20 L 132 20" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+                        <line x1="132" y1="14" x2="132" y2="26" stroke="#f59e0b" stroke-width="1.5"/>
+                        <line x1="138" y1="14" x2="138" y2="26" stroke="#f59e0b" stroke-width="1.5"/>
+                        <path d="M 138 20 L 200 20 L 200 50" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+                        <text x="135" y="10" text-anchor="middle" fill="#f59e0b" font-size="9">Cs (Inter-disk)</text>
+
+                        <!-- Node 2 -->
+                        <circle cx="200" cy="50" r="3" fill="#06b6d4"/>
+                        <text x="200" y="40" text-anchor="middle" fill="#94a3b8" font-size="9">Node 2</text>
+
+                        <!-- Shunt Ground Capacitance Cg1 from Node 1 -->
+                        <line x1="80" y1="50" x2="80" y2="95" stroke="#94a3b8" stroke-width="1.2"/>
+                        <line x1="72" y1="95" x2="88" y2="95" stroke="#10b981" stroke-width="1.5"/>
+                        <line x1="72" y1="101" x2="88" y2="101" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="96" y="100" text-anchor="start" fill="#10b981" font-size="9">Cg1</text>
+                        <line x1="80" y1="101" x2="80" y2="135" stroke="#94a3b8" stroke-width="1.2"/>
+                        <!-- Shunt Conductance G1 in parallel with Cg1 -->
+                        <line x1="80" y1="75" x2="110" y2="75" stroke="#94a3b8" stroke-width="1"/>
+                        <line x1="110" y1="75" x2="110" y2="90" stroke="#94a3b8" stroke-width="1"/>
+                        <rect x="105" y="90" width="10" height="18" fill="#172030" stroke="#64748b" stroke-width="1"/>
+                        <text x="122" y="102" text-anchor="start" fill="#64748b" font-size="8">G1</text>
+                        <line x1="110" y1="108" x2="110" y2="125" stroke="#94a3b8" stroke-width="1"/>
+                        <line x1="110" y1="125" x2="80" y2="125" stroke="#94a3b8" stroke-width="1"/>
+
+                        <!-- Ground Rail -->
+                        <line x1="20" y1="180" x2="440" y2="180" stroke="#475569" stroke-width="1.5" stroke-dasharray="4 2"/>
+                        <line x1="80" y1="135" x2="80" y2="180" stroke="#475569" stroke-width="1.2"/>
+                        <text x="230" y="200" text-anchor="middle" fill="#64748b" font-size="9">CORE & TANK GROUND PLANE (0V)</text>
+
+                        <!-- Section 2 Inductor Ls2 -->
+                        <rect x="215" y="44" width="28" height="12" fill="#172030" stroke="#e2e8f0" stroke-width="1.2"/>
+                        <line x1="200" y1="50" x2="215" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+                        <text x="229" y="53" text-anchor="middle" fill="#94a3b8" font-size="8">Rs</text>
+                        <line x1="243" y1="50" x2="255" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+
+                        <path d="M 255 50 Q 262 35 270 50 Q 277 35 285 50 Q 292 35 300 50" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+                        <text x="277" y="32" text-anchor="middle" fill="#06b6d4" font-size="9">Ls2</text>
+                        <line x1="300" y1="50" x2="320" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+
+                        <!-- Mutual M curve between Ls1 and Ls2 -->
+                        <path d="M 160 30 C 180 15, 250 15, 275 30" fill="none" stroke="#8b5cf6" stroke-width="1.2" stroke-dasharray="2 2"/>
+                        <text x="218" y="16" text-anchor="middle" fill="#8b5cf6" font-size="8">M12 (Mutual)</text>
+
+                        <!-- Shunt Cg2 from Node 2 -->
+                        <line x1="200" y1="50" x2="200" y2="95" stroke="#94a3b8" stroke-width="1.2"/>
+                        <line x1="192" y1="95" x2="208" y2="95" stroke="#10b981" stroke-width="1.5"/>
+                        <line x1="192" y1="101" x2="208" y2="101" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="214" y="100" text-anchor="start" fill="#10b981" font-size="9">Cg2</text>
+                        <line x1="200" y1="101" x2="200" y2="180" stroke="#475569" stroke-width="1.2"/>
+
+                        <!-- Node 3 (Output / 50-ohm Measuring Receiver) -->
+                        <circle cx="320" cy="50" r="3" fill="#06b6d4"/>
+                        <line x1="320" y1="50" x2="360" y2="50" stroke="#94a3b8" stroke-width="1.5"/>
+                        <circle cx="380" cy="50" r="14" fill="#121824" stroke="#10b981" stroke-width="1.5"/>
+                        <text x="380" y="54" text-anchor="middle" fill="#10b981" font-size="10" font-weight="bold">50Ω</text>
+                        <line x1="380" y1="64" x2="380" y2="180" stroke="#334155" stroke-width="1.5"/>
+
+                        <!-- Output Label Vout -->
+                        <text x="420" y="54" text-anchor="middle" fill="#10b981" font-size="11" font-weight="bold">Vout</text>
+                        <path d="M 395 50 L 405 50" stroke="#10b981" stroke-width="1.5"/>
+                    </svg>
+                </div>
+
+                <div class="text-[10px] font-mono text-slate-400 space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-telemetry-cyan">• $L_s, M_{ij}$ Series & Mutual Inductance:</span>
+                        <span class="text-slate-300">Winding turns & core permeability</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-telemetry-amber">• $C_s$ Series Inter-disk Capacitance:</span>
+                        <span class="text-slate-300">Axial disk spacing & spacer geometry</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-telemetry-emerald">• $C_g$ Shunt Ground Capacitance:</span>
+                        <span class="text-slate-300">Radial distance to core leg & tank</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: STANDARDIZED FREQUENCY SUB-BAND DECOMPOSITION -->
+    <section id="subbands" class="bg-panel border border-border-subtle p-5 rounded-sm space-y-5 tactile-inset scroll-mt-28">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-amber"></span>
+                <span class="font-mono text-xs font-bold text-telemetry-amber uppercase tracking-wider">SECTION 02</span>
+                <span class="text-slate-600 font-mono">|</span>
+                <h2 class="text-base font-bold text-white tracking-tight">IEEE Std C57.149 & IEC 60076-18 Sub-band Decomposition</h2>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500">Frequency Sub-band Partitioning</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed">
+            Because different physical transformer structures dominate the electrical response within distinct frequency regimes, both IEEE Std C57.149-2012 and IEC 60076-18 define three standardized diagnostic sub-bands. Decomposing the sweep into these sub-bands allows localized mechanical fault isolation without masking across the spectrum:
+        </p>
+
+        <!-- 3-BAY SUB-BAND SPECIFICATION CARDS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- SUB-BAND 1: LOW FREQUENCY -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between font-mono text-[10px]">
+                        <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-cyan border border-telemetry-cyan/40 rounded-sm font-bold">SUB-BAND 1</span>
+                        <span class="text-slate-400">&lt; 2 kHz</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white tracking-tight">Core Magnetizing & Inductive Region</h3>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        In this low-frequency band, capacitive impedances ($1/\omega C$) are exceedingly high (open circuits). The response is strictly governed by the magnetic core geometry, iron core lamination permeability, and bulk winding resistance.
+                    </p>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-border-subtle font-mono text-[11px]">
+                    <div class="bg-chassis p-2.5 rounded-sm border border-border-subtle space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">PHYSICAL GOVERNING ELEMENTS:</div>
+                        <div class="text-telemetry-cyan font-semibold">Core Magnetizing Inductance ($L_m$), Core Residual Flux</div>
+                    </div>
+                    <div class="bg-chassis p-2.5 rounded-sm border border-border-subtle space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">TARGET FAULT DETECTIONS:</div>
+                        <div class="text-white text-[10px] space-y-0.5">
+                            <div>• Main Core Displacement or Shifting</div>
+                            <div>• Core Lamination Short-Circuits</div>
+                            <div>• Open or Unintended Multiple Core Grounds</div>
+                            <div>• Residual DC Magnetization</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1">
+                        <span>Threshold Target:</span>
+                        <span class="text-telemetry-emerald font-bold">R² ≥ 0.95</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-BAND 2: MEDIUM FREQUENCY -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between font-mono text-[10px]">
+                        <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-amber border border-telemetry-amber/40 rounded-sm font-bold">SUB-BAND 2</span>
+                        <span class="text-slate-400">2 kHz — 100 kHz</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white tracking-tight">Winding Structure & Resonance Region</h3>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        The core magnetically decouples as leakage flux dominates. The curve exhibits complex resonance peaks and anti-resonance troughs formed by the interaction between winding leakage inductance ($L_\sigma$) and inter-disk capacitance ($C_s$).
+                    </p>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-border-subtle font-mono text-[11px]">
+                    <div class="bg-chassis p-2.5 rounded-sm border border-border-subtle space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">PHYSICAL GOVERNING ELEMENTS:</div>
+                        <div class="text-telemetry-amber font-semibold">Winding Inductance ($L_\sigma$), Inter-disk ($C_s$) & Ground ($C_g$)</div>
+                    </div>
+                    <div class="bg-chassis p-2.5 rounded-sm border border-border-subtle space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">TARGET FAULT DETECTIONS:</div>
+                        <div class="text-white text-[10px] space-y-0.5">
+                            <div>• Radial Winding Buckling (Hoop Stress)</div>
+                            <div>• Axial Winding Displacement / Tilting</div>
+                            <div>• Coil Clamping Loss / Spacer Loosening</div>
+                            <div>• Inter-turn Short-Circuit Faults</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1">
+                        <span>Threshold Target:</span>
+                        <span class="text-telemetry-amber font-bold">R² ≥ 0.95, Δf &lt; 2%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-BAND 3: HIGH FREQUENCY -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between font-mono text-[10px]">
+                        <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-violet border border-telemetry-violet/40 rounded-sm font-bold">SUB-BAND 3</span>
+                        <span class="text-slate-400">&gt; 100 kHz</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white tracking-tight">Terminal Leads, Bushings & Contacts</h3>
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        At frequencies above 100 kHz (up to 2 MHz), winding inductances present extremely high impedance. The response is governed primarily by terminal leads, bushing internal capacitances, tap-changer leads, and test grounding braid inductance.
+                    </p>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-border-subtle font-mono text-[11px]">
+                    <div class="bg-chassis p-2.5 rounded-sm border border-border-subtle space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">PHYSICAL GOVERNING ELEMENTS:</div>
+                        <div class="text-telemetry-violet font-semibold">Lead Inductance, Bushing Capacitance ($C_b$), Ground Braids</div>
+                    </div>
+                    <div class="bg-chassis p-2.5 rounded-sm border border-border-subtle space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">TARGET FAULT DETECTIONS:</div>
+                        <div class="text-white text-[10px] space-y-0.5">
+                            <div>• Tap Changer Selector Contact Anomaly</div>
+                            <div>• Loose Internal Terminal Connections</div>
+                            <div>• Bushing Shield & Insulation Degradation</div>
+                            <div>• Test Lead Grounding Artifact Errors</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-slate-400 pt-1">
+                        <span>Threshold Target:</span>
+                        <span class="text-telemetry-emerald font-bold">R² ≥ 0.90</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 3: MATHEMATICAL ANALYTICAL METRICS -->
+    <section id="math-formulations" class="bg-panel border border-border-subtle p-5 rounded-sm space-y-5 tactile-inset scroll-mt-28">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>
+                <span class="font-mono text-xs font-bold text-telemetry-emerald uppercase tracking-wider">SECTION 03</span>
+                <span class="text-slate-600 font-mono">|</span>
+                <h2 class="text-base font-bold text-white tracking-tight">Mathematical Correlation & Analytical Evaluation Formulations</h2>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500">IEEE Std C57.149 Annex B / DL/T 911</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Metric 1: Cross-Correlation Factor (CCF / R2) -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset">
+                <div class="flex items-center justify-between font-mono text-[10px] border-b border-border-subtle pb-2">
+                    <span class="text-telemetry-cyan font-bold">1. CROSS-CORRELATION FACTOR (CCF / R²)</span>
+                    <span class="text-slate-500">DL/T 911 & IEEE C57.149</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    The normalized cross-correlation coefficient evaluates spectral shape similarity between the reference baseline vector ($X_i$) and the current test sweep ($Y_i$) across discrete frequency samples ($N$).
+                </p>
+
+                <div class="bg-chassis p-3 rounded-sm border border-border-subtle font-mono text-xs text-center text-white py-2.5">
+                    $$\text{CCF}(X, Y) = \frac{\sum_{i=1}^N (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^N (X_i - \bar{X})^2 \cdot \sum_{i=1}^N (Y_i - \bar{Y})^2}}$$
+                </div>
+
+                <!-- Interpretation Table -->
+                <div class="border border-border-subtle rounded-sm overflow-hidden font-mono text-[11px]">
+                    <div class="bg-panel px-3 py-1.5 font-bold text-slate-400 border-b border-border-subtle text-[10px]">
+                        IEEE C57.149 / DL/T 911 EVALUATION THRESHOLDS:
+                    </div>
+                    <div class="divide-y divide-border-subtle bg-chassis text-[11px]">
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-telemetry-emerald font-semibold">R² ≥ 0.95</span>
+                            <span class="text-slate-300">Nominal / Good Agreement (Normal Condition)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-telemetry-amber font-semibold">0.85 ≤ R² &lt; 0.95</span>
+                            <span class="text-slate-300">Slight Deviation / Advisory (Warrant Investigation)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-telemetry-rose font-semibold">R² &lt; 0.85</span>
+                            <span class="text-slate-300">Severe Deviation / Critical Alarm (Deformation Suspected)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metric 2: Absolute Sum of Logarithmic Error (ASLE) -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset">
+                <div class="flex items-center justify-between font-mono text-[10px] border-b border-border-subtle pb-2">
+                    <span class="text-telemetry-amber font-bold">2. ABSOLUTE SUM OF LOGARITHMIC ERROR (ASLE)</span>
+                    <span class="text-slate-500">IEEE C57.149 Clause B.3</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    While CCF evaluates curve pattern shape, ASLE quantifies vertical amplitude offsets and damping shifts, avoiding correlation bias when curve shapes align but absolute magnitude levels have shifted.
+                </p>
+
+                <div class="bg-chassis p-3 rounded-sm border border-border-subtle font-mono text-xs text-center text-white py-2.5">
+                    $$\text{ASLE}(X, Y) = \frac{1}{N} \sum_{i=1}^N \left| 20\log_{10}(X_i) - 20\log_{10}(Y_i) \right|$$
+                </div>
+
+                <!-- Interpretation Table -->
+                <div class="border border-border-subtle rounded-sm overflow-hidden font-mono text-[11px]">
+                    <div class="bg-panel px-3 py-1.5 font-bold text-slate-400 border-b border-border-subtle text-[10px]">
+                        ASLE METRIC INTERPRETATION THRESHOLDS:
+                    </div>
+                    <div class="divide-y divide-border-subtle bg-chassis text-[11px]">
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-telemetry-emerald font-semibold">ASLE &lt; 0.6 dB</span>
+                            <span class="text-slate-300">Excellent agreement, zero mechanical variation</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-telemetry-amber font-semibold">0.6 dB ≤ ASLE &lt; 1.5 dB</span>
+                            <span class="text-slate-300">Moderate deviation, insulation/aging or mild shift</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <span class="text-telemetry-rose font-semibold">ASLE ≥ 1.5 dB</span>
+                            <span class="text-slate-300">Substantial magnitude offset, mechanical change</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metric 3: Peak Decibel Residual (|ΔdB|) -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset">
+                <div class="flex items-center justify-between font-mono text-[10px] border-b border-border-subtle pb-2">
+                    <span class="text-telemetry-violet font-bold">3. PEAK RESIDUAL DEVIATION (|ΔdB_max|)</span>
+                    <span class="text-slate-500">IEEE C57.149 Clause 6.1</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Identifies the singular maximum decibel difference between baseline and test response across a specific sub-band $[f_{\min}, f_{\max}]$. Pinpoints sharp resonant peak shifts.
+                </p>
+
+                <div class="bg-chassis p-3 rounded-sm border border-border-subtle font-mono text-xs text-center text-white py-2.5">
+                    $$|\Delta\text{dB}_{\max}| = \max_{f \in [f_{\min}, f_{\max}]} \left| X_{\text{test}}(f) - X_{\text{baseline}}(f) \right|$$
+                </div>
+
+                <div class="text-[11px] font-mono text-slate-400 space-y-1 bg-chassis p-2.5 rounded-sm border border-border-subtle">
+                    <div class="text-slate-300 font-semibold">• Nominal: $|\Delta\text{dB}| &lt; 2.5\text{ dB}$</div>
+                    <div class="text-telemetry-amber font-semibold">• Warning: $2.5\text{ dB} \le |\Delta\text{dB}| &lt; 6.0\text{ dB}$</div>
+                    <div class="text-telemetry-rose font-semibold">• Critical: $|\Delta\text{dB}| \ge 6.0\text{ dB}$ (localized resonance alteration)</div>
+                </div>
+            </div>
+
+            <!-- Metric 4: Resonance Peak Frequency Shift (Δf / f0) -->
+            <div class="bg-surface border border-border-subtle p-4 rounded-sm space-y-3 tactile-inset">
+                <div class="flex items-center justify-between font-mono text-[10px] border-b border-border-subtle pb-2">
+                    <span class="text-telemetry-rose font-bold">4. RESONANCE FREQUENCY SHIFT RATIO</span>
+                    <span class="text-slate-500">CIGRE Brochure 342</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Measures relative percentage drift of identifiable resonance poles $f_{\text{res}} = 1/(2\pi\sqrt{L_{\text{eff}}C_{\text{eff}}})$. An increase in capacitance shifts poles downward; inductance loss shifts poles upward.
+                </p>
+
+                <div class="bg-chassis p-3 rounded-sm border border-border-subtle font-mono text-xs text-center text-white py-2.5">
+                    $$\frac{\Delta f}{f_0} = \frac{\left| f_{\text{test, peak}} - f_{\text{baseline, peak}} \right|}{f_{\text{baseline, peak}}} \times 100\%$$
+                </div>
+
+                <div class="text-[11px] font-mono text-slate-400 space-y-1 bg-chassis p-2.5 rounded-sm border border-border-subtle">
+                    <div class="text-slate-300 font-semibold">• Stable: $\Delta f / f_0 &lt; 1.0\%$ (thermal/oil variation)</div>
+                    <div class="text-telemetry-amber font-semibold">• Advisory: $1.0\% \le \Delta f / f_0 &lt; 3.0\%$ (slight physical shift)</div>
+                    <div class="text-telemetry-rose font-semibold">• Alert: $\Delta f / f_0 \ge 3.0\%$ (significant geometry displacement)</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 4: DIAGNOSTIC FAULT SIGNATURE MATRIX -->
+    <section id="fault-matrix" class="bg-panel border border-border-subtle p-5 rounded-sm space-y-5 tactile-inset scroll-mt-28">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-rose"></span>
+                <span class="font-mono text-xs font-bold text-telemetry-rose uppercase tracking-wider">SECTION 04</span>
+                <span class="text-slate-600 font-mono">|</span>
+                <h2 class="text-base font-bold text-white tracking-tight">Transformer Failure Mechanisms & SFRA Diagnostic Signature Matrix</h2>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500">Field Diagnostics Matrix</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed">
+            Correlating observed spectral deviations to specific transformer failure modes based on IEEE Std C57.149 Clause 6 and CIGRE WG A2.26 field recommendations:
+        </p>
+
+        <!-- HIGH-DENSITY ENGINEERING FAULT MATRIX TABLE -->
+        <div class="border border-border-subtle rounded-sm overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs border-collapse">
+                <thead>
+                    <tr class="bg-surface border-b border-border-subtle text-[10px] text-slate-400 uppercase tracking-wider">
+                        <th class="p-3 w-48">Failure Mechanism</th>
+                        <th class="p-3 w-32">Dominant Band</th>
+                        <th class="p-3">Characteristic SFRA Curve Manifestation</th>
+                        <th class="p-3 w-64">Field Verification Protocol</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-border-subtle bg-chassis text-[11px]">
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-rose"></span>
+                            Radial Winding Deformation (Buckling)
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-amber border border-telemetry-amber/30 rounded-sm">2 kHz – 100 kHz</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Resonance peaks and anti-resonance troughs in the mid-frequency band shift toward lower frequencies due to increased winding-to-ground capacitance ($C_g$). New distinct resonance ripples appear.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Perform low-voltage leakage reactance (LVLR) test; compare per-phase values (&gt;1% shift indicates radial deformation).
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-rose"></span>
+                            Axial Winding Displacement / Tilting
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-amber border border-telemetry-amber/30 rounded-sm">2 kHz – 100 kHz</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Alteration in inter-disk series capacitance ($C_s$) and mutual inductance ($M$). Resonance poles shift upward or damp out. Marked asymmetry between Phase A and Phase C sweeps.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Perform excitation current test; verify mechanical tie-rod clamping torque and bushing alignment.
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-amber"></span>
+                            Core Lamination Movement / Shifting
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-cyan border border-telemetry-cyan/30 rounded-sm">&lt; 2 kHz</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Low-frequency antiresonance notch shifts significantly along frequency axis ($&gt;5\%$). Inductive curve slope between 50 Hz and 1 kHz changes angle due to altered reluctance path.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Execute single-phase excitation current at low voltage; inspect core grounding current telemetry.
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-amber"></span>
+                            Unintended Core Multiple Grounds
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-cyan border border-telemetry-cyan/30 rounded-sm">&lt; 2 kHz</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Circulating eddy current loops through multiple ground straps introduce parasitic damping, causing flattening of the initial inductive slope and attenuation of the first resonance peak.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Disconnect external core ground link; measure core-to-tank DC insulation resistance with 1000V Megohmmeter ($&gt;100\text{ M}\Omega$).
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-rose"></span>
+                            Inter-Turn Insulation Short-Circuit
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-amber border border-telemetry-amber/30 rounded-sm">All Sub-bands</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Massive upward shift across the low-frequency inductive curve (&gt;15 dB), completely eliminating the primary antiresonance notch. Mid-frequency poles shift drastically upward.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Immediate DGA oil test for acetylene ($C_2H_2$) and ethylene; perform transformer turns ratio (TTR) and DC resistance.
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-telemetry-violet"></span>
+                            Tap Changer Lead Anomaly / Contact
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-violet border border-telemetry-violet/30 rounded-sm">&gt; 100 kHz</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Localized resonance variations beyond 100 kHz. Severe attenuation or anomalous anti-resonance notch appearing exclusively on specific tap selector positions.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Perform dynamic resistance measurement (DRM) across all tap positions (1 through 33) to identify contact wear.
+                        </td>
+                    </tr>
+
+                    <tr class="hover:bg-panel transition">
+                        <td class="p-3 font-semibold text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                            Test Ground Lead Artifact (Measurement Error)
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 bg-panel-elevated text-telemetry-violet border border-telemetry-violet/30 rounded-sm">&gt; 300 kHz</span>
+                        </td>
+                        <td class="p-3 text-slate-300 leading-relaxed">
+                            Divergence appearing strictly at high frequencies (&gt; 300 kHz to 2 MHz) caused by excessive ground braid length or poor grounding contact onto the bushing flange.
+                        </td>
+                        <td class="p-3 text-slate-400">
+                            Re-verify flat braided grounding strap length (&lt; 100mm) and ensure metallic contact with unpainted bushing flange.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECTION 5: STANDARDIZED TEST CONNECTION & GROUNDING PROTOCOLS -->
+    <section id="test-protocols" class="bg-panel border border-border-subtle p-5 rounded-sm space-y-5 tactile-inset scroll-mt-28">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-violet"></span>
+                <span class="font-mono text-xs font-bold text-telemetry-violet uppercase tracking-wider">SECTION 05</span>
+                <span class="text-slate-600 font-mono">|</span>
+                <h2 class="text-base font-bold text-white tracking-tight">Standardized Test Configurations & Field Grounding Protocols</h2>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500">IEC 60076-18 Clause 5 & 6</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div class="bg-surface border border-border-subtle p-3.5 rounded-sm space-y-2">
+                <div class="font-mono font-bold text-telemetry-cyan flex items-center gap-1.5 text-[11px]">
+                    <i data-lucide="radio" class="w-3.5 h-3.5"></i>
+                    1. End-to-End Open Circuit
+                </div>
+                <p class="text-slate-400 text-[11px] leading-relaxed">
+                    Source applied to one winding terminal (e.g. H1), measurement taken at opposite terminal of same phase (H0). All other windings floating. Exposes core and winding series parameters.
+                </p>
+            </div>
+
+            <div class="bg-surface border border-border-subtle p-3.5 rounded-sm space-y-2">
+                <div class="font-mono font-bold text-telemetry-amber flex items-center gap-1.5 text-[11px]">
+                    <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                    2. End-to-End Short Circuit
+                </div>
+                <p class="text-slate-400 text-[11px] leading-relaxed">
+                    Secondary winding terminals short-circuited together. Eliminates core magnetizing inductance, directly isolating leakage inductance and isolating winding mechanical distortion.
+                </p>
+            </div>
+
+            <div class="bg-surface border border-border-subtle p-3.5 rounded-sm space-y-2">
+                <div class="font-mono font-bold text-telemetry-emerald flex items-center gap-1.5 text-[11px]">
+                    <i data-lucide="git-pull-request" class="w-3.5 h-3.5"></i>
+                    3. Inter-Winding Capacitive
+                </div>
+                <p class="text-slate-400 text-[11px] leading-relaxed">
+                    Signal injected into HV winding terminal; response measured on corresponding LV winding terminal. Highly sensitive to inter-winding space deformation and barrier displacement.
+                </p>
+            </div>
+
+            <div class="bg-surface border border-border-subtle p-3.5 rounded-sm space-y-2">
+                <div class="font-mono font-bold text-telemetry-rose flex items-center gap-1.5 text-[11px]">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                    4. &lt;100mm Grounding Rule
+                </div>
+                <p class="text-slate-400 text-[11px] leading-relaxed">
+                    Test lead shield grounds must be flat braided copper, strictly shorter than 100 mm, clamped direct to bare metal bushing flange to avoid artificial &gt;300 kHz resonance nulls.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 6: INTERACTIVE SUB-BAND DIAGNOSTIC SIMULATOR & CALCULATOR -->
+    <section id="interactive-calc" class="bg-panel border border-border-subtle p-5 rounded-sm space-y-5 tactile-inset scroll-mt-28">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-telemetry-cyan beacon-active"></span>
+                <span class="font-mono text-xs font-bold text-telemetry-cyan uppercase tracking-wider">SECTION 06</span>
+                <span class="text-slate-600 font-mono">|</span>
+                <h2 class="text-base font-bold text-white tracking-tight">Interactive Sub-band Criteria Simulator & Evaluation Engine</h2>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500">Live Client-side Instrument Tool</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed">
+            Test and verify IEEE Std C57.149 diagnostic logic in real time. Select standard test presets or adjust correlation coefficients ($R^2$), magnitude deviations ($|\Delta\text{dB}|$), and affected sub-bands to observe immediate diagnostic classifications:
+        </p>
+
+        <!-- PRESET CONTROLLER DECK -->
+        <div class="flex flex-wrap items-center gap-2 font-mono text-xs pt-1">
+            <span class="text-[10px] text-slate-500 uppercase mr-1">EVALUATION PRESETS:</span>
+            <button onclick="applySimPreset('healthy')" class="px-2.5 py-1 bg-surface border border-border-interactive text-telemetry-emerald rounded-sm hover:border-telemetry-emerald transition flex items-center gap-1">
+                <i data-lucide="check-circle" class="w-3 h-3"></i> Nominal Factory Baseline
+            </button>
+            <button onclick="applySimPreset('buckling')" class="px-2.5 py-1 bg-surface border border-border-interactive text-telemetry-rose rounded-sm hover:border-telemetry-rose transition flex items-center gap-1">
+                <i data-lucide="alert-octagon" class="w-3 h-3"></i> Radial Winding Buckling
+            </button>
+            <button onclick="applySimPreset('core')" class="px-2.5 py-1 bg-surface border border-border-interactive text-telemetry-amber rounded-sm hover:border-telemetry-amber transition flex items-center gap-1">
+                <i data-lucide="disc" class="w-3 h-3"></i> Core Lamination Shift
+            </button>
+            <button onclick="applySimPreset('lead')" class="px-2.5 py-1 bg-surface border border-border-interactive text-telemetry-violet rounded-sm hover:border-telemetry-violet transition flex items-center gap-1">
+                <i data-lucide="zap" class="w-3 h-3"></i> Tap / Lead Disconnect
+            </button>
+            <button onclick="applySimPreset('artifact')" class="px-2.5 py-1 bg-surface border border-border-interactive text-slate-300 rounded-sm hover:border-slate-400 transition flex items-center gap-1">
+                <i data-lucide="wrench" class="w-3 h-3"></i> Ground Braid Artifact
+            </button>
+        </div>
+
+        <!-- SIMULATOR CONTROL & RESULTS GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+            
+            <!-- Controls Deck (5 cols) -->
+            <div class="lg:col-span-5 bg-surface border border-border-subtle p-4 rounded-sm space-y-4 tactile-inset">
+                <div class="font-mono text-xs font-bold text-white border-b border-border-subtle pb-2 flex items-center justify-between">
+                    <span>TELEMETRY INPUT PARAMETERS</span>
+                    <i data-lucide="sliders" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+                </div>
+
+                <!-- Input 1: Correlation R2 -->
+                <div class="space-y-1.5 font-mono">
+                    <div class="flex justify-between text-xs">
+                        <label for="sim-r2" class="text-slate-400">Sub-band Correlation (R²):</label>
+                        <span id="r2-display" class="text-telemetry-cyan font-bold text-sm">0.9920</span>
+                    </div>
+                    <input type="range" id="sim-r2" min="0.50" max="1.00" step="0.005" value="0.992" oninput="updateSimEngine()" class="w-full accent-telemetry-cyan bg-panel h-1.5 rounded cursor-pointer">
+                    <div class="flex justify-between text-[9px] text-slate-500">
+                        <span>0.50 (Critical)</span>
+                        <span>0.85 (Advisory)</span>
+                        <span>0.95 (Nominal)</span>
+                        <span>1.00</span>
+                    </div>
+                </div>
+
+                <!-- Input 2: Max Decibel Deviation -->
+                <div class="space-y-1.5 font-mono">
+                    <div class="flex justify-between text-xs">
+                        <label for="sim-db" class="text-slate-400">Peak Deviation (|ΔdB|):</label>
+                        <span id="db-display" class="text-telemetry-amber font-bold text-sm">0.8 dB</span>
+                    </div>
+                    <input type="range" id="sim-db" min="0.0" max="18.0" step="0.2" value="0.8" oninput="updateSimEngine()" class="w-full accent-telemetry-amber bg-panel h-1.5 rounded cursor-pointer">
+                    <div class="flex justify-between text-[9px] text-slate-500">
+                        <span>0.0 dB</span>
+                        <span>3.0 dB (Advisory)</span>
+                        <span>6.0 dB (Critical)</span>
+                        <span>18.0 dB</span>
+                    </div>
+                </div>
+
+                <!-- Input 3: Sub-band Selection -->
+                <div class="space-y-1.5 font-mono">
+                    <label id="sim-band-label" class="text-xs text-slate-400">Affected Frequency Sub-band:</label>
+                    <div class="grid grid-cols-3 gap-2 text-[10px]" role="group" aria-labelledby="sim-band-label">
+                        <button type="button" onclick="selectSimBand('low')" id="band-btn-low" class="p-2 border border-border-interactive bg-panel text-slate-300 rounded-sm hover:border-slate-400 transition text-center font-bold">
+                            LOW (&lt;2k)
+                        </button>
+                        <button type="button" onclick="selectSimBand('mid')" id="band-btn-mid" class="p-2 border border-telemetry-cyan bg-panel-elevated text-telemetry-cyan rounded-sm transition text-center font-bold">
+                            MID (2k-100k)
+                        </button>
+                        <button type="button" onclick="selectSimBand('high')" id="band-btn-high" class="p-2 border border-border-interactive bg-panel text-slate-300 rounded-sm hover:border-slate-400 transition text-center font-bold">
+                            HIGH (&gt;100k)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input 4: Frequency Shift -->
+                <div class="space-y-1.5 font-mono">
+                    <div class="flex justify-between text-xs">
+                        <label for="sim-shift" class="text-slate-400">Resonant Shift (Δf / f₀):</label>
+                        <span id="shift-display" class="text-slate-300 font-bold text-sm">0.2 %</span>
+                    </div>
+                    <input type="range" id="sim-shift" min="0.0" max="8.0" step="0.1" value="0.2" oninput="updateSimEngine()" class="w-full accent-slate-400 bg-panel h-1.5 rounded cursor-pointer">
+                    <div class="flex justify-between text-[9px] text-slate-500">
+                        <span>0% (Stable)</span>
+                        <span>1.5%</span>
+                        <span>3.0% (Alert)</span>
+                        <span>8.0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Diagnostic Evaluation Output (7 cols) -->
+            <div class="lg:col-span-7 bg-surface border border-border-subtle p-5 rounded-sm space-y-4 tactile-inset" role="status">
+                <div class="font-mono text-xs font-bold text-white border-b border-border-subtle pb-2 flex items-center justify-between">
+                    <span>IEEE C57.149 DIAGNOSTIC VERDICT</span>
+                    <div class="flex items-center gap-2">
+                        <span id="verdict-beacon" class="w-2 h-2 rounded-full bg-telemetry-emerald beacon-active"></span>
+                        <span id="verdict-status-badge" class="px-2 py-0.5 rounded-sm bg-panel border border-telemetry-emerald/40 text-telemetry-emerald text-[10px]">
+                            NOMINAL (PASS)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Health Integrity Index Gauge -->
+                <div class="space-y-1.5 font-mono">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-400">Health Integrity Index (HII):</span>
+                        <span id="sim-health-val" class="text-telemetry-emerald font-bold text-base">98.5%</span>
+                    </div>
+                    <div class="w-full h-2 bg-chassis rounded-sm overflow-hidden border border-border-subtle">
+                        <div id="sim-health-bar" class="h-full bg-telemetry-emerald transition-all duration-300" style="width: 98.5%;"></div>
+                    </div>
+                </div>
+
+                <!-- Diagnostic Interpretation Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 font-mono text-xs">
+                    <div class="bg-chassis border border-border-subtle p-3 rounded-sm space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">PHYSICAL FAULT DIAGNOSIS:</div>
+                        <div id="sim-fault-name" class="text-white font-bold text-xs">Healthy Baseline Geometry</div>
+                        <div id="sim-fault-desc" class="text-[10px] text-slate-400 leading-relaxed pt-1">
+                            Frequency response matches reference within acceptable measurement tolerances. No mechanical deformation.
+                        </div>
+                    </div>
+
+                    <div class="bg-chassis border border-border-subtle p-3 rounded-sm space-y-1">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">IEEE COMPLIANCE AUDIT:</div>
+                        <div id="sim-audit-code" class="text-telemetry-cyan font-bold text-xs">IEEE C57.149 SEC 6.1: PASS</div>
+                        <div id="sim-audit-desc" class="text-[10px] text-slate-400 leading-relaxed pt-1">
+                            All sub-band correlation coefficients exceed standard threshold R² ≥ 0.95.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended Engineering Action Protocol -->
+                <div class="bg-panel border border-border-subtle p-3.5 rounded-sm space-y-1.5 font-mono text-xs">
+                    <div class="flex items-center gap-1.5 text-telemetry-amber font-bold text-[11px]">
+                        <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i>
+                        <span>RECOMMENDED ENGINEERING ACTION:</span>
+                    </div>
+                    <p id="sim-action-text" class="text-slate-300 text-xs leading-relaxed font-sans">
+                        Unit cleared for continued energized service. Archive current SFRA sweep as verified commissioning reference baseline. Next scheduled test cycle: 36 months.
+                    </p>
+                </div>
+
+                <!-- Direct Ingestion CTA -->
+                <div class="flex items-center justify-between pt-2 border-t border-border-subtle font-mono text-xs">
+                    <span class="text-slate-500 text-[11px]">Ready to process field data?</span>
+                    <a href="/analysis" class="flex items-center gap-1.5 px-3 py-1.5 bg-panel-elevated border border-telemetry-cyan/50 text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-semibold text-xs tactile-inset">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                        <span>LOAD WORKBENCH</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER CITATION -->
+    <footer class="pt-6 pb-12 border-t border-border-subtle text-center font-mono text-[10px] text-slate-500 space-y-1">
+        <p>IEEE STD C57.149-2012 • IEC 60076-18:2012 • CIGRE WORKING GROUP A2.26 TECHNICAL BROCHURE 342</p>
+        <p class="text-slate-600">PRECISION INDUSTRIAL SFRA DIAGNOSTIC INSTRUMENTATION SYSTEM</p>
+    </footer>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Selected Sub-band in Simulator State
+    let currentSimBand = 'mid';
+
+    function selectSimBand(band) {
+        currentSimBand = band;
+        
+        const bands = ['low', 'mid', 'high'];
+        bands.forEach(b => {
+            const btn = document.getElementById('band-btn-' + b);
+            if (b === band) {
+                btn.className = 'p-2 border border-telemetry-cyan bg-panel-elevated text-telemetry-cyan rounded-sm transition text-center font-bold';
+            } else {
+                btn.className = 'p-2 border border-border-interactive bg-panel text-slate-300 rounded-sm hover:border-slate-400 transition text-center font-bold';
+            }
+        });
+
+        updateSimEngine();
+    }
+
+    function applySimPreset(presetKey) {
+        const r2Input = document.getElementById('sim-r2');
+        const dbInput = document.getElementById('sim-db');
+        const shiftInput = document.getElementById('sim-shift');
+
+        if (presetKey === 'healthy') {
+            r2Input.value = 0.992;
+            dbInput.value = 0.8;
+            shiftInput.value = 0.2;
+            selectSimBand('mid');
+        } else if (presetKey === 'buckling') {
+            r2Input.value = 0.742;
+            dbInput.value = 8.4;
+            shiftInput.value = 4.2;
+            selectSimBand('mid');
+        } else if (presetKey === 'core') {
+            r2Input.value = 0.810;
+            dbInput.value = 11.2;
+            shiftInput.value = 5.8;
+            selectSimBand('low');
+        } else if (presetKey === 'lead') {
+            r2Input.value = 0.884;
+            dbInput.value = 5.1;
+            shiftInput.value = 1.8;
+            selectSimBand('high');
+        } else if (presetKey === 'artifact') {
+            r2Input.value = 0.912;
+            dbInput.value = 7.8;
+            shiftInput.value = 0.4;
+            selectSimBand('high');
+        }
+
+        updateSimEngine();
+    }
+
+    function updateSimEngine() {
+        const r2 = parseFloat(document.getElementById('sim-r2').value);
+        const db = parseFloat(document.getElementById('sim-db').value);
+        const shift = parseFloat(document.getElementById('sim-shift').value);
+
+        document.getElementById('r2-display').innerText = r2.toFixed(4);
+        document.getElementById('db-display').innerText = db.toFixed(1) + ' dB';
+        document.getElementById('shift-display').innerText = shift.toFixed(1) + ' %';
+
+        // Calculate Health Integrity Index (HII)
+        let healthScore = Math.max(0, Math.min(100, Math.round((r2 * 100) - (db * 1.5) - (shift * 2))));
+        if (r2 >= 0.95 && db < 2.5) {
+            healthScore = Math.max(90, Math.round(r2 * 100));
+        }
+
+        const healthVal = document.getElementById('sim-health-val');
+        const healthBar = document.getElementById('sim-health-bar');
+        healthVal.innerText = healthScore.toFixed(1) + '%';
+        healthBar.style.width = healthScore + '%';
+
+        const beacon = document.getElementById('verdict-beacon');
+        const badge = document.getElementById('verdict-status-badge');
+        const faultName = document.getElementById('sim-fault-name');
+        const faultDesc = document.getElementById('sim-fault-desc');
+        const auditCode = document.getElementById('sim-audit-code');
+        const auditDesc = document.getElementById('sim-audit-desc');
+        const actionText = document.getElementById('sim-action-text');
+
+        if (r2 >= 0.95 && db < 3.0 && shift < 1.5) {
+            // Nominal Pass
+            beacon.className = 'w-2 h-2 rounded-full bg-telemetry-emerald beacon-active';
+            badge.className = 'px-2 py-0.5 rounded-sm bg-panel border border-telemetry-emerald/40 text-telemetry-emerald text-[10px] font-bold';
+            badge.innerText = 'NOMINAL (PASS)';
+            healthBar.className = 'h-full bg-telemetry-emerald transition-all duration-300';
+            healthVal.className = 'text-telemetry-emerald font-bold text-base';
+
+            faultName.innerText = 'Healthy Baseline Geometry';
+            faultName.className = 'text-telemetry-emerald font-bold text-xs';
+            faultDesc.innerText = 'Spectral signature correlates tightly with baseline reference across all IEEE sub-bands.';
+            auditCode.innerText = 'IEEE C57.149 SEC 6.1: PASS';
+            auditDesc.innerText = 'Correlation coefficient R² ≥ 0.95 satisfies nominal operating criteria.';
+            actionText.innerText = 'Unit cleared for continued energized service. Archive current SFRA sweep as verified reference baseline. Next scheduled test cycle: 36 months.';
+        } else if (r2 >= 0.85 || (db < 6.0 && shift < 3.0)) {
+            // Advisory Warning
+            beacon.className = 'w-2 h-2 rounded-full bg-telemetry-amber beacon-active';
+            badge.className = 'px-2 py-0.5 rounded-sm bg-panel border border-telemetry-amber/40 text-telemetry-amber text-[10px] font-bold';
+            badge.innerText = 'ADVISORY (MONITOR)';
+            healthBar.className = 'h-full bg-telemetry-amber transition-all duration-300';
+            healthVal.className = 'text-telemetry-amber font-bold text-base';
+
+            if (currentSimBand === 'low') {
+                faultName.innerText = 'Minor Core Magnetic Deviation';
+                faultDesc.innerText = 'Moderate spectral deviation in <2 kHz band indicates potential residual DC magnetization or slight core clamp movement.';
+                auditCode.innerText = 'IEEE C57.149 SEC 6.2: ADVISORY';
+                auditDesc.innerText = 'Sub-band correlation below 0.95 in core inductive region.';
+                actionText.innerText = 'Perform core de-magnetization protocol and re-test low-frequency sweep. Check core-to-tank ground strap resistance with megohmmeter.';
+            } else if (currentSimBand === 'mid') {
+                faultName.innerText = 'Incipient Winding Displacement';
+                faultDesc.innerText = 'Moderate resonance shift (2k-100k Hz) suggests early spacer loosening, clamping relaxation, or mild coil displacement.';
+                auditCode.innerText = 'IEEE C57.149 SEC 6.2: ADVISORY';
+                auditDesc.innerText = 'Winding region correlation in 0.85-0.95 range.';
+                actionText.innerText = 'Schedule short-interval re-test (6 months). Execute low-voltage leakage reactance (LVLR) per-phase comparison to verify mechanical symmetry.';
+            } else {
+                faultName.innerText = 'Bushing / Lead Impedance Anomaly';
+                faultDesc.innerText = 'Deviation localized above 100 kHz. Likely tap changer lead contact resistance or test lead grounding braid inductance.';
+                auditCode.innerText = 'IEEE C57.149 SEC 6.2: ADVISORY';
+                auditDesc.innerText = 'High-frequency deviation beyond nominal tolerance.';
+                actionText.innerText = 'Inspect test lead grounding braid length (<100mm). Exercise tap changer through full range and repeat test at nominal tap position.';
+            }
+        } else {
+            // Critical Alarm
+            beacon.className = 'w-2 h-2 rounded-full bg-telemetry-rose beacon-active';
+            badge.className = 'px-2 py-0.5 rounded-sm bg-panel border border-telemetry-rose/40 text-telemetry-rose text-[10px] font-bold';
+            badge.innerText = 'CRITICAL (ALARM)';
+            healthBar.className = 'h-full bg-telemetry-rose transition-all duration-300';
+            healthVal.className = 'text-telemetry-rose font-bold text-base';
+
+            if (currentSimBand === 'low') {
+                faultName.innerText = 'Severe Core Displacement / Short Lamination';
+                faultDesc.innerText = 'Severe inductive notch distortion in <2 kHz region. Indicates structural core shifting or unintended multiple core grounds.';
+                auditCode.innerText = 'IEEE C57.149 SEC 6.3: CRITICAL ALARM';
+                auditDesc.innerText = 'Low-frequency correlation R² < 0.85 indicates major magnetic circuit disruption.';
+                actionText.innerText = 'Urgent: Disconnect unit from grid. Perform core insulation resistance test. Authorize de-tanking or internal endoscopic core inspection.';
+            } else if (currentSimBand === 'mid') {
+                faultName.innerText = 'Severe Radial Buckling / Coil Collapse';
+                faultDesc.innerText = 'Substantial resonance frequency shift and peak decibel deviation (>6 dB) in 2k-100k Hz band indicating plastic winding deformation from through-fault forces.';
+                auditCode.innerText = 'IEEE C57.149 SEC 6.3: CRITICAL ALARM';
+                auditDesc.innerText = 'Mid-frequency correlation R² < 0.85 indicates catastrophic winding geometry alteration.';
+                actionText.innerText = 'Immediate shutdown required. Do NOT re-energize without internal inspection. Mobilize crane and de-tank for winding structural audit.';
+            } else {
+                faultName.innerText = 'Internal Lead Disconnection / Bushing Failure';
+                faultDesc.innerText = 'Extreme high-frequency divergence (>100 kHz). Indicates disconnected or severely burnt tap lead or internal bushing shield flashover.';
+                auditCode.innerText = 'IEEE C57.149 SEC 6.3: CRITICAL ALARM';
+                auditDesc.innerText = 'High-frequency correlation failure.';
+                actionText.innerText = 'Perform dynamic winding resistance (DRM) and bushing power factor / capacitance test. Inspect internal lead connections before energizing.';
+            }
+        }
+
+        lucide.createIcons();
+    }
+
+    // Initialize Simulator on Page Load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSimEngine();
+    });
+</script>
+{% endblock %}

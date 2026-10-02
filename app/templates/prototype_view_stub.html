@@ -1,0 +1,319 @@
+{% if view == 'workbench' %}
+<!-- WORKBENCH VIEW STUB (Precision Industrial Asymmetric Command Deck) -->
+<div class="space-y-4">
+    <!-- Top Metric Matrix Ribbon (4-column compact ribbon) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-panel border border-border-subtle p-3 rounded-sm tactile-inset">
+            <span class="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mb-1">CORRELATION FACTOR</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-xl font-bold font-mono text-telemetry-emerald">0.9842</span>
+                <span class="text-[10px] font-mono text-telemetry-emerald bg-emerald-950/40 px-1.5 py-0.5 rounded-sm border border-emerald-800/40">R² HIGH</span>
+            </div>
+            <div class="w-full bg-surface h-1 mt-2 rounded-sm overflow-hidden">
+                <div class="bg-telemetry-emerald h-full w-[98%]"></div>
+            </div>
+        </div>
+
+        <div class="bg-panel border border-border-subtle p-3 rounded-sm tactile-inset">
+            <span class="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mb-1">MAX RESONANCE SHIFT</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-xl font-bold font-mono text-telemetry-cyan">0.00 dB</span>
+                <span class="text-[10px] font-mono text-slate-400">@ 45.2 kHz</span>
+            </div>
+            <div class="w-full bg-surface h-1 mt-2 rounded-sm overflow-hidden">
+                <div class="bg-telemetry-cyan h-full w-[5%]"></div>
+            </div>
+        </div>
+
+        <div class="bg-panel border border-border-subtle p-3 rounded-sm tactile-inset">
+            <span class="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mb-1">ACQUISITION BANDWIDTH</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-xl font-bold font-mono text-slate-100">2.00 MHz</span>
+                <span class="text-[10px] font-mono text-slate-400">1,000 PTS</span>
+            </div>
+            <div class="w-full bg-surface h-1 mt-2 rounded-sm overflow-hidden">
+                <div class="bg-slate-600 h-full w-[100%]"></div>
+            </div>
+        </div>
+
+        <div class="bg-panel border border-border-subtle p-3 rounded-sm tactile-inset">
+            <span class="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mb-1">DIAGNOSTIC VERDICT</span>
+            <div class="flex items-baseline justify-between">
+                <span class="text-xl font-bold font-mono text-telemetry-emerald">HEALTHY</span>
+                <span class="text-[10px] font-mono text-telemetry-emerald bg-emerald-950/40 px-1.5 py-0.5 rounded-sm border border-emerald-800/40">NORMAL</span>
+            </div>
+            <div class="w-full bg-surface h-1 mt-2 rounded-sm overflow-hidden">
+                <div class="bg-telemetry-emerald h-full w-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asymmetric Command Deck: Plot Canvas (left 70%) + Diagnostic Telemetry Rail (right 30%) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Bode Plot Viewing Chamber (8 cols) -->
+        <div class="lg:col-span-8 bg-panel border border-border-subtle p-4 rounded-sm flex flex-col justify-between tactile-inset min-h-[440px]">
+            <div class="flex items-center justify-between pb-3 border-b border-border-subtle font-mono text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-white font-bold tracking-wide">BODE SPECTRAL RESPONSE (dB vs LOG Hz)</span>
+                    <span class="text-[10px] text-slate-500 bg-surface px-1.5 py-0.5 rounded border border-border-subtle">DUAL TRACE</span>
+                </div>
+                <div class="flex items-center gap-4 text-[11px]">
+                    <span class="flex items-center gap-1.5 text-telemetry-violet">
+                        <span class="w-3 h-0.5 bg-telemetry-violet inline-block"></span> BASELINE REF
+                    </span>
+                    <span class="flex items-center gap-1.5 text-telemetry-cyan font-bold">
+                        <span class="w-3 h-0.5 bg-telemetry-cyan inline-block"></span> TEST SWEEP
+                    </span>
+                </div>
+            </div>
+
+            <!-- Simulated Bode Plot Graphic with IEEE Sub-band zones -->
+            <div class="relative flex-1 my-4 bg-chassis border border-border-subtle rounded-sm flex flex-col justify-between p-4 overflow-hidden">
+                <!-- Sub-band Zones Overlays -->
+                <div class="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-20">
+                    <div class="col-span-3 bg-telemetry-violet/20 border-r border-telemetry-violet/50 relative">
+                        <span class="absolute top-2 left-2 text-[9px] font-mono text-telemetry-violet">CORE &lt;2kHz</span>
+                    </div>
+                    <div class="col-span-5 bg-telemetry-cyan/20 border-r border-telemetry-cyan/50 relative">
+                        <span class="absolute top-2 left-2 text-[9px] font-mono text-telemetry-cyan">WINDING 2k-100kHz</span>
+                    </div>
+                    <div class="col-span-4 bg-slate-500/20 relative">
+                        <span class="absolute top-2 left-2 text-[9px] font-mono text-slate-300">HIGH &gt;100kHz</span>
+                    </div>
+                </div>
+
+                <!-- Simulated Spectral Traces -->
+                <div class="relative z-10 flex-1 flex items-center justify-center">
+                    <svg viewBox="0 0 800 240" class="w-full h-48 stroke-current" fill="none">
+                        <!-- Grid lines -->
+                        <line x1="0" y1="60" x2="800" y2="60" stroke="#1e293b" stroke-dasharray="2,4" />
+                        <line x1="0" y1="120" x2="800" y2="120" stroke="#1e293b" stroke-dasharray="2,4" />
+                        <line x1="0" y1="180" x2="800" y2="180" stroke="#1e293b" stroke-dasharray="2,4" />
+                        <!-- Baseline trace -->
+                        <path d="M 0 160 Q 150 140, 200 80 T 350 130 T 500 70 T 650 150 T 800 110" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="4,4" />
+                        <!-- Test trace -->
+                        <path d="M 0 162 Q 150 142, 200 82 T 350 128 T 500 72 T 650 152 T 800 108" stroke="#06b6d4" stroke-width="2" />
+                    </svg>
+                </div>
+
+                <div class="relative z-10 flex justify-between text-[10px] font-mono text-slate-500 border-t border-border-subtle pt-2">
+                    <span>20 Hz</span>
+                    <span>100 Hz</span>
+                    <span>1 kHz</span>
+                    <span>10 kHz</span>
+                    <span>100 kHz</span>
+                    <span>1 MHz</span>
+                    <span>2 MHz</span>
+                </div>
+            </div>
+
+            <!-- Plot Footer Telemetry Controls -->
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400 pt-2 border-t border-border-subtle">
+                <div class="flex items-center gap-3">
+                    <span class="text-slate-500">CURSOR:</span>
+                    <span class="text-telemetry-cyan">f = 45.20 kHz</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="text-telemetry-cyan">Mag = -34.8 dB</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-2 py-1 bg-surface border border-border-subtle rounded-sm hover:text-white transition">RESET ZOOM</button>
+                    <button class="px-2 py-1 bg-surface border border-border-subtle rounded-sm hover:text-white transition">EXPORT SVG</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Telemetry & Diagnostic Rail (4 cols) -->
+        <div class="lg:col-span-4 space-y-4">
+            <!-- Health Integrity Gauge -->
+            <div class="bg-panel border border-border-subtle p-4 rounded-sm tactile-inset">
+                <div class="flex items-center justify-between pb-2 border-b border-border-subtle font-mono text-xs">
+                    <span class="text-white font-bold">HEALTH INTEGRITY</span>
+                    <span class="text-telemetry-emerald font-semibold">NORMAL</span>
+                </div>
+                <div class="py-6 flex flex-col items-center justify-center">
+                    <div class="relative w-36 h-36 flex items-center justify-center">
+                        <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="42" stroke="#1e293b" stroke-width="8" fill="none" />
+                            <circle cx="50" cy="50" r="42" stroke="#10b981" stroke-width="8" fill="none" stroke-dasharray="264" stroke-dashoffset="10" stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute flex flex-col items-center">
+                            <span class="text-3xl font-mono font-bold text-white">98%</span>
+                            <span class="text-[9px] font-mono text-slate-400 uppercase">Confidence</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs font-mono text-slate-400 bg-surface p-2.5 rounded-sm border border-border-subtle">
+                    <div class="flex justify-between mb-1">
+                        <span>CORE STATUS:</span>
+                        <span class="text-telemetry-emerald">STABLE (R² 0.992)</span>
+                    </div>
+                    <div class="flex justify-between mb-1">
+                        <span>WINDING STATUS:</span>
+                        <span class="text-telemetry-emerald">STABLE (R² 0.981)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>HIGH FREQ:</span>
+                        <span class="text-telemetry-emerald">STABLE (R² 0.978)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Physics-grounded Diagnostic Summary -->
+            <div class="bg-panel border border-border-subtle p-4 rounded-sm tactile-inset">
+                <span class="block text-xs font-mono font-bold text-white pb-2 border-b border-border-subtle">PHYSICS DIAGNOSTIC RATIONALE</span>
+                <div class="mt-3 text-xs text-slate-300 space-y-2 leading-relaxed">
+                    <p>Frequency sweep exhibits exceptional congruence across all three IEEE C57.149 sub-bands. No core displacement or winding radial deformation detected.</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between">
+                    <a href="/download-report" class="w-full text-center py-2 bg-surface hover:bg-border-interactive border border-border-subtle font-mono text-xs font-semibold text-telemetry-cyan rounded-sm transition">
+                        DOWNLOAD FORMAL REPORT (PDF)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif view == 'history' %}
+<!-- FLEET RECORDS VIEW STUB -->
+<div class="space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-panel p-4 rounded-sm border border-border-subtle tactile-inset">
+        <div>
+            <h2 class="text-base font-bold font-mono text-white">TRANSFORMER FLEET RECORDS</h2>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">Historical SFRA Baselines and Multi-Asset Condition Monitoring Archive</p>
+        </div>
+        <div class="flex items-center gap-2 font-mono text-xs">
+            <span class="text-slate-500">ASSETS MONITORED:</span>
+            <span class="px-2 py-0.5 bg-surface text-telemetry-cyan rounded border border-border-subtle font-bold">12 UNITS</span>
+        </div>
+    </div>
+
+    <!-- Table Frame -->
+    <div class="bg-panel border border-border-subtle rounded-sm overflow-x-auto tactile-inset">
+        <table class="w-full text-left font-mono text-xs">
+            <thead>
+                <tr class="bg-surface/80 border-b border-border-subtle text-slate-400 text-[11px] uppercase">
+                    <th class="p-3">Asset Serial</th>
+                    <th class="p-3">Rating / Spec</th>
+                    <th class="p-3">Last Acquisition</th>
+                    <th class="p-3">Correlation R²</th>
+                    <th class="p-3">Sub-band Verdict</th>
+                    <th class="p-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border-subtle">
+                <tr class="hover:bg-surface/40 transition">
+                    <td class="p-3 font-bold text-white">TX-765KV-MAIN-01</td>
+                    <td class="p-3 text-slate-400">500 MVA / 765 kV</td>
+                    <td class="p-3 text-slate-300">2026-10-02</td>
+                    <td class="p-3 text-telemetry-emerald font-semibold">0.9842</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-emerald-950/40 text-telemetry-emerald border border-emerald-800/40 rounded-sm">HEALTHY</span></td>
+                    <td class="p-3 text-right"><a href="?variant={{ variant }}&view=workbench" class="text-telemetry-cyan hover:underline">LOAD DECK →</a></td>
+                </tr>
+                <tr class="hover:bg-surface/40 transition">
+                    <td class="p-3 font-bold text-white">TX-400KV-BAY-03</td>
+                    <td class="p-3 text-slate-400">315 MVA / 400 kV</td>
+                    <td class="p-3 text-slate-300">2026-09-18</td>
+                    <td class="p-3 text-telemetry-amber font-semibold">0.9120</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-amber-950/40 text-telemetry-amber border border-amber-800/40 rounded-sm">WINDING WARNING</span></td>
+                    <td class="p-3 text-right"><a href="?variant={{ variant }}&view=workbench" class="text-telemetry-cyan hover:underline">LOAD DECK →</a></td>
+                </tr>
+                <tr class="hover:bg-surface/40 transition">
+                    <td class="p-3 font-bold text-white">TX-220KV-GEN-02</td>
+                    <td class="p-3 text-slate-400">160 MVA / 220 kV</td>
+                    <td class="p-3 text-slate-300">2026-08-30</td>
+                    <td class="p-3 text-telemetry-rose font-semibold">0.7845</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-rose-950/40 text-telemetry-rose border border-rose-800/40 rounded-sm">DEFORMATION ALERT</span></td>
+                    <td class="p-3 text-right"><a href="?variant={{ variant }}&view=workbench" class="text-telemetry-cyan hover:underline">LOAD DECK →</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% elif view == 'standards' %}
+<!-- STANDARDS KNOWLEDGE BASE VIEW STUB -->
+<div class="space-y-4">
+    <div class="bg-panel p-4 rounded-sm border border-border-subtle tactile-inset">
+        <h2 class="text-base font-bold font-mono text-white">STANDARDS & DIAGNOSTIC CRITERIA</h2>
+        <p class="text-xs text-slate-400 font-mono mt-0.5">Normative Sub-Band Frequency Boundaries and Physics Interpretation Guides</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-panel border border-border-subtle p-4 rounded-sm tactile-inset">
+            <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+                <span class="font-mono text-xs font-bold text-telemetry-violet">CORE SUB-BAND (&lt; 2 kHz)</span>
+                <span class="text-[10px] font-mono text-slate-500">IEEE C57.149</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                Dominated by magnetizing inductance ($L_m$) and core grounding. Deviations indicate core magnetic circuit degradation, short-circuited laminations, or residual magnetization.
+            </p>
+        </div>
+
+        <div class="bg-panel border border-border-subtle p-4 rounded-sm tactile-inset">
+            <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+                <span class="font-mono text-xs font-bold text-telemetry-cyan">WINDING INTERACTION (2k - 100 kHz)</span>
+                <span class="text-[10px] font-mono text-slate-500">IEEE C57.149</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                Determined by winding series capacitances and mutual inductances. Resonance shifts in this band signify mechanical deformation: axial displacement or radial hoop buckling.
+            </p>
+        </div>
+
+        <div class="bg-panel border border-border-subtle p-4 rounded-sm tactile-inset">
+            <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+                <span class="font-mono text-xs font-bold text-slate-200">HIGH FREQUENCY (&gt; 100 kHz)</span>
+                <span class="text-[10px] font-mono text-slate-500">IEEE C57.149</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+                Dominated by tap changer leads, bushing capacitance, and grounding leads. Deviations correspond to lead shifts, grounding resistance fluctuations, or bushing issues.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% elif view == 'landing' %}
+<!-- PLATFORM OVERVIEW / LANDING STUB -->
+<div class="space-y-6">
+    <div class="bg-panel border border-border-subtle p-6 rounded-sm tactile-inset">
+        <span class="text-xs font-mono uppercase tracking-wider text-telemetry-cyan">PRECISION INDUSTRIAL SFRA INSTRUMENT</span>
+        <h1 class="text-2xl font-mono font-bold text-white mt-1">AI-Assisted Sweep Frequency Response Analysis</h1>
+        <p class="text-sm text-slate-300 max-w-3xl mt-2 leading-relaxed">
+            Engineered for high-voltage substation commissioning, condition monitoring, and post-fault mechanical integrity assessments. Built on strict IEEE Std C57.149 and IEC 60076-18 sub-band diagnostics.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3 mt-6 font-mono text-xs">
+            <a href="?variant={{ variant }}&view=workbench" class="px-4 py-2 bg-telemetry-cyan text-slate-950 font-bold rounded-sm hover:bg-cyan-400 transition">
+                LAUNCH SFRA WORKBENCH →
+            </a>
+            <a href="?variant={{ variant }}&view=standards" class="px-4 py-2 bg-surface hover:bg-border-interactive border border-border-subtle text-slate-300 rounded-sm transition">
+                VIEW STANDARDS SPECIFICATION
+            </a>
+        </div>
+    </div>
+
+    <!-- Pipeline Architecture Matrix -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-panel p-4 rounded-sm border border-border-subtle font-mono text-xs tactile-inset">
+            <span class="text-slate-500 text-[10px]">STAGE 01</span>
+            <div class="font-bold text-white mt-1">Multi-Vendor Ingestion</div>
+            <p class="text-slate-400 text-[11px] mt-1">Omicron, Doble, and Megger CSV parser with auto-delimiter detection.</p>
+        </div>
+        <div class="bg-panel p-4 rounded-sm border border-border-subtle font-mono text-xs tactile-inset">
+            <span class="text-slate-500 text-[10px]">STAGE 02</span>
+            <div class="font-bold text-white mt-1">Log-Space Spline</div>
+            <p class="text-slate-400 text-[11px] mt-1">100 pts/decade logarithmic frequency alignment across 20Hz-2MHz.</p>
+        </div>
+        <div class="bg-panel p-4 rounded-sm border border-border-subtle font-mono text-xs tactile-inset">
+            <span class="text-slate-500 text-[10px]">STAGE 03</span>
+            <div class="font-bold text-white mt-1">Sub-band Evaluation</div>
+            <p class="text-slate-400 text-[11px] mt-1">IEEE C57.149 sub-band correlation $R^2$, spectrum area, and dB shift.</p>
+        </div>
+        <div class="bg-panel p-4 rounded-sm border border-border-subtle font-mono text-xs tactile-inset">
+            <span class="text-slate-500 text-[10px]">STAGE 04</span>
+            <div class="font-bold text-white mt-1">Physics Verdict</div>
+            <p class="text-slate-400 text-[11px] mt-1">Hybrid rule-based & ML classification for radial buckling or tilt.</p>
+        </div>
+    </div>
+</div>
+{% endif %}

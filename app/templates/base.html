@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FRA Diagnostics Workstation | Precision Industrial Instrument{% endblock %}</title>
+
+    <!-- Google Fonts: Inter (Prose) & JetBrains Mono (Telemetry) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chassis: '#070a0f',
+                        surface: '#0c1017',
+                        panel: '#121824',
+                        'panel-elevated': '#172030',
+                        'border-subtle': '#1e293b',
+                        'border-interactive': '#334155',
+                        'border-emphasized': '#475569',
+                        'telemetry-cyan': '#06b6d4',
+                        'telemetry-emerald': '#10b981',
+                        'telemetry-amber': '#f59e0b',
+                        'telemetry-rose': '#f43f5e',
+                        'telemetry-violet': '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    borderRadius: {
+                        'sm': '2px',
+                        'DEFAULT': '4px',
+                        'md': '4px',
+                        'lg': '6px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --canvas-chassis: #070a0f;
+            --canvas-surface: #0c1017;
+            --canvas-panel: #121824;
+            --border-subtle: #1e293b;
+        }
+
+        body {
+            background-color: #070a0f;
+            color: #f8fafc;
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-mono-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-feature-settings: 'tnum' on, 'zero' on;
+        }
+
+        .grid-frame {
+            border: 1px solid #1e293b;
+        }
+
+        .tactile-inset {
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes beacon-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+        .beacon-active {
+            animation: beacon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Browser surfaces: themed from the instrument palette */
+        ::selection {
+            background: rgba(6, 182, 212, 0.35);
+            color: #f8fafc;
+        }
+        input, textarea {
+            caret-color: #06b6d4;
+        }
+        :focus-visible {
+            outline: 1px solid #06b6d4;
+            outline-offset: 2px;
+        }
+
+        /* Skip link: instrument-styled, visible on keyboard focus only */
+        .skip-link {
+            position: absolute;
+            left: 8px;
+            top: -48px;
+            z-index: 50;
+            padding: 8px 16px;
+            background: #172030;
+            border: 1px solid #06b6d4;
+            color: #06b6d4;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 2px;
+            transition: top 0.15s ease-out;
+        }
+        .skip-link:focus {
+            top: 8px;
+        }
+
+        /* Motion: preserve state change without pulsing for reduced-motion users */
+        @media (prefers-reduced-motion: reduce) {
+            .beacon-active {
+                animation: none;
+                opacity: 1;
+            }
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Touch: guarantee 44px targets on coarse pointers without disturbing dense desktop layout */
+        @media (pointer: coarse) {
+            aside nav a {
+                min-height: 44px;
+            }
+            button, td a {
+                min-height: 44px;
+            }
+            td button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-chassis text-slate-100 flex min-h-screen">
+    <a href="#main-content" class="skip-link">SKIP TO MAIN CONTENT</a>
+
+    <!-- LEFT VERTICAL AVIONICS COMMAND RAIL -->
+    <aside class="w-16 lg:w-56 bg-surface border-r border-border-subtle flex flex-col justify-between shrink-0 tactile-inset z-40 sticky top-0 h-screen">
+        <div>
+            <!-- Instrument Brand & System State -->
+            <a href="/" class="h-14 border-b border-border-subtle flex items-center px-4 gap-3 hover:bg-panel transition group">
+                <div class="w-8 h-8 rounded-sm bg-panel border border-border-interactive flex items-center justify-center text-telemetry-cyan shrink-0 group-hover:border-telemetry-cyan transition">
+                    <i data-lucide="activity" class="w-4 h-4 text-telemetry-cyan"></i>
+                </div>
+                <div class="hidden lg:block overflow-hidden">
+                    <div class="font-mono font-bold text-xs tracking-wider text-white truncate">FRA-INSTRUMENT</div>
+                    <div class="text-[9px] font-mono text-telemetry-emerald flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald beacon-active"></span>
+                        ONLINE V4.1
+                    </div>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="p-2 space-y-1 font-mono text-xs">
+                <a href="/analysis" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'workbench' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="SFRA Diagnostic Workbench">
+                    <i data-lucide="cpu" class="w-4 h-4 shrink-0"></i>
+                    <span class="hidden lg:inline">WORKBENCH</span>
+                </a>
+                <a href="/history" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'history' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="Fleet Records & Baselines">
+                    <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
+                    <span class="hidden lg:inline">FLEET RECORDS</span>
+                </a>
+                <a href="/about" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'standards' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="IEEE Standards & Criteria">
+                    <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+                    <span class="hidden lg:inline">STANDARDS KB</span>
+                </a>
+                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'landing' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="Platform Overview">
+                    <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
+                    <span class="hidden lg:inline">OVERVIEW</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Rail Bottom Hardware & Telemetry Status -->
+        <div class="p-3 border-t border-border-subtle font-mono text-[10px] text-slate-400 hidden lg:block bg-surface/50">
+            <div class="text-slate-400 font-semibold mb-1 flex items-center justify-between">
+                <span>RACK BUS:</span>
+                <span class="text-telemetry-emerald">SYNC</span>
+            </div>
+            <div class="text-slate-400">GPIB / ETHERNET OK</div>
+            <div class="text-slate-400 mt-1 flex items-center justify-between">
+                <span>LATENCY:</span>
+                <span class="text-slate-300">14ms</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN APPLICATION WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- TOP CONTEXT TELEMETRY STRIP (56px Sticky Header) -->
+        <header class="h-14 bg-surface/95 backdrop-blur border-b border-border-subtle px-4 lg:px-6 flex items-center justify-between sticky top-0 z-30 tactile-inset">
+            <!-- Left: Asset Hierarchy Breadcrumb -->
+            <div class="flex items-center gap-3 lg:gap-4 overflow-hidden">
+                <div class="flex items-center gap-2 text-xs font-mono truncate">
+                    <span class="text-slate-400 hidden sm:inline">ASSET:</span>
+                    <span class="text-slate-400 hidden md:inline">SUBSTATION-01</span>
+                    <span class="text-slate-600 hidden md:inline">/</span>
+                    <span class="text-white font-bold bg-panel px-2 py-0.5 rounded-sm border border-border-subtle tracking-wide">
+                        {{ transformerId if transformerId else 'TX-765KV-MAIN-01' }}
+                    </span>
+                </div>
+
+                <div class="h-4 w-px bg-border-subtle hidden sm:block"></div>
+
+                <!-- IEEE Compliance Badge -->
+                <div class="hidden md:flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-panel px-2 py-0.5 rounded-sm border border-border-subtle">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+                    <span>IEEE C57.149 / IEC 60076-18</span>
+                </div>
+            </div>
+
+            <!-- Right: Real-time Telemetry & Action Deck -->
+            <div class="flex items-center gap-3 lg:gap-4 font-mono text-xs">
+                {% if status %}
+                <div class="flex items-center gap-2 bg-panel px-2.5 py-1 rounded-sm border border-border-subtle">
+                    <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-telemetry-emerald{% elif status == 'Warning' %}bg-telemetry-amber{% else %}bg-telemetry-rose{% endif %}"></span>
+                    <span class="text-[11px] text-slate-400">STATE:</span>
+                    <strong class="{% if status == 'Healthy' %}text-telemetry-emerald{% elif status == 'Warning' %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %}">
+                        {{ status | upper }}
+                    </strong>
+                    {% if corr %}
+                    <span class="text-slate-600">|</span>
+                    <span class="text-[11px] text-slate-300">R² {{ corr }}</span>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="hidden sm:flex items-center gap-2 bg-panel px-2.5 py-1 rounded-sm border border-border-subtle text-[11px] text-slate-400">
+                    <span class="w-2 h-2 rounded-full bg-telemetry-emerald beacon-active"></span>
+                    <span>STANDBY READY</span>
+                </div>
+                {% endif %}
+
+                <a href="/analysis" class="flex items-center gap-1.5 px-3 py-1.5 bg-panel-elevated border border-border-interactive text-telemetry-cyan rounded-sm hover:border-telemetry-cyan transition font-semibold text-xs tactile-inset">
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">INGEST CSV</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- MAIN VIEW CONTENT CONTAINER -->
+        <main id="main-content" class="flex-1 p-4 lg:p-6 max-w-[1800px] w-full mx-auto">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

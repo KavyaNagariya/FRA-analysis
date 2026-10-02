@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOTYPE — Master Layout Shell & Navigation [ISSUE-009]</title>
+    
+    <!-- Precision Industrial Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chassis: '#070a0f',
+                        surface: '#0c1017',
+                        panel: '#121824',
+                        'panel-elevated': '#172030',
+                        'border-subtle': '#1e293b',
+                        'border-interactive': '#334155',
+                        'border-emphasized': '#475569',
+                        'telemetry-cyan': '#06b6d4',
+                        'telemetry-emerald': '#10b981',
+                        'telemetry-amber': '#f59e0b',
+                        'telemetry-rose': '#f43f5e',
+                        'telemetry-violet': '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    borderRadius: {
+                        'sm': '2px',
+                        'DEFAULT': '4px',
+                        'md': '4px',
+                        'lg': '6px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070a0f;
+            color: #f8fafc;
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .mono-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-feature-settings: 'tnum' on, 'zero' on;
+        }
+
+        /* 1px Structural borders */
+        .grid-frame {
+            border: 1px solid #1e293b;
+        }
+
+        /* Tactical bevel highlight */
+        .tactile-inset {
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Phosphor Beacon Pulse */
+        @keyframes beacon-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+        .beacon-active {
+            animation: beacon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .beacon-active {
+                animation: none;
+                opacity: 1;
+            }
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Touch: guarantee 44px targets on coarse pointers without disturbing dense desktop layout */
+        @media (pointer: coarse) {
+            button, td a, aside nav a {
+                min-height: 44px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-chassis text-slate-100 flex flex-col">
+
+    <!-- PROTOTYPE BANNER -->
+    <div class="bg-amber-950/40 border-b border-amber-800/60 px-4 py-1.5 text-xs text-amber-300 font-mono flex items-center justify-between z-50">
+        <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+            <span class="font-bold tracking-wider">[PROTOTYPE — ISSUE-009]</span>
+            <span class="text-amber-200/80 hidden sm:inline">Evaluating Master Layout Shell & Navigation Structures</span>
+        </div>
+        <div class="flex items-center gap-4 text-[11px]">
+            <span>Active Variant: <strong class="text-white underline">Variant {{ variant }}</strong></span>
+            <div class="flex items-center gap-1 bg-surface px-2 py-0.5 rounded border border-border-subtle">
+                <span class="text-slate-400">View:</span>
+                <a href="?variant={{ variant }}&view=workbench" class="px-1.5 py-0.2 rounded hover:text-white {% if view == 'workbench' %}bg-telemetry-cyan/20 text-telemetry-cyan font-bold{% else %}text-slate-400{% endif %}">Workbench</a>
+                <a href="?variant={{ variant }}&view=history" class="px-1.5 py-0.2 rounded hover:text-white {% if view == 'history' %}bg-telemetry-cyan/20 text-telemetry-cyan font-bold{% else %}text-slate-400{% endif %}">History</a>
+                <a href="?variant={{ variant }}&view=standards" class="px-1.5 py-0.2 rounded hover:text-white {% if view == 'standards' %}bg-telemetry-cyan/20 text-telemetry-cyan font-bold{% else %}text-slate-400{% endif %}">Standards</a>
+                <a href="?variant={{ variant }}&view=landing" class="px-1.5 py-0.2 rounded hover:text-white {% if view == 'landing' %}bg-telemetry-cyan/20 text-telemetry-cyan font-bold{% else %}text-slate-400{% endif %}">Landing</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================== -->
+    <!-- VARIANT A: MONOLITHIC HORIZONTAL TELEMETRY DECK                               -->
+    <!-- ============================================================================== -->
+    {% if variant == 'A' %}
+    <div class="flex-1 flex flex-col">
+        <!-- Master Sticky Telemetry Deck (56px) -->
+        <header class="sticky top-0 z-40 bg-surface/95 backdrop-blur border-b border-border-subtle px-4 h-14 flex items-center justify-between tactile-inset">
+            <!-- Left: Instrument Brand & Sub-standard Compliance -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-sm bg-panel border border-border-interactive flex items-center justify-center text-telemetry-cyan font-mono font-bold text-sm tactile-inset">
+                        <i data-lucide="activity" class="w-4 h-4 text-telemetry-cyan"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-sm tracking-wider text-white">FRA-DIAGNOSTICS</span>
+                            <span class="text-[10px] font-mono text-slate-500 bg-panel px-1.5 py-0.5 rounded-sm border border-border-subtle">V4.1</span>
+                            <span class="flex items-center gap-1.5 text-[10px] font-mono text-telemetry-emerald bg-emerald-950/40 px-2 py-0.5 rounded-sm border border-emerald-800/60">
+                                <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald beacon-active"></span>
+                                SYS ONLINE
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden lg:block h-6 w-px bg-border-subtle"></div>
+
+                <!-- IEEE Compliance Pill -->
+                <div class="hidden lg:flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-panel/80 px-2.5 py-1 rounded-sm border border-border-subtle">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+                    <span>IEEE Std C57.149 / IEC 60076-18</span>
+                </div>
+            </div>
+
+            <!-- Center: Segmented Navigation Switcher -->
+            <nav class="flex items-center bg-panel border border-border-subtle p-0.5 rounded-sm tactile-inset font-mono text-xs">
+                <a href="?variant=A&view=workbench" class="flex items-center gap-1.5 px-3 py-1.5 rounded-sm transition-colors {% if view == 'workbench' %}bg-panel-elevated text-telemetry-cyan font-semibold border border-border-interactive shadow-sm{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                    <span>WORKBENCH</span>
+                </a>
+                <a href="?variant=A&view=history" class="flex items-center gap-1.5 px-3 py-1.5 rounded-sm transition-colors {% if view == 'history' %}bg-panel-elevated text-telemetry-cyan font-semibold border border-border-interactive shadow-sm{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+                    <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                    <span>FLEET RECORDS</span>
+                </a>
+                <a href="?variant=A&view=standards" class="flex items-center gap-1.5 px-3 py-1.5 rounded-sm transition-colors {% if view == 'standards' %}bg-panel-elevated text-telemetry-cyan font-semibold border border-border-interactive shadow-sm{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                    <span>STANDARDS KB</span>
+                </a>
+                <a href="?variant=A&view=landing" class="flex items-center gap-1.5 px-3 py-1.5 rounded-sm transition-colors {% if view == 'landing' %}bg-panel-elevated text-telemetry-cyan font-semibold border border-border-interactive shadow-sm{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+                    <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                    <span>OVERVIEW</span>
+                </a>
+            </nav>
+
+            <!-- Right: Active Asset Readout & Rapid Action -->
+            <div class="flex items-center gap-3">
+                <div class="hidden md:flex flex-col items-end font-mono text-[11px]">
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <span class="text-slate-500 text-[10px]">UNIT:</span>
+                        <span class="font-bold text-white bg-panel px-1.5 py-0.5 rounded-sm border border-border-subtle">TX-765KV-MAIN-01</span>
+                    </div>
+                    <div class="text-[10px] text-slate-500">CORR R²: <span class="text-telemetry-emerald font-semibold">0.9842</span> (HEALTHY)</div>
+                </div>
+
+                <a href="/analysis" class="flex items-center gap-1.5 font-mono text-xs font-semibold px-3 py-1.5 bg-telemetry-cyan text-slate-950 rounded-sm hover:bg-cyan-400 transition tactile-inset">
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                    <span>NEW SWEEP</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Sub-Header / Telemetry Metadata Ribbon -->
+        <div class="bg-surface/60 border-b border-border-subtle px-6 py-2 flex flex-wrap items-center justify-between text-xs font-mono text-slate-400">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-600">SUBSTATION:</span>
+                    <span class="text-slate-200">NORTH-GRID-765</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-600">BANDWIDTH:</span>
+                    <span class="text-telemetry-cyan">20 Hz – 2.00 MHz (Log)</span>
+                </div>
+                <div class="hidden sm:flex items-center gap-2">
+                    <span class="text-slate-600">TEST REF:</span>
+                    <span class="text-slate-300">SFRA-2026-OCT-02</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-[11px]">
+                <span class="text-slate-500">IEEE SUB-BANDS:</span>
+                <span class="px-1.5 py-0.5 rounded-sm bg-panel border border-border-subtle text-telemetry-violet">CORE &lt;2kHz</span>
+                <span class="px-1.5 py-0.5 rounded-sm bg-panel border border-border-subtle text-telemetry-cyan">WINDING 2k-100kHz</span>
+                <span class="px-1.5 py-0.5 rounded-sm bg-panel border border-border-subtle text-slate-300">HIGH &gt;100kHz</span>
+            </div>
+        </div>
+
+        <!-- Main Workspace Stage with 1px Responsive Grid Frame -->
+        <main class="flex-1 p-4 lg:p-6 max-w-[1720px] w-full mx-auto">
+            {% include 'prototype_view_stub.html' %}
+        </main>
+    </div>
+    {% endif %}
+
+    <!-- ============================================================================== -->
+    <!-- VARIANT B: VERTICAL AVIONICS COMMAND RAIL + CONTEXT TELEMETRY STRIP          -->
+    <!-- ============================================================================== -->
+    {% if variant == 'B' %}
+    <div class="flex-1 flex flex-row min-h-screen">
+        <!-- Left Vertical Command Rail (68px) -->
+        <aside class="w-16 lg:w-56 bg-surface border-r border-border-subtle flex flex-col justify-between shrink-0 tactile-inset z-40">
+            <div>
+                <!-- Brand Badge -->
+                <div class="h-14 border-b border-border-subtle flex items-center px-4 gap-3">
+                    <div class="w-8 h-8 rounded-sm bg-panel border border-border-interactive flex items-center justify-center text-telemetry-cyan shrink-0">
+                        <i data-lucide="activity" class="w-4 h-4 text-telemetry-cyan"></i>
+                    </div>
+                    <div class="hidden lg:block overflow-hidden">
+                        <div class="font-mono font-bold text-xs tracking-wider text-white truncate">FRA-INSTRUMENT</div>
+                        <div class="text-[9px] font-mono text-telemetry-emerald flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald beacon-active"></span>
+                            ONLINE V4.1
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Navigation Stack -->
+                <nav class="p-2 space-y-1 font-mono text-xs">
+                    <a href="?variant=B&view=workbench" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if view == 'workbench' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}">
+                        <i data-lucide="cpu" class="w-4 h-4 shrink-0"></i>
+                        <span class="hidden lg:inline">WORKBENCH</span>
+                    </a>
+                    <a href="?variant=B&view=history" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if view == 'history' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}">
+                        <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
+                        <span class="hidden lg:inline">FLEET RECORDS</span>
+                    </a>
+                    <a href="?variant=B&view=standards" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if view == 'standards' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}">
+                        <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+                        <span class="hidden lg:inline">STANDARDS KB</span>
+                    </a>
+                    <a href="?variant=B&view=landing" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if view == 'landing' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}">
+                        <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
+                        <span class="hidden lg:inline">OVERVIEW</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Bottom Rail System Status -->
+            <div class="p-3 border-t border-border-subtle font-mono text-[10px] text-slate-500 hidden lg:block">
+                <div class="text-slate-400 font-semibold mb-1">RACK BUS:</div>
+                <div class="text-slate-300">GPIB / ETHERNET OK</div>
+                <div class="text-slate-500 mt-1">LATENCY: 14ms</div>
+            </div>
+        </aside>
+
+        <!-- Right Content & Top Telemetry Header -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- Top Context Telemetry Strip -->
+            <header class="h-14 bg-surface/90 border-b border-border-subtle px-6 flex items-center justify-between sticky top-0 z-30 tactile-inset">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-xs font-mono">
+                        <span class="text-slate-500">ASSET HIERARCHY:</span>
+                        <span class="text-slate-400">SUBSTN-01</span>
+                        <span class="text-slate-600">/</span>
+                        <span class="text-white font-bold bg-panel px-2 py-0.5 rounded-sm border border-border-subtle">TX-765KV-MAIN-01</span>
+                    </div>
+
+                    <div class="h-4 w-px bg-border-subtle"></div>
+
+                    <div class="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-400">
+                        <span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>
+                        <span>DIAGNOSTIC STATUS: <strong class="text-telemetry-emerald">PASS (R² 0.984)</strong></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 font-mono text-xs">
+                    <span class="hidden md:inline text-slate-500 text-[11px]">IEEE C57.149 VALIDATED</span>
+                    <a href="/analysis" class="flex items-center gap-1.5 px-3 py-1.5 bg-panel-elevated border border-border-interactive text-telemetry-cyan rounded-sm hover:border-telemetry-cyan transition">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>INGEST CSV</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Body Frame -->
+            <main class="flex-1 p-4 lg:p-6 max-w-[1800px] w-full mx-auto">
+                {% include 'prototype_view_stub.html' %}
+            </main>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ============================================================================== -->
+    <!-- VARIANT C: DUAL-TIER MISSION CONTROL DECK + FIXED DIAGNOSTICS STATUSBAR        -->
+    <!-- ============================================================================== -->
+    {% if variant == 'C' %}
+    <div class="flex-1 flex flex-col min-h-screen">
+        <!-- Tier 1: Hardware & Asset Instrument Header (44px) -->
+        <div class="bg-chassis border-b border-border-subtle px-4 py-2 flex flex-wrap items-center justify-between font-mono text-xs text-slate-400">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-telemetry-cyan font-bold">RACK-UNIT [01]:</span>
+                    <span class="text-white font-semibold">POWER TX SFRA ANALYZER</span>
+                </div>
+                <div class="hidden md:flex items-center gap-2 text-[11px]">
+                    <span class="text-slate-600">SERIAL:</span>
+                    <span class="text-slate-200">TX-765KV-MAIN-01</span>
+                    <span class="text-slate-600">|</span>
+                    <span class="text-slate-600">RATING:</span>
+                    <span class="text-slate-200">500 MVA / 765 kV</span>
+                    <span class="text-slate-600">|</span>
+                    <span class="text-slate-600">TEMP:</span>
+                    <span class="text-slate-200">42.5°C OIL</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 text-[11px]">
+                <div class="flex items-center gap-1.5 text-telemetry-emerald">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                    <span>IEEE C57.149 READY</span>
+                </div>
+                <div class="text-slate-500">2026-10-02 21:40 UTC</div>
+            </div>
+        </div>
+
+        <!-- Tier 2: Workstation Mode & Navigation Bar (52px) -->
+        <header class="bg-surface border-b border-border-subtle px-4 h-13 flex items-center justify-between sticky top-0 z-30 tactile-inset">
+            <!-- Navigation with Function Key Badges -->
+            <nav class="flex items-center gap-1 font-mono text-xs">
+                <a href="?variant=C&view=workbench" class="flex items-center gap-2 px-3 py-2 rounded-sm transition {% if view == 'workbench' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-bold{% else %}text-slate-400 hover:text-white{% endif %}">
+                    <span class="text-[10px] bg-panel px-1 py-0.2 rounded border border-border-subtle text-slate-400">F1</span>
+                    <span>WORKBENCH</span>
+                </a>
+                <a href="?variant=C&view=history" class="flex items-center gap-2 px-3 py-2 rounded-sm transition {% if view == 'history' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-bold{% else %}text-slate-400 hover:text-white{% endif %}">
+                    <span class="text-[10px] bg-panel px-1 py-0.2 rounded border border-border-subtle text-slate-400">F2</span>
+                    <span>FLEET HISTORY</span>
+                </a>
+                <a href="?variant=C&view=standards" class="flex items-center gap-2 px-3 py-2 rounded-sm transition {% if view == 'standards' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-bold{% else %}text-slate-400 hover:text-white{% endif %}">
+                    <span class="text-[10px] bg-panel px-1 py-0.2 rounded border border-border-subtle text-slate-400">F3</span>
+                    <span>STANDARDS</span>
+                </a>
+                <a href="?variant=C&view=landing" class="flex items-center gap-2 px-3 py-2 rounded-sm transition {% if view == 'landing' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-bold{% else %}text-slate-400 hover:text-white{% endif %}">
+                    <span class="text-[10px] bg-panel px-1 py-0.2 rounded border border-border-subtle text-slate-400">F4</span>
+                    <span>OVERVIEW</span>
+                </a>
+            </nav>
+
+            <!-- Diagnostic Quick Metrics & Action -->
+            <div class="flex items-center gap-4 font-mono text-xs">
+                <div class="hidden sm:flex items-center gap-3 bg-panel px-3 py-1 rounded-sm border border-border-subtle">
+                    <div class="text-[11px]"><span class="text-slate-500">CORR:</span> <strong class="text-telemetry-emerald">0.9842</strong></div>
+                    <div class="h-3 w-px bg-border-subtle"></div>
+                    <div class="text-[11px]"><span class="text-slate-500">SHIFT:</span> <strong class="text-telemetry-cyan">0.00 dB</strong></div>
+                    <div class="h-3 w-px bg-border-subtle"></div>
+                    <div class="text-[11px]"><span class="text-slate-500">STATE:</span> <strong class="text-telemetry-emerald">HEALTHY</strong></div>
+                </div>
+
+                <a href="/analysis" class="px-3 py-1.5 bg-telemetry-cyan text-slate-950 font-bold rounded-sm text-xs hover:bg-cyan-400 transition flex items-center gap-1.5">
+                    <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                    <span>EXECUTE DIAGNOSIS</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Workspace Stage -->
+        <main class="flex-1 p-4 lg:p-6 max-w-[1720px] w-full mx-auto pb-12">
+            {% include 'prototype_view_stub.html' %}
+        </main>
+
+        <!-- Fixed Bottom Physical Instrument Ticker -->
+        <footer class="fixed bottom-0 left-0 right-0 h-8 bg-chassis border-t border-border-subtle px-4 flex items-center justify-between font-mono text-[11px] text-slate-500 z-30">
+            <div class="flex items-center gap-4">
+                <span>SWEEP POINTS: <strong class="text-slate-300">1,000 PTS</strong></span>
+                <span>•</span>
+                <span>DENSITY: <strong class="text-slate-300">100 PTS/DEC</strong></span>
+                <span>•</span>
+                <span>INTERPOLATION: <strong class="text-slate-300">CUBIC SPLINE</strong></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>FIRMWARE: <span class="text-slate-400">V4.1.0-STABLE</span></span>
+                <span>•</span>
+                <span>LATENCY: <span class="text-telemetry-emerald">12ms</span></span>
+            </div>
+        </footer>
+    </div>
+    {% endif %}
+
+    <!-- ============================================================================== -->
+    <!-- FLOATING PROTOTYPE SWITCHER (Per prototype skill UI.md specification)          -->
+    <!-- ============================================================================== -->
+    <div id="prototype-switcher" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-panel-elevated/95 backdrop-blur-md border border-border-interactive px-4 py-2 rounded shadow-2xl flex items-center gap-4 text-xs font-mono tactile-inset">
+        <!-- Previous Variant -->
+        <button id="prev-variant" class="px-2 py-1 rounded bg-panel hover:bg-border-interactive text-slate-200 hover:text-white transition flex items-center gap-1" title="Previous Variant (or Left Arrow)">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span class="text-[10px]">Prev (←)</span>
+        </button>
+
+        <!-- Active Indicator -->
+        <div class="text-center px-2">
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Layout Prototype</div>
+            <div class="font-bold text-white flex items-center gap-2">
+                <span class="text-telemetry-cyan text-sm">Variant {{ variant }}</span>
+                <span class="text-slate-300">
+                    {% if variant == 'A' %}— Monolithic Top Telemetry Deck
+                    {% elif variant == 'B' %}— Split Left Avionics Rail
+                    {% elif variant == 'C' %}— Dual-Deck Mission Control & Statusbar
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Next Variant -->
+        <button id="next-variant" class="px-2 py-1 rounded bg-panel hover:bg-border-interactive text-slate-200 hover:text-white transition flex items-center gap-1" title="Next Variant (or Right Arrow)">
+            <span class="text-[10px]">Next (→)</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Interactive script for keyboard and switcher navigation -->
+    <script>
+        lucide.createIcons();
+
+        const currentVariant = '{{ variant }}';
+        const currentView = '{{ view }}';
+        const variants = ['A', 'B', 'C'];
+
+        function navigateVariant(newVar) {
+            window.location.search = `?variant=${newVar}&view=${currentView}`;
+        }
+
+        const currentIndex = variants.indexOf(currentVariant);
+
+        document.getElementById('prev-variant').addEventListener('click', () => {
+            const nextIdx = (currentIndex - 1 + variants.length) % variants.length;
+            navigateVariant(variants[nextIdx]);
+        });
+
+        document.getElementById('next-variant').addEventListener('click', () => {
+            const nextIdx = (currentIndex + 1) % variants.length;
+            navigateVariant(variants[nextIdx]);
+        });
+
+        // Keyboard arrow listener (don't intercept if focused on inputs)
+        window.addEventListener('keydown', (e) => {
+            if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) {
+                return;
+            }
+            if (e.key === 'ArrowLeft') {
+                const nextIdx = (currentIndex - 1 + variants.length) % variants.length;
+                navigateVariant(variants[nextIdx]);
+            } else if (e.key === 'ArrowRight') {
+                const nextIdx = (currentIndex + 1) % variants.length;
+                navigateVariant(variants[nextIdx]);
+            }
+        });
+    </script>
+</body>
+</html>
