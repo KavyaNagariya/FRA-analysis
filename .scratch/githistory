@@ -1,0 +1,231 @@
+commit 6c6964d21c1aa78b75750671a973093e90c73576
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 19:04:00 2026 +0530
+
+    docs: mark tickets 02 and 03 completed
+
+ .../issues/02-subband-physics-thresholds.md                  | 12 ++++++++++++
+ .../issues/03-hybrid-fusion-engine.md                        | 11 +++++++++++
+ 2 files changed, 23 insertions(+)
+
+commit 7c683693a9d8f49a78240712a8c81f94e479bce2
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 18:56:19 2026 +0530
+
+    fix(report): support nested diagnostic dict, light-theme plots, and component guidance
+
+ FRA_AI_Data/src/plotter.py       | 23 +++++++++-----
+ FRA_AI_Data/src/report.py        | 67 +++++++++++++++++++++++++++++++---------
+ FRA_AI_Data/tests/test_report.py | 33 ++++++++++++++++++++
+ 3 files changed, 101 insertions(+), 22 deletions(-)
+
+commit 1d530e96f0f951b1a599863e4b7d25ce0fb8cdf7
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 18:50:00 2026 +0530
+
+    feat(report): implement enriched PDF report with Bode plots and sub-band tables (Ticket 05)
+
+ .../issues/05-pdf-report-bode-plots.md             |  11 +
+ FRA_AI_Data/app/app.py                             |  18 +-
+ FRA_AI_Data/src/pipeline.py                        |  25 +-
+ FRA_AI_Data/src/report.py                          | 474 +++++++++++++++++++--
+ FRA_AI_Data/tests/test_report.py                   | 163 +++++++
+ 5 files changed, 624 insertions(+), 67 deletions(-)
+
+commit 3747822aa3541c173a041f7a55e6085bcf2c8ec6
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 18:45:48 2026 +0530
+
+    fix(ingestion): resolve code review feedback on phase detection, null metadata, and baseline deduplication
+
+ FRA_AI_Data/app/app.py                |  8 ++++
+ FRA_AI_Data/src/data_loader.py        | 52 +++++++++++-----------
+ FRA_AI_Data/src/pipeline.py           | 84 +++++++++++++++++++++++------------
+ FRA_AI_Data/tests/test_data_loader.py | 28 +++++++++---
+ 4 files changed, 113 insertions(+), 59 deletions(-)
+
+commit 53a6a88a7ee7b9cc15809948f2c65a0fc98d2d90
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 18:36:21 2026 +0530
+
+    feat(ingestion): implement multi-asset CSV grouping and pipeline execution (Ticket 04)
+
+ .../issues/04-multi-asset-csv-grouping.md          |  12 ++
+ FRA_AI_Data/app/app.py                             |  23 ++-
+ FRA_AI_Data/src/analyzer.py                        |   7 +-
+ FRA_AI_Data/src/data_loader.py                     | 175 ++++++++++++++++-----
+ FRA_AI_Data/src/pipeline.py                        |  97 ++++++++++++
+ FRA_AI_Data/tests/test_data_loader.py              |  70 +++++++++
+ FRA_AI_Data/tests/test_pipeline.py                 |  47 ++++++
+ 7 files changed, 372 insertions(+), 59 deletions(-)
+
+commit a7882f92160dd8c15cf22f735fff91e7fed21628
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 18:26:18 2026 +0530
+
+    Fix code review issues: Refactor Severity enum and fix ML mapping, rewrite tests to be E2E
+
+ FRA_AI_Data/src/analyzer.py        | 71 ++++++++++++++++++++------------------
+ FRA_AI_Data/tests/test_analyzer.py | 61 ++++++++++++++++----------------
+ 2 files changed, 69 insertions(+), 63 deletions(-)
+
+commit 77e396510c488b7bde60a1b840b4896460656f02
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 18:19:09 2026 +0530
+
+    Implement ML severity escalation and composite Health Integrity Score
+
+ FRA_AI_Data/src/analyzer.py        | 20 +++++++++++++++++-
+ FRA_AI_Data/src/report.py          |  3 ++-
+ FRA_AI_Data/tests/test_analyzer.py | 42 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 63 insertions(+), 2 deletions(-)
+
+commit 6f37589b943dff2e2d2bbe73dcbb5ac5b356d3e2
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 15:50:16 2026 +0530
+
+    fix(analyzer): resolve code review feedback (empty bands, variable naming)
+
+ FRA_AI_Data/src/analyzer.py | 42 ++++++++++++++++++++++++------------------
+ 1 file changed, 24 insertions(+), 18 deletions(-)
+
+commit 63d5e7ba15dd28750b6d20db8927a48089267e75
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 15:48:37 2026 +0530
+
+    fix(analyzer): map Critical status to High severity for UI colors
+
+ ...SSUE-002-log-interpolation-and-preprocessing.md |  41 ++++++++++-
+ ...SUE-003-multiclass-dataset-training-pipeline.md |  78 ++++++++++++++++++++-
+ .../ISSUE-004-hybrid-diagnostic-fusion-logic.md    |  71 ++++++++++++++++++-
+ .../.issues/ISSUE-005-multi-asset-csv-ingestion.md |   9 ++-
+ ...SUE-006-enrich-pdf-reporting-with-bode-plots.md |   9 ++-
+ .../.issues/ISSUE-007-web-dashboard-subband-ui.md  |   8 ++-
+ FRA_AI_Data/WAYFINDER_MAP.md                       |   8 ++-
+ FRA_AI_Data/models/trained_model.pkl               | Bin 81729 -> 109367 bytes
+ FRA_AI_Data/src/analyzer.py                        |   2 +-
+ 9 files changed, 212 insertions(+), 14 deletions(-)
+
+commit 610f15bc7096b820262eaf4f3ff1fab0ffb22b2e
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 15:47:21 2026 +0530
+
+    feat(analyzer): implement IEEE C57.149 sub-bands physics thresholds
+
+ FRA_AI_Data/src/analyzer.py | 79 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 63 insertions(+), 16 deletions(-)
+
+commit 89df295bb0cae7d6c09103c397de633cb0810c2f
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 15:42:38 2026 +0530
+
+    fix(preprocessor): gracefully handle sparse sweeps and NaN features
+    
+    - Add subband slicing and metrics utilities to preprocessor
+    - Fix ValueError during scipy interpolation by falling back to linear/empty for arrays under 4 points
+    - Fill NaN variance features with 0.0 to prevent Random Forest model crashes
+    - Remove references to throwaway prototype file
+
+ FRA_AI_Data/src/dataset_generator.py |  58 ++++++++++
+ FRA_AI_Data/src/model.py             | 212 ++++++++++-------------------------
+ FRA_AI_Data/src/preprocessor.py      |  67 ++++++++++-
+ 3 files changed, 182 insertions(+), 155 deletions(-)
+
+commit 43f8d99f5e2107cd07f7371fc86fe5e1e2010a6c
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 15:30:26 2026 +0530
+
+    feat: standardize CSV preprocessing to 500-point log grid
+    
+    Implements Ticket 01 - Logarithmic Preprocessing.
+    - Updates src/preprocessor.py with 500-point dB-space cubic interpolation.
+    - Refactors app/app.py to apply preprocess_sweep before analysis.
+    - Removes min_len synchronization from src/analyzer.py in favor of valid_mask subsetting.
+    - Removes Windows-incompatible emojis from src/data_loader.py.
+
+ FRA_AI_Data/app/app.py          |   7 +-
+ FRA_AI_Data/src/analyzer.py     |  36 +++++----
+ FRA_AI_Data/src/data_loader.py  |   8 +-
+ FRA_AI_Data/src/preprocessor.py | 163 +++++++++++++++++++++++++++++++---------
+ 4 files changed, 154 insertions(+), 60 deletions(-)
+
+commit becb479fbccc1080c88dc3118759d3074b3c7b38
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 13:40:12 2026 +0530
+
+    docs(wayfinder): resolve ISSUE-001 with IEEE C57.149 / IEC 60076-18 sub-band standards
+
+ ...SSUE-001-ieee-subband-boundaries-and-metrics.md | 35 ++++++++++++++++++++--
+ ...SSUE-002-log-interpolation-and-preprocessing.md |  2 +-
+ ...SUE-006-enrich-pdf-reporting-with-bode-plots.md |  2 +-
+ FRA_AI_Data/WAYFINDER_MAP.md                       |  2 +-
+ 4 files changed, 35 insertions(+), 6 deletions(-)
+
+commit d9fc63fdcf6e0c4561705d997aa9e936aa01c16c
+Author: KavyaNagariya <mehukavyanagariya@gmail.com>
+Date:   Fri Oct 2 13:38:35 2026 +0530
+
+    docs(wayfinder): initialize technical roadmap, domain context, and decision tickets
+
+ ...SSUE-001-ieee-subband-boundaries-and-metrics.md | 14 +++++++
+ ...SSUE-002-log-interpolation-and-preprocessing.md | 14 +++++++
+ ...SUE-003-multiclass-dataset-training-pipeline.md | 14 +++++++
+ .../ISSUE-004-hybrid-diagnostic-fusion-logic.md    | 14 +++++++
+ .../.issues/ISSUE-005-multi-asset-csv-ingestion.md | 14 +++++++
+ ...SUE-006-enrich-pdf-reporting-with-bode-plots.md | 14 +++++++
+ .../.issues/ISSUE-007-web-dashboard-subband-ui.md  | 14 +++++++
+ FRA_AI_Data/CONTEXT.md                             | 40 ++++++++++++++++++
+ FRA_AI_Data/WAYFINDER_MAP.md                       | 48 ++++++++++++++++++++++
+ 9 files changed, 186 insertions(+)
+
+commit 1878901040e50df0fc506a9f4a5bc9fea9334cc0
+Author: Vivek <vivekkesharwani4444@gmail.com>
+Date:   Sat Mar 28 10:00:31 2026 +0530
+
+    first commit
+
+ .gitignore                                         |      1 +
+ FRA_AI_Data/README.md                              |      0
+ FRA_AI_Data/app/__pycache__/app.cpython-311.pyc    |    Bin 0 -> 7342 bytes
+ FRA_AI_Data/app/app.py                             |    111 +
+ FRA_AI_Data/app/templates/about.html               |    136 +
+ FRA_AI_Data/app/templates/history.html             |    133 +
+ FRA_AI_Data/app/templates/index.html               |    254 +
+ FRA_AI_Data/app/templates/landing.html             |    210 +
+ FRA_AI_Data/data/FRA_Mock_Data _001.csv            |    251 +
+ FRA_AI_Data/data/FRA_Mock_Data_Large.csv           |   4001 +
+ FRA_AI_Data/data/FRA_mock_data.csv                 |    101 +
+ FRA_AI_Data/data/processed/clean.csv               |      0
+ FRA_AI_Data/data/raw/FRA_Mock_Data _001.csv        |    251 +
+ FRA_AI_Data/data/raw/FRA_Mock_Data_Large.csv       |   4001 +
+ FRA_AI_Data/data/raw/FRA_mock_data.csv             |    101 +
+ .../api_data_aadhar_biometric_1000000_1500000.csv  | 361109 ++++++++++++++++++
+ ..._data_aadhar_biometric_1000000_1500000_001.xlsx |    Bin 0 -> 5066595 bytes
+ FRA_AI_Data/data/raw/fra_falty.csv                 |     10 +
+ FRA_AI_Data/data/raw/fra_healthy.csv               |     10 +
+ FRA_AI_Data/data/raw/train.csv                     |     81 +
+ FRA_AI_Data/fix_data.py                            |     16 +
+ FRA_AI_Data/main.py                                |      9 +
+ FRA_AI_Data/models/trained_model.pk1               |      0
+ FRA_AI_Data/models/trained_model.pkl               |    Bin 0 -> 81729 bytes
+ FRA_AI_Data/notebooks/experiments.ipynb            |     10 +
+ FRA_AI_Data/report.pdf                             |     74 +
+ FRA_AI_Data/reports/report.pdf                     |     80 +
+ FRA_AI_Data/requirements.txt                       |      8 +
+ .../src/__pycache__/analyzer.cpython-311.pyc       |    Bin 0 -> 4232 bytes
+ .../src/__pycache__/data_loader.cpython-311.pyc    |    Bin 0 -> 3069 bytes
+ .../src/__pycache__/data_loader.cpython-313.pyc    |    Bin 0 -> 616 bytes
+ FRA_AI_Data/src/__pycache__/model.cpython-311.pyc  |    Bin 0 -> 7585 bytes
+ .../src/__pycache__/plotter.cpython-311.pyc        |    Bin 0 -> 1727 bytes
+ .../src/__pycache__/preprocessor.cpython-311.pyc   |    Bin 0 -> 2348 bytes
+ FRA_AI_Data/src/__pycache__/report.cpython-311.pyc |    Bin 0 -> 4140 bytes
+ FRA_AI_Data/src/__pycache__/utils.cpython-311.pyc  |    Bin 0 -> 1863 bytes
+ FRA_AI_Data/src/analyzer.py                        |    103 +
+ FRA_AI_Data/src/data_loader.py                     |     59 +
+ FRA_AI_Data/src/init.py                            |      0
+ FRA_AI_Data/src/model.py                           |    171 +
+ FRA_AI_Data/src/plotter.py                         |     57 +
+ FRA_AI_Data/src/preprocessor.py                    |     45 +
+ FRA_AI_Data/src/report.py                          |     70 +
+ FRA_AI_Data/src/utils.py                           |     43 +
+ 44 files changed, 371506 insertions(+)
