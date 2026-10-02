@@ -27,7 +27,7 @@ Transform FRA Diagnostics into a robust, standard-aligned (IEEE Std C57.149 / IE
 ## Decisions so far
 
 <!-- the index — one line per closed ticket: enough to judge relevance, then zoom the link for the detail the ticket holds -->
-*(No tickets resolved yet)*
+- [[ISSUE-001] Define Sub-band Frequency Boundaries and Mathematical Metrics (IEEE C57.149 / IEC 60076-18)](.issues/ISSUE-001-ieee-subband-boundaries-and-metrics.md) — Standardized on 3-band IEEE C57.149/CIGRE model (LF <2 kHz: core, MF 2 kHz–100 kHz: winding, HF >100 kHz: leads/insulation) with CCF, ASLE, and MaxDev thresholds (>0.98 Healthy, 0.90–0.98 Warning, <0.90 Fault).
 
 ---
 

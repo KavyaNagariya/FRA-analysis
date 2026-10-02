@@ -4,7 +4,7 @@
 - **Type**: `wayfinder:prototype` (HITL)
 - **Status**: Open
 - **Assignee**: Unassigned
-- **Blocked By**: ISSUE-001
+- **Blocked By**: None (Unblocked by ISSUE-001) (Frontier)
 - **Blocks**: None
 
 ---
