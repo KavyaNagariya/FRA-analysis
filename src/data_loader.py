@@ -39,7 +39,7 @@ def load_fra_data(path):
         data = data[[freq_col, mag_col]].copy() # Keep only what we need
         data = data.rename(columns={freq_col: "Frequency", mag_col: "Magnitude"})
 
-        # 3. 🛡️ CLEANING: Convert to Numeric
+        # 3. CLEANING: Convert to Numeric
         # This is the most important step for industrial CSVs
         for col in ["Frequency", "Magnitude"]:
             data[col] = pd.to_numeric(data[col], errors='coerce')
@@ -48,12 +48,12 @@ def load_fra_data(path):
         data = data.dropna().reset_index(drop=True)
 
         if data.empty:
-            print(f"❌ Error: {path} contains no valid numeric data.")
+            print(f"Error: {path} contains no valid numeric data.")
             return None
 
-        print(f"✅ Data loaded successfully: {len(data)} points.")
+        print(f"Data loaded successfully: {len(data)} points.")
         return data
 
     except Exception as e:
-        print(f"❌ Data Loader Error ({path}): {e}")
+        print(f"Data Loader Error ({path}): {e}")
         return None

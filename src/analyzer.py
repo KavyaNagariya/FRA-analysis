@@ -10,18 +10,17 @@ def calculate_metrics(data1, data2):
     Calculates the statistical difference between the reference and test signals.
     """
     try:
-        # Convert to numpy arrays for speed and reliability
-        m1 = np.array(data1["Magnitude"])
-        m2 = np.array(data2["Magnitude"])
-        
-        # ✅ FIX: Synchronize lengths before any math
-        min_len = min(len(m1), len(m2))
-        m1_sync = m1[:min_len]
-        m2_sync = m2[:min_len]
+        # Get valid mask where both have data
+        valid_mask = data1["Magnitude"].notna() & data2["Magnitude"].notna()
+        if valid_mask.sum() == 0:
+            return 0, 0.0, 0.0
+
+        m1_sync = data1.loc[valid_mask, "Magnitude"].values
+        m2_sync = data2.loc[valid_mask, "Magnitude"].values
 
         # 1. Peak Shift (Using argmax on the synchronized arrays)
         peak1 = np.argmax(m1_sync)
-        peak2 = np.argmax(m2~_sync)
+        peak2 = np.argmax(m2_sync)
         shift = int(abs(peak1 - peak2))
 
         # 2. Max Deviation (dB difference)
@@ -45,18 +44,17 @@ def advanced_analysis(healthy_df, uploaded_df):
     """
     Performs AI + Statistical analysis on FRA data.
     """
-    # 1. ✅ PRE-SYNC: Ensure both dataframes are the same length globally
-    min_len = min(len(healthy_df), len(uploaded_df))
-    h_df = healthy_df.iloc[:min_len].copy()
-    u_df = uploaded_df.iloc[:min_len].copy()
+    # Now that data is preprocessed, both are 500 points on the same grid
+    h_df = healthy_df.copy()
+    u_df = uploaded_df.copy()
 
-    # 2. Get core statistical metrics using synchronized data
+    # 2. Get core statistical metrics using valid intersection
     shift, max_dev, corr = calculate_metrics(h_df, u_df)
 
     # 3. Get AI Prediction from your ML model
     try:
-        # Pass the synchronized dataframes to the AI model
-        ai_fault, ai_confidence = predict_fault(h_df, u_df)
+        # Pass the preprocessed dataframes to the AI model
+        ai_fault, ai_confidence, _ = predict_fault(h_df, u_df)
     except Exception as e:
         print(f"AI Prediction failed, falling back to stats: {e}")
         ai_fault, ai_confidence = "Analysis Pending", 0.0
@@ -81,10 +79,10 @@ def advanced_analysis(healthy_df, uploaded_df):
 
     # 5. 📊 Data Alignment for Chart.js
     try:
-        # Use synchronized data for the frontend
+        # Use common grid data for the frontend, replacing NaNs with None for JSON
         freq = u_df["Frequency"].tolist()
-        mag_h = h_df["Magnitude"].tolist()
-        mag_u = u_df["Magnitude"].tolist()
+        mag_h = h_df["Magnitude"].replace({np.nan: None}).tolist()
+        mag_u = u_df["Magnitude"].replace({np.nan: None}).tolist()
     except Exception as e:
         print(f"Chart Alignment Error: {e}")
         freq, mag_h, mag_u = [], [], []

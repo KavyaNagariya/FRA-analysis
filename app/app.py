@@ -8,7 +8,7 @@ from datetime import datetime
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(BASE_DIR)
 
-from src.model import load_fra_data
+from src.data_loader import load_fra_data
 from src.analyzer import advanced_analysis
 
 app = Flask(__name__)
@@ -76,6 +76,11 @@ def analyze():
 
         if uploaded_df is None or healthy_df is None:
             return "Error: CSV parsing failed. Ensure columns are 'Frequency' and 'Magnitude'.", 500
+
+        # Preprocess the sweeps to align them to the 500-point standard grid
+        from src.preprocessor import preprocess_sweep
+        uploaded_df = preprocess_sweep(uploaded_df, file_path)
+        healthy_df = preprocess_sweep(healthy_df, baseline_path)
 
         # 4. Run Analysis
         result = advanced_analysis(healthy_df, uploaded_df)
