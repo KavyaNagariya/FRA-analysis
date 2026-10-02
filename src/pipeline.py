@@ -26,7 +26,29 @@ class PipelineResult(list):
         return super().__contains__(key)
 
 
-def run_pipeline(uploaded_data, baseline_data=None):
+def _resolve_baseline_df(baseline_source, fallback_sweep):
+    """Loads and unwraps raw baseline sweep data."""
+    if baseline_source is not None:
+        if isinstance(baseline_source, pd.DataFrame):
+            return baseline_source
+        loaded = load_fra_data(baseline_source)
+        if isinstance(loaded, list) and len(loaded) > 0:
+            return loaded[0]["data"]
+        if isinstance(loaded, pd.DataFrame):
+            return loaded
+
+    default_path = os.path.join("data", "raw", "fra_healthy.csv")
+    if os.path.exists(default_path):
+        loaded = load_fra_data(default_path)
+        if isinstance(loaded, list) and len(loaded) > 0:
+            return loaded[0]["data"]
+        if isinstance(loaded, pd.DataFrame):
+            return loaded
+
+    return fallback_sweep["data"]
+
+
+def run_pipeline(uploaded_data, baseline_data=None, generate_pdf=False, pdf_output_path=None):
     """
     Executes the full diagnostic pipeline on uploaded data (file path or DataFrame).
     
@@ -47,27 +69,15 @@ def run_pipeline(uploaded_data, baseline_data=None):
     is_multi = (ingest_result["type"] == "multi_sweep")
 
     # Resolve baseline
-    if baseline_data is not None:
-        if isinstance(baseline_data, pd.DataFrame):
-            baseline_raw = baseline_data
-        else:
-            baseline_raw = load_fra_data(baseline_data)
-            if isinstance(baseline_raw, list) and len(baseline_raw) > 0:
-                baseline_raw = baseline_raw[0]["data"]
-    else:
-        # Default baseline if exists
-        default_baseline_path = os.path.join("data", "raw", "fra_healthy.csv")
-        if os.path.exists(default_baseline_path):
-            baseline_raw = load_fra_data(default_baseline_path)
-            if isinstance(baseline_raw, list) and len(baseline_raw) > 0:
-                baseline_raw = baseline_raw[0]["data"]
-        else:
-            # Fallback to the first sweep of uploaded data
-            baseline_raw = sweeps[0]["data"]
-
-    # Preprocess baseline
+    baseline_raw = _resolve_baseline_df(baseline_data, sweeps[0])
     source_info = str(baseline_data) if baseline_data is not None else "baseline"
     baseline_prep = preprocess_sweep(baseline_raw, source_path=source_info)
+
+    known_keys = {
+        "transformer_id": ["transformer_id", "transformerid", "asset_id", "assetid"],
+        "winding_type": ["winding_type", "winding"],
+        "test_date": ["test_date", "date"]
+    }
 
     results = []
     for sweep in sweeps:
@@ -80,14 +90,32 @@ def run_pipeline(uploaded_data, baseline_data=None):
         # Attach metadata to result dictionary
         result_dict = dict(analysis)
         result_dict["metadata"] = metadata
-        for meta_k, meta_v in metadata.items():
-            k_lower = str(meta_k).lower()
-            if k_lower in ["transformer_id", "transformerid", "asset_id", "assetid"]:
-                result_dict["transformer_id"] = meta_v
-            if k_lower in ["winding_type", "winding"]:
-                result_dict["winding_type"] = meta_v
-            if k_lower in ["test_date", "date"]:
-                result_dict["test_date"] = meta_v
+
+        for target_key, candidate_names in known_keys.items():
+            for meta_k, meta_v in metadata.items():
+                if str(meta_k).lower() in candidate_names:
+                    result_dict[target_key] = meta_v
+                    break
+
+        # Generate Bode comparison plot
+        try:
+            from src.plotter import generate_comparison_plot
+            result_dict["bode_plot"] = generate_comparison_plot(baseline_prep, sweep_prep)
+        except Exception as e:
+            print(f"Warning generating Bode plot: {e}")
+
+        # Optional PDF report generation
+        if generate_pdf:
+            try:
+                from src.report import generate_report
+                pdf_path = generate_report(
+                    result_dict,
+                    bode_plot=result_dict.get("bode_plot"),
+                    output_path=pdf_output_path
+                )
+                result_dict["pdf_path"] = pdf_path
+            except Exception as e:
+                print(f"Warning generating PDF report: {e}")
 
         results.append(result_dict)
 

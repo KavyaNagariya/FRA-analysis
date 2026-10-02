@@ -59,12 +59,28 @@ def test_load_fra_data_in_memory_multi_asset():
     assert len(sweeps[0]["data"]) == 2
     assert list(sweeps[0]["data"]["Frequency"]) == [20.0, 50.0]
 
-def test_load_fra_data_single_sweep_file():
+def test_detect_columns_winding_phase_is_metadata():
+    # Transformer winding phase like "Phase_A" or "Phase_ID" must be metadata, not phase angle
+    columns = ["Frequency", "Magnitude", "Phase_ID", "Transformer_ID"]
+    cols_info = detect_columns(columns)
+    assert cols_info["freq"] == "Frequency"
+    assert cols_info["mag"] == "Magnitude"
+    assert cols_info["phase"] is None
+    assert "Phase_ID" in cols_info["metadata"]
+
+def test_load_fra_data_nan_metadata_preserved():
     from src.data_loader import load_fra_data
-    df = load_fra_data("data/raw/fra_healthy.csv")
-    assert isinstance(df, pd.DataFrame)
-    assert "Frequency" in df.columns
-    assert "Magnitude" in df.columns
-    assert len(df) > 0
+    df = pd.DataFrame({
+        "Asset_ID": ["A", "A", None, None],
+        "Frequency_Hz": [20.0, 50.0, 20.0, 50.0],
+        "Magnitude_dB": [-10.0, -12.0, -15.0, -18.0]
+    })
+    sweeps = load_fra_data(df)
+    assert isinstance(sweeps, list)
+    assert len(sweeps) == 2
+    # Second group with NaN Asset_ID should not be dropped
+    assert len(sweeps[0]["data"]) == 2
+    assert len(sweeps[1]["data"]) == 2
+
 
 

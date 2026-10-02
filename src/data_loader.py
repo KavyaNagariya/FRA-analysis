@@ -1,10 +1,25 @@
 import pandas as pd
 import numpy as np
 
+def is_phase_measurement_column(col_name):
+    """
+    Distinguishes phase angle measurements (e.g. Phase_deg, Phase (deg), Angle)
+    from transformer winding phase metadata (e.g. Phase_ID, Phase_A, Test_Phase).
+    """
+    col_lower = str(col_name).lower()
+    metadata_patterns = ["id", "name", "type", "label", "_a", "_b", "_c", "_u", "_v", "_w", "test", "winding"]
+    if any(pat in col_lower for pat in metadata_patterns):
+        return False
+    
+    angle_patterns = ["deg", "degree", "angle", "rad"]
+    if any(k in col_lower for k in angle_patterns):
+        return True
+    
+    return col_lower in ["phase", "phase_rad"]
+
 def detect_columns(columns):
     freq_keywords = ["freq", "frequency", "hz"]
     mag_keywords = ["mag", "magnitude", "amplitude", "db"]
-    phase_keywords = ["phase", "deg", "degree", "angle"]
 
     cols_info = {
         "freq": None,
@@ -19,29 +34,23 @@ def detect_columns(columns):
             cols_info["freq"] = col
         elif any(k in col_lower for k in mag_keywords) and not cols_info["mag"]:
             cols_info["mag"] = col
-        elif any(k in col_lower for k in phase_keywords) and not cols_info["phase"]:
+        elif is_phase_measurement_column(col) and not cols_info["phase"]:
             cols_info["phase"] = col
         else:
             cols_info["metadata"].append(col)
 
-    # Fallback to first two columns if detection fails
+    # Fallback to first available columns if detection fails
     if cols_info["freq"] is None or cols_info["mag"] is None:
-        if len(columns) >= 2:
-            cols_info["freq"] = columns[0]
-            cols_info["mag"] = columns[1]
-            cols_info["metadata"] = [c for c in columns[2:] if c != cols_info["phase"]]
+        remaining = [c for c in columns if c not in [cols_info["freq"], cols_info["mag"], cols_info["phase"]]]
+        if cols_info["freq"] is None and remaining:
+            cols_info["freq"] = remaining.pop(0)
+        if cols_info["mag"] is None and remaining:
+            cols_info["mag"] = remaining.pop(0)
+        cols_info["metadata"] = remaining
 
     return cols_info
 
 class FRADataIngestor:
-    def __init__(self):
-        self.freq_keywords = ["freq", "frequency", "hz"]
-        self.mag_keywords = ["mag", "magnitude", "amplitude", "db"]
-        self.phase_keywords = ["phase", "deg", "degree", "angle"]
-
-    def _detect_columns(self, columns):
-        return detect_columns(columns)
-
     def load(self, path_or_df):
         """Load and parse the dataset, detecting single vs multi-test."""
         try:
@@ -63,7 +72,7 @@ class FRADataIngestor:
                     except Exception:
                         data = pd.read_csv(path_or_df, encoding="latin1", sep=None, engine='python')
 
-            cols_info = self._detect_columns(data.columns)
+            cols_info = detect_columns(data.columns)
 
             if not cols_info['freq'] or not cols_info['mag']:
                 raise ValueError("Could not detect Frequency and Magnitude columns.")
@@ -83,13 +92,10 @@ class FRADataIngestor:
                 rename_map[cols_info['phase']] = 'Phase'
             data = data.rename(columns=rename_map)
 
-            # Determine if multi-asset
+            meas_cols = ['Frequency', 'Magnitude'] + (['Phase'] if cols_info['phase'] else [])
             metadata_cols = cols_info['metadata']
 
             if not metadata_cols:
-                meas_cols = ['Frequency', 'Magnitude']
-                if cols_info['phase']:
-                    meas_cols.append('Phase')
                 clean_data = data[meas_cols].copy().reset_index(drop=True)
                 return {
                     'type': 'single_sweep',
@@ -98,16 +104,12 @@ class FRADataIngestor:
                 }
             else:
                 sweeps = []
-                grouped = data.groupby(metadata_cols, sort=False)
+                grouped = data.groupby(metadata_cols, sort=False, dropna=False)
                 for name, group in grouped:
                     if isinstance(name, tuple):
                         meta_dict = dict(zip(metadata_cols, name))
                     else:
                         meta_dict = {metadata_cols[0]: name}
-
-                    meas_cols = ['Frequency', 'Magnitude']
-                    if cols_info['phase']:
-                        meas_cols.append('Phase')
 
                     sweeps.append({
                         'metadata': meta_dict,

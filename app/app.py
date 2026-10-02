@@ -78,6 +78,14 @@ def analyze():
 
         result = pipeline_results[0] if isinstance(pipeline_results, list) else pipeline_results
 
+        # Generate downloadable PDF report
+        try:
+            from src.report import generate_report
+            pdf_path = os.path.join(REPORT_FOLDER, "report.pdf")
+            generate_report(result, bode_plot=result.get("bode_plot"), output_path=pdf_path)
+        except Exception as e:
+            print(f"Warning: Failed to generate PDF report: {e}")
+
         # Calculate a Confidence Score out of 100 based on correlation
         conf_score = int(result.get("correlation", 0) * 100)
         transformer_id = result.get("transformer_id") or file.filename
