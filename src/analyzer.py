@@ -71,15 +71,25 @@ def advanced_analysis(healthy_df, uploaded_df):
     per_band = {}
     band_ccfs = []
     
-    def evaluate_band(ccf):
-        if ccf >= 0.98: return "Healthy", 0, "Low"
-        if ccf >= 0.90: return "Warning", 1, "Medium"
-        if ccf >= 0.80: return "Danger", 2, "High"
-        return "Critical", 3, "High"
+    class Severity:
+        def __init__(self, name: str, level: int, label: str):
+            self.name = name
+            self.level = level
+            self.label = label
 
-    worst_sev_level = -1
-    overall_status = "Healthy"
-    overall_severity = "Low"
+    SEVERITY_HEALTHY = Severity("Healthy", 0, "Low")
+    SEVERITY_WARNING = Severity("Warning", 1, "Medium")
+    SEVERITY_DANGER = Severity("Danger", 2, "High")
+    SEVERITY_CRITICAL = Severity("Critical", 3, "High")
+    SEVERITY_INSUFFICIENT = Severity("Insufficient Data", -1, "Unknown")
+    
+    def evaluate_band(ccf):
+        if ccf >= 0.98: return SEVERITY_HEALTHY
+        if ccf >= 0.90: return SEVERITY_WARNING
+        if ccf >= 0.80: return SEVERITY_DANGER
+        return SEVERITY_CRITICAL
+
+    overall_severity = SEVERITY_HEALTHY
     
     for band_code, band_name, band_range in bands:
         band_metrics = compute_subband_metrics(h_df, u_df, band_code)
@@ -93,55 +103,48 @@ def advanced_analysis(healthy_df, uploaded_df):
         else:
             band_ccf = band_metrics.get("CCF", 0.0)
             band_max_dev = band_metrics.get("MaxDev_dB", 0.0)
-            band_status, band_level, band_severity = evaluate_band(band_ccf)
+            band_sev = evaluate_band(band_ccf)
             
             per_band[band_name] = {
                 "range": band_range,
                 "ccf": band_ccf,
                 "max_dev": band_max_dev,
-                "status": band_status
+                "status": band_sev.name
             }
             band_ccfs.append(band_ccf)
             
-            if band_level > worst_sev_level:
-                worst_sev_level = band_level
-                overall_status = band_status
-                overall_severity = band_severity
+            if band_sev.level > overall_severity.level:
+                overall_severity = band_sev
 
     min_band_ccf = min(band_ccfs) if band_ccfs else corr
     
     if not band_ccfs:
-        overall_status = "Insufficient Data"
-        overall_severity = "Unknown"
-        worst_sev_level = -1
+        overall_severity = SEVERITY_INSUFFICIENT
         
     # ML severity escalation
     # The deterministic physics floor ensures that ML predictions can escalate severity but never downgrade it.
-    ml_level = 0
-    ml_status = "Healthy"
-    ml_severity_label = "Low"
+    ML_FAULT_MAP = {
+        "Healthy": SEVERITY_HEALTHY,
+        "Analysis Pending": SEVERITY_HEALTHY,
+        "Insulation Degradation": SEVERITY_WARNING,
+        "Winding Deformation": SEVERITY_DANGER,
+        "Core Displacement": SEVERITY_CRITICAL
+    }
     
-    # If ML predicts a known fault, map it to a severity level (e.g., Danger = 2)
-    if ai_fault and ai_fault not in ["Healthy", "Analysis Pending"]:
-        ml_level = 2
-        ml_status = "Danger"
-        ml_severity_label = "High"
-
-    if worst_sev_level < ml_level:
-        worst_sev_level = ml_level
-        overall_status = ml_status
-        overall_severity = ml_severity_label
+    ml_sev = ML_FAULT_MAP.get(ai_fault, SEVERITY_HEALTHY)
+    if ml_sev.level > overall_severity.level:
+        overall_severity = ml_sev
     
     # Composite Score formula from SPEC-001
     ml_conf = ai_confidence if ai_confidence > 0 else (corr * 100)
     composite_score = (0.6 * min_band_ccf * 100) + (0.4 * ml_conf)
     
     # Recommendation logic (keep original simple logic based on worst status)
-    if overall_status == "Healthy":
+    if overall_severity.name == "Healthy":
         recommendation = "Transformer operating within normal parameters. No action required."
-    elif overall_status == "Warning":
+    elif overall_severity.name == "Warning":
         recommendation = "Minor deviation detected. Schedule a DGA (Dissolved Gas Analysis) to confirm internal state."
-    elif overall_status == "Insufficient Data":
+    elif overall_severity.name == "Insufficient Data":
         recommendation = "Insufficient data points across all bands. Please perform a higher-resolution sweep."
     else: 
         recommendation = "Significant frequency response shift! Immediate internal inspection of windings recommended."
@@ -157,10 +160,10 @@ def advanced_analysis(healthy_df, uploaded_df):
         freq, mag_h, mag_u = [], [], []
 
     return {
-        "status": overall_status,
+        "status": overall_severity.name,
         "shift": max_dev,               # Displayed in "Max Deviation"
         "correlation": corr,           # Displayed in "Correlation"
-        "severity": overall_severity,
+        "severity": overall_severity.label,
         "fault_type": ai_fault,      # Displayed in "AI Fault Classification"
         "confidence": round(ml_conf, 1),
         "composite_score": round(composite_score, 2), # 0-100% composite value

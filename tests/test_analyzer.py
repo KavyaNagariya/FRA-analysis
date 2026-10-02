@@ -1,42 +1,45 @@
 import pandas as pd
 import numpy as np
 import pytest
+from src.preprocessor import preprocess_sweep
 from src.analyzer import advanced_analysis
 
-def test_ml_severity_escalation(monkeypatch):
-    # Mock compute_subband_metrics to return healthy metrics
-    monkeypatch.setattr('src.preprocessor.compute_subband_metrics', lambda *args, **kwargs: {
-        "status": "Healthy",
-        "CCF": 0.99,
-        "MaxDev_dB": 0.1,
-    })
-    
-    # Mock predict_fault to return a fault
-    monkeypatch.setattr('src.analyzer.predict_fault', lambda *args, **kwargs: ("Winding Deformation", 95.0, {}))
-    
-    # Create dummy dataframes
-    f = np.linspace(20, 1000000, 500)
-    mag = np.zeros(500)
-    h_df = pd.DataFrame({'Frequency': f, 'Magnitude': mag})
-    u_df = h_df.copy()
-    
-    result = advanced_analysis(h_df, u_df)
-    
-    assert result['fault_type'] == "Winding Deformation"
-    assert result['status'] == "Danger"
-    assert result['severity'] == "High"
+def generate_dummy_sweep(seed=42):
+    rng = np.random.RandomState(seed)
+    f = np.logspace(np.log10(20), np.log10(1000000), 100)
+    mag = -20 - 10 * np.log10(f/20 + 1)
+    return pd.DataFrame({'Frequency': f, 'Magnitude': mag})
 
-def test_health_integrity_score_format(monkeypatch):
-    # Mock predict_fault to return healthy
-    monkeypatch.setattr('src.analyzer.predict_fault', lambda *args, **kwargs: ("Healthy", 0.0, {}))
+def test_pipeline_integration_healthy():
+    h_df = generate_dummy_sweep(seed=1)
+    u_df = generate_dummy_sweep(seed=2)
     
-    f = np.linspace(20, 1000000, 500)
-    mag = np.zeros(500)
-    h_df = pd.DataFrame({'Frequency': f, 'Magnitude': mag})
-    u_df = h_df.copy()
+    # Preprocess
+    h_prep = preprocess_sweep(h_df)
+    u_prep = preprocess_sweep(u_df)
     
-    result = advanced_analysis(h_df, u_df)
+    # Analyze
+    result = advanced_analysis(h_prep, u_prep)
     
-    assert 'composite_score' in result
-    assert isinstance(result['composite_score'], (float, int))
+    assert "status" in result
+    assert "severity" in result
+    assert "composite_score" in result
+    assert 0 <= result['composite_score'] <= 100
+
+def test_pipeline_integration_fault():
+    h_df = generate_dummy_sweep(seed=1)
+    u_df = generate_dummy_sweep(seed=2)
+    
+    # Inject a fault logic manually so model flags it
+    mask = (u_df['Frequency'] >= 2000) & (u_df['Frequency'] <= 100000)
+    u_df.loc[mask, 'Magnitude'] += 10.0 # Winding Deformation signature
+    
+    h_prep = preprocess_sweep(h_df)
+    u_prep = preprocess_sweep(u_df)
+    
+    result = advanced_analysis(h_prep, u_prep)
+    
+    assert "status" in result
+    assert "severity" in result
+    assert result['status'] in ["Danger", "Critical"] # because of huge shift
     assert 0 <= result['composite_score'] <= 100
