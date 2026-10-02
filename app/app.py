@@ -70,21 +70,19 @@ def analyze():
             print(f"WARNING: Baseline missing at {baseline_path}. Using upload as temporary baseline.")
             baseline_path = file_path
 
-        # 3. Run Diagnostic Pipeline
+        # 3. Run Diagnostic Pipeline (includes Bode plotting and PDF generation)
         from src.pipeline import run_pipeline
-        pipeline_results = run_pipeline(file_path, baseline_path)
+        pdf_path = os.path.join(REPORT_FOLDER, "report.pdf")
+        pipeline_results = run_pipeline(
+            file_path,
+            baseline_path,
+            generate_pdf=True,
+            pdf_output_path=pdf_path
+        )
         if not pipeline_results:
             return "Error: CSV parsing failed. Ensure columns are 'Frequency' and 'Magnitude'.", 500
 
         result = pipeline_results[0] if isinstance(pipeline_results, list) else pipeline_results
-
-        # Generate downloadable PDF report
-        try:
-            from src.report import generate_report
-            pdf_path = os.path.join(REPORT_FOLDER, "report.pdf")
-            generate_report(result, bode_plot=result.get("bode_plot"), output_path=pdf_path)
-        except Exception as e:
-            print(f"Warning: Failed to generate PDF report: {e}")
 
         # Calculate a Confidence Score out of 100 based on correlation
         conf_score = int(result.get("correlation", 0) * 100)

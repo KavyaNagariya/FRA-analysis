@@ -26,24 +26,29 @@ class PipelineResult(list):
         return super().__contains__(key)
 
 
+def _unwrap_data(loaded):
+    """Unwraps DataFrame from loader output (list of sweeps or raw DataFrame)."""
+    if isinstance(loaded, list) and len(loaded) > 0:
+        return loaded[0].get("data", loaded[0]) if isinstance(loaded[0], dict) else loaded[0]
+    if isinstance(loaded, pd.DataFrame):
+        return loaded
+    return None
+
+
 def _resolve_baseline_df(baseline_source, fallback_sweep):
     """Loads and unwraps raw baseline sweep data."""
     if baseline_source is not None:
         if isinstance(baseline_source, pd.DataFrame):
             return baseline_source
-        loaded = load_fra_data(baseline_source)
-        if isinstance(loaded, list) and len(loaded) > 0:
-            return loaded[0]["data"]
-        if isinstance(loaded, pd.DataFrame):
-            return loaded
+        unwrapped = _unwrap_data(load_fra_data(baseline_source))
+        if unwrapped is not None:
+            return unwrapped
 
     default_path = os.path.join("data", "raw", "fra_healthy.csv")
     if os.path.exists(default_path):
-        loaded = load_fra_data(default_path)
-        if isinstance(loaded, list) and len(loaded) > 0:
-            return loaded[0]["data"]
-        if isinstance(loaded, pd.DataFrame):
-            return loaded
+        unwrapped = _unwrap_data(load_fra_data(default_path))
+        if unwrapped is not None:
+            return unwrapped
 
     return fallback_sweep["data"]
 
