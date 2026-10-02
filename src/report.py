@@ -106,7 +106,7 @@ def _extract_band_info(per_band, match_tokens, default_name, default_range):
             "range": default_range,
             "ccf": None,
             "max_dev": None,
-            "status": "Insufficient Data"
+            "status": "Not Evaluated"
         }
 
     return {
@@ -142,12 +142,17 @@ def generate_report(result, bode_plot=None, output_path=None):
         bode_plot = result.get("bode_plot")
         
     # Auto-generate plot if raw frequency and magnitudes are available but no plot string was passed
-    if bode_plot is None and result.get("frequencies") and result.get("magnitude_healthy") and result.get("magnitude_uploaded"):
+    chart_data = result.get("chart_data", {}) if isinstance(result.get("chart_data"), dict) else {}
+    freqs = result.get("frequencies") or chart_data.get("frequencies")
+    mag_h = result.get("magnitude_healthy") or chart_data.get("magnitude_healthy")
+    mag_u = result.get("magnitude_uploaded") or chart_data.get("magnitude_uploaded")
+
+    if bode_plot is None and freqs and mag_h and mag_u:
         try:
             from src.plotter import generate_comparison_plot
-            df_ref = pd.DataFrame({"Frequency": result["frequencies"], "Magnitude": result["magnitude_healthy"]})
-            df_test = pd.DataFrame({"Frequency": result["frequencies"], "Magnitude": result["magnitude_uploaded"]})
-            bode_plot = generate_comparison_plot(df_ref, df_test)
+            df_ref = pd.DataFrame({"Frequency": freqs, "Magnitude": mag_h})
+            df_test = pd.DataFrame({"Frequency": freqs, "Magnitude": mag_u})
+            bode_plot = generate_comparison_plot(df_ref, df_test, theme='light')
         except Exception as e:
             print(f"Auto Bode plot generation warning: {e}")
 
@@ -255,12 +260,16 @@ def generate_report(result, bode_plot=None, output_path=None):
     ))
     content.append(HRFlowable(width="100%", thickness=1.5, color=brand_blue, spaceBefore=0, spaceAfter=8))
 
+    # Support both flat and nested diagnostic dictionaries
+    diag = result.get("diagnosis", {}) if isinstance(result.get("diagnosis"), dict) else {}
+    per_band_dict = result.get("per_band") or diag.get("per_band") or {}
+
     # Metadata & Asset Info
-    transformer_id = result.get("transformer_id") or result.get("asset_id") or "TX-ASSET-01"
-    test_date = result.get("test_date") or result.get("date") or datetime.now().strftime("%Y-%m-%d %H:%M")
-    winding_type = result.get("winding_type") or "HV to LV Transfer Function"
-    overall_status = result.get("status", "N/A")
-    severity = result.get("severity", "N/A")
+    transformer_id = result.get("transformer_id") or result.get("asset_id") or diag.get("transformer_id") or "TX-ASSET-01"
+    test_date = result.get("test_date") or result.get("date") or diag.get("test_date") or datetime.now().strftime("%Y-%m-%d %H:%M")
+    winding_type = result.get("winding_type") or diag.get("winding_type") or "HV to LV Transfer Function"
+    overall_status = result.get("status") or diag.get("status") or "N/A"
+    severity = result.get("severity") or diag.get("severity") or "N/A"
 
     meta_data = [
         [
@@ -286,11 +295,11 @@ def generate_report(result, bode_plot=None, output_path=None):
     content.append(Spacer(1, 8))
 
     # 2. Executive Summary & Prominent Health Integrity Score
-    composite_score = float(result.get("composite_score", 0.0))
-    fault_type = result.get("fault_type", "N/A")
-    confidence = float(result.get("confidence", 0.0))
-    corr = float(result.get("correlation", 0.0))
-    shift = float(result.get("shift", 0.0))
+    composite_score = float(result.get("composite_score") if result.get("composite_score") is not None else diag.get("composite_score", 0.0))
+    fault_type = result.get("fault_type") or diag.get("fault_type") or "N/A"
+    confidence = float(result.get("confidence") if result.get("confidence") is not None else diag.get("confidence", 0.0))
+    corr = float(result.get("correlation") if result.get("correlation") is not None else diag.get("correlation", 0.0))
+    shift = float(result.get("shift") if result.get("shift") is not None else (diag.get("shift") or diag.get("max_dev") or 0.0))
 
     # Color badge based on composite health score
     if composite_score >= 85:
@@ -424,6 +433,34 @@ def generate_report(result, bode_plot=None, output_path=None):
             break
 
     rec_flowables.append(Paragraph(action_note, cell_normal))
+    rec_flowables.append(Spacer(1, 6))
+
+    # Context-aware component-level breakdown
+    def _band_guidance(comp_name, band_info):
+        st = str(band_info.get("status", "")).lower()
+        if "critical" in st or "danger" in st:
+            if "core" in comp_name.lower():
+                return "Severe deviation detected. Magnetic core deformation or core ground fault suspected. Check core ground current and excitation current."
+            elif "winding" in comp_name.lower():
+                return "Severe deviation detected. Radial or axial mechanical winding deformation indicated. Perform DC winding resistance and leakage reactance tests."
+            else:
+                return "Severe deviation detected. Dielectric degradation or main lead displacement indicated. Perform insulation resistance and bushing inspections."
+        elif "warning" in st:
+            if "core" in comp_name.lower():
+                return "Moderate deviation. Inspect magnetic circuit grounding and monitor no-load losses."
+            elif "winding" in comp_name.lower():
+                return "Moderate deviation. Review short-circuit event history and re-sweep SFRA at next scheduled outage."
+            else:
+                return "Moderate deviation. Schedule oil sampling for Dissolved Gas Analysis (DGA) within 30 days."
+        elif "insufficient" in st:
+            return "Insufficient data points (< 10 points) in this sub-band. Re-sweep frequency response."
+        else:
+            return "Operating within IEEE C57.149 normal parameters. No physical deformation indicated."
+
+    rec_flowables.append(Paragraph("<b>Component-Level Guidance (IEEE C57.149):</b>", cell_bold))
+    rec_flowables.append(Paragraph(f"• <b>Core (Low Band, &lt; 2 kHz):</b> {_band_guidance('Core', band_low)}", cell_normal))
+    rec_flowables.append(Paragraph(f"• <b>Winding (Mid Band, 2–100 kHz):</b> {_band_guidance('Winding', band_mid)}", cell_normal))
+    rec_flowables.append(Paragraph(f"• <b>Insulation (High Band, &gt; 100 kHz):</b> {_band_guidance('Insulation', band_high)}", cell_normal))
 
     rec_box = Table([[rec_flowables]], colWidths=[540])
     rec_box.setStyle(TableStyle([

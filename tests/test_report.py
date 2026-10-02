@@ -161,3 +161,36 @@ def test_pipeline_integration_with_report(tmp_path):
     
     assert "Health Integrity Score" in all_text
     assert "Sub-band" in all_text or "Sub-Band" in all_text
+
+def test_generate_report_nested_diagnostic_dict(tmp_path):
+    """Verifies that generate_report supports the nested diagnostic dictionary format."""
+    pdf_path = str(tmp_path / "nested_report.pdf")
+    nested_result = {
+        "diagnosis": {
+            "status": "Critical",
+            "severity": "High",
+            "fault_type": "Winding Deformation",
+            "composite_score": 42.8,
+            "confidence": 91.2,
+            "correlation": 0.7123,
+            "max_dev": 9.45,
+            "recommendation": "Immediate internal winding inspection mandated.",
+            "transformer_id": "TX-NESTED-99"
+        },
+        "per_band": {
+            "Low (Core)": {"range": "< 2 kHz", "ccf": 0.991, "max_dev": 0.5, "status": "Healthy"},
+            "Mid (Winding)": {"range": "2 - 100 kHz", "ccf": 0.650, "max_dev": 9.45, "status": "Critical"},
+            "High (Insulation)": {"range": "> 100 kHz", "ccf": 0.920, "max_dev": 2.1, "status": "Warning"}
+        }
+    }
+    output_path = generate_report(nested_result, output_path=pdf_path)
+    assert os.path.exists(output_path)
+    
+    reader = pypdf.PdfReader(output_path)
+    all_text = " ".join(page.extract_text() for page in reader.pages)
+    assert "TX-NESTED-99" in all_text
+    assert "Critical" in all_text
+    assert "42.8" in all_text
+    assert "Winding Deformation" in all_text
+    assert "Component-Level Guidance" in all_text
+    assert "radial or axial" in all_text.lower() or "radial" in all_text.lower()
