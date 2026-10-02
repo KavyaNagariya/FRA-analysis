@@ -58,8 +58,9 @@ def smooth_signal(df, window=11, polyorder=3):
 # ─────────────────────────────────────────────
 def interpolate_to_common_grid(df, grid=None):
     """
-    Cubic interpolation in dB-space onto the common log grid.
+    Interpolation in dB-space onto the common log grid.
     Points outside the native sweep range are NaN (no extrapolation).
+    Gracefully falls back to linear or empty for sparse arrays.
     """
     if grid is None:
         grid = COMMON_GRID
@@ -67,9 +68,16 @@ def interpolate_to_common_grid(df, grid=None):
     native_freq = df["Frequency"].values
     native_mag = df["Magnitude"].values
 
+    if len(native_freq) < 2:
+        # Too sparse to interpolate at all
+        return pd.DataFrame({"Frequency": grid, "Magnitude": np.nan})
+    
+    # Fallback to linear if fewer than 4 points
+    kind = "cubic" if len(native_freq) >= 4 else "linear"
+
     interp_fn = interp1d(
         native_freq, native_mag,
-        kind="cubic",
+        kind=kind,
         bounds_error=False,
         fill_value=np.nan,
     )
@@ -126,10 +134,61 @@ def preprocess_sweep(df, source_path=None):
     # --- Attach metadata ---
     result.attrs["source_file"] = str(source_path) if source_path else "unknown"
     result.attrs["native_point_count"] = len(cleaned)
-    result.attrs["native_freq_min"] = float(cleaned["Frequency"].min())
-    result.attrs["native_freq_max"] = float(cleaned["Frequency"].max())
+    result.attrs["native_freq_min"] = float(cleaned["Frequency"].min()) if not cleaned.empty else 0.0
+    result.attrs["native_freq_max"] = float(cleaned["Frequency"].max()) if not cleaned.empty else 0.0
 
     return result
+
+# ─────────────────────────────────────────────
+# Sub-band Helpers
+# ─────────────────────────────────────────────
+def slice_subband(df, band_name):
+    """Extract rows for a named sub-band. Returns (slice_df, is_valid)."""
+    lo, hi = SUBBAND_BOUNDARIES[band_name]
+    mask = (df["Frequency"] >= lo) & (df["Frequency"] <= hi) & df["Magnitude"].notna()
+    band_df = df.loc[mask]
+    is_valid = len(band_df) >= MIN_BAND_POINTS
+    return band_df, is_valid
+
+def compute_subband_metrics(baseline_df, test_df, band_name):
+    """
+    Compute CCF, ASLE, MaxDev on the intersection of valid points in a sub-band.
+    Both DataFrames must already be on the common grid.
+    Returns dict with metrics or {"status": "Insufficient Data"}.
+    """
+    b_band, b_valid = slice_subband(baseline_df, band_name)
+    t_band, t_valid = slice_subband(test_df, band_name)
+
+    if not (b_valid and t_valid):
+        return {"band": band_name, "status": "Insufficient Data"}
+
+    # Intersection: both must be non-NaN at the same grid points
+    valid_mask = b_band["Magnitude"].notna() & t_band["Magnitude"].notna()
+    b_vals = b_band.loc[valid_mask, "Magnitude"].values
+    t_vals = t_band.loc[valid_mask, "Magnitude"].values
+
+    if len(b_vals) < MIN_BAND_POINTS:
+        return {"band": band_name, "status": "Insufficient Data"}
+
+    # CCF (cross-correlation factor)
+    ccf = np.corrcoef(b_vals, t_vals)[0, 1]
+    if np.isnan(ccf):
+        ccf = 0.0
+
+    # ASLE (mean absolute dB error)
+    asle = np.mean(np.abs(t_vals - b_vals))
+
+    # MaxDev
+    max_dev = np.max(np.abs(t_vals - b_vals))
+
+    return {
+        "band": band_name,
+        "status": "OK",
+        "n_points": int(len(b_vals)),
+        "CCF": round(float(ccf), 4),
+        "ASLE_dB": round(float(asle), 2),
+        "MaxDev_dB": round(float(max_dev), 2),
+    }
 
 # Keeping this for backwards compatibility if anyone calls it
 def preprocess_all(data):
