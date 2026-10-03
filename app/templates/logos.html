@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}Brand Identity & Logo Showcase | FRA Intelligence{% endblock %}
+
+{% block extra_head %}
+<style>
+    .logo-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E8E3DA;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(31, 30, 29, 0.04), 0 6px 20px rgba(31, 30, 29, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .logo-card:hover {
+        border-color: #CC785C;
+        box-shadow: 0 6px 18px rgba(31, 30, 29, 0.08), 0 16px 36px rgba(31, 30, 29, 0.04);
+    }
+    .preview-stage {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set active_page = 'logos' %}
+
+<div class="max-w-6xl mx-auto space-y-12 pb-16">
+
+    <!-- EDITORIAL MONOGRAPH HEADER -->
+    <div class="text-center max-w-3xl mx-auto space-y-4 pt-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border-subtle text-xs font-mono text-ink-secondary shadow-soft-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+            <span>BRAND IDENTITY SYSTEM // ANTHROPIC AESTHETIC</span>
+        </div>
+
+        <h1 class="font-serif text-4xl sm:text-5xl font-medium text-ink-primary tracking-tight">
+            Faceted Dual-Tone Spark & Harmonic Pulse
+        </h1>
+
+        <p class="text-base text-ink-secondary leading-relaxed font-sans">
+            Four bespoke vector emblem concepts exploring the intersection of Claude's iconic geometric spark with high-voltage frequency response harmonics and apparatus resonance physics.
+        </p>
+
+        <!-- Substrate Stage Switcher -->
+        <div class="pt-2 flex items-center justify-center gap-2 text-xs font-mono">
+            <span class="text-ink-muted uppercase mr-1">Preview Substrate:</span>
+            <button onclick="setSubstrate('linen')" id="btnLinen" class="px-3 py-1 rounded-full bg-ink-primary text-white font-medium transition shadow-soft-xs">
+                Warm Linen (#FAF8F5)
+            </button>
+            <button onclick="setSubstrate('white')" id="btnWhite" class="px-3 py-1 rounded-full bg-surface text-ink-secondary border border-border-medium hover:text-ink-primary transition">
+                Pure White (#FFFFFF)
+            </button>
+            <button onclick="setSubstrate('charcoal')" id="btnCharcoal" class="px-3 py-1 rounded-full bg-[#1F1E1D] text-[#FAF8F5] border border-[#383531] hover:border-terracotta transition">
+                Deep Ink (#1F1E1D)
+            </button>
+        </div>
+    </div>
+
+    <!-- 4 LOGO CONCEPT CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- CONCEPT 1: THE HARMONIC COMPASS -->
+        <div class="logo-card p-6 sm:p-8 space-y-6">
+            <!-- Header Tag -->
+            <div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-terracotta">CONCEPT 01</span>
+                    <span class="text-ink-muted">·</span>
+                    <h2 class="font-serif text-xl font-semibold text-ink-primary">The Harmonic Compass</h2>
+                </div>
+                <span class="text-[11px] font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle">
+                    4-Point Faceted
+                </span>
+            </div>
+
+            <!-- Preview Chamber -->
+            <div class="preview-stage rounded-xl border border-border-subtle p-8 flex items-center justify-center min-h-[220px] bg-[#FAF8F5]">
+                <div class="w-36 h-36 drop-shadow-sm hover:scale-105 transition-transform duration-300">
+                    <img src="/static/logos/logo_harmonic_compass.svg" alt="Concept 1: The Harmonic Compass" class="w-full h-full">
+                </div>
+            </div>
+
+            <!-- Design Rationale -->
+            <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                A mathematical 4-point diamond spark split down the vertical meridian. The left facets are finished in Claude terracotta (<code class="text-terracotta">#CC785C</code>), while the right facets use rich deep charcoal (<code class="text-ink-primary">#1F1E1D</code>). A subtle horizontal sinusoidal frequency pulse traverses the central resonance aperture, symbolizing Sweep Frequency Response Analysis.
+            </p>
+
+            <!-- Wordmark Lockup Preview -->
+            <div class="p-4 rounded-lg bg-canvas-subtle border border-border-subtle space-y-2">
+                <div class="text-[10px] font-mono uppercase text-ink-muted">Horizontal Wordmark Lockup</div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 shrink-0">
+                        <img src="/static/logos/logo_harmonic_compass.svg" alt="Icon" class="w-full h-full">
+                    </div>
+                    <div>
+                        <div class="font-serif font-semibold text-base text-ink-primary leading-none">FRA Intelligence</div>
+                        <div class="text-[11px] font-sans text-ink-muted mt-0.5 font-mono">High-Voltage SFRA Diagnostics</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scale & Favicon Test -->
+            <div class="flex items-center justify-between text-xs font-mono text-ink-muted pt-1">
+                <span>Scale Verification:</span>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 border border-border-subtle rounded bg-white p-1" title="40px App Icon">
+                        <img src="/static/logos/logo_harmonic_compass.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-6 h-6 border border-border-subtle rounded bg-white p-0.5" title="24px Nav Icon">
+                        <img src="/static/logos/logo_harmonic_compass.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-4 h-4 border border-border-subtle rounded bg-white" title="16px Favicon">
+                        <img src="/static/logos/logo_harmonic_compass.svg" class="w-full h-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex items-center gap-3 border-t border-border-subtle">
+                <a href="/static/logos/logo_harmonic_compass.svg" download="fra_intelligence_harmonic_compass.svg" class="flex-1 text-center py-2 bg-ink-primary text-white text-xs font-mono font-medium rounded-lg hover:bg-ink-secondary transition shadow-soft-xs">
+                    Download SVG
+                </a>
+                <button onclick="copySvgCode('logo_harmonic_compass.svg', this)" class="px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium rounded-lg text-xs font-mono transition">
+                    Copy SVG
+                </button>
+            </div>
+        </div>
+
+        <!-- CONCEPT 2: THE RESONANT OCTAGRAM -->
+        <div class="logo-card p-6 sm:p-8 space-y-6">
+            <!-- Header Tag -->
+            <div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-sage">CONCEPT 02</span>
+                    <span class="text-ink-muted">·</span>
+                    <h2 class="font-serif text-xl font-semibold text-ink-primary">The Resonant Octagram</h2>
+                </div>
+                <span class="text-[11px] font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle">
+                    8-Point Dual-Tone
+                </span>
+            </div>
+
+            <!-- Preview Chamber -->
+            <div class="preview-stage rounded-xl border border-border-subtle p-8 flex items-center justify-center min-h-[220px] bg-[#FAF8F5]">
+                <div class="w-36 h-36 drop-shadow-sm hover:scale-105 transition-transform duration-300">
+                    <img src="/static/logos/logo_resonant_octagram.svg" alt="Concept 2: The Resonant Octagram" class="w-full h-full">
+                </div>
+            </div>
+
+            <!-- Design Rationale -->
+            <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                An authoritative 8-point geometric research seal with 4 primary cardinal rays and 4 diagonal harmonic rays. Faceted shading balances terracotta hues with deep charcoal and warm ochre accents. The concentric circular nucleus symbolizes precision electrical calibration.
+            </p>
+
+            <!-- Wordmark Lockup Preview -->
+            <div class="p-4 rounded-lg bg-canvas-subtle border border-border-subtle space-y-2">
+                <div class="text-[10px] font-mono uppercase text-ink-muted">Horizontal Wordmark Lockup</div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 shrink-0">
+                        <img src="/static/logos/logo_resonant_octagram.svg" alt="Icon" class="w-full h-full">
+                    </div>
+                    <div>
+                        <div class="font-serif font-semibold text-base text-ink-primary leading-none">FRA Intelligence</div>
+                        <div class="text-[11px] font-sans text-ink-muted mt-0.5 font-mono">High-Voltage SFRA Diagnostics</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scale & Favicon Test -->
+            <div class="flex items-center justify-between text-xs font-mono text-ink-muted pt-1">
+                <span>Scale Verification:</span>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 border border-border-subtle rounded bg-white p-1" title="40px App Icon">
+                        <img src="/static/logos/logo_resonant_octagram.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-6 h-6 border border-border-subtle rounded bg-white p-0.5" title="24px Nav Icon">
+                        <img src="/static/logos/logo_resonant_octagram.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-4 h-4 border border-border-subtle rounded bg-white" title="16px Favicon">
+                        <img src="/static/logos/logo_resonant_octagram.svg" class="w-full h-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex items-center gap-3 border-t border-border-subtle">
+                <a href="/static/logos/logo_resonant_octagram.svg" download="fra_intelligence_resonant_octagram.svg" class="flex-1 text-center py-2 bg-ink-primary text-white text-xs font-mono font-medium rounded-lg hover:bg-ink-secondary transition shadow-soft-xs">
+                    Download SVG
+                </a>
+                <button onclick="copySvgCode('logo_resonant_octagram.svg', this)" class="px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium rounded-lg text-xs font-mono transition">
+                    Copy SVG
+                </button>
+            </div>
+        </div>
+
+        <!-- CONCEPT 3: THE WAVEFORM SPARK -->
+        <div class="logo-card p-6 sm:p-8 space-y-6">
+            <!-- Header Tag -->
+            <div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-ochre">CONCEPT 03</span>
+                    <span class="text-ink-muted">·</span>
+                    <h2 class="font-serif text-xl font-semibold text-ink-primary">The Waveform Spark</h2>
+                </div>
+                <span class="text-[11px] font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle">
+                    Sinusoidal Intersection
+                </span>
+            </div>
+
+            <!-- Preview Chamber -->
+            <div class="preview-stage rounded-xl border border-border-subtle p-8 flex items-center justify-center min-h-[220px] bg-[#FAF8F5]">
+                <div class="w-36 h-36 drop-shadow-sm hover:scale-105 transition-transform duration-300">
+                    <img src="/static/logos/logo_waveform_spark.svg" alt="Concept 3: The Waveform Spark" class="w-full h-full">
+                </div>
+            </div>
+
+            <!-- Design Rationale -->
+            <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                Sculpted from two continuous sinusoidal Bode curves that cross diagonally at 90 degrees to form a star in negative space. Features an interlocking terracotta wing and deep charcoal wing separated by a dielectric isolation gap, with harmonic orbital nodes.
+            </p>
+
+            <!-- Wordmark Lockup Preview -->
+            <div class="p-4 rounded-lg bg-canvas-subtle border border-border-subtle space-y-2">
+                <div class="text-[10px] font-mono uppercase text-ink-muted">Horizontal Wordmark Lockup</div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 shrink-0">
+                        <img src="/static/logos/logo_waveform_spark.svg" alt="Icon" class="w-full h-full">
+                    </div>
+                    <div>
+                        <div class="font-serif font-semibold text-base text-ink-primary leading-none">FRA Intelligence</div>
+                        <div class="text-[11px] font-sans text-ink-muted mt-0.5 font-mono">High-Voltage SFRA Diagnostics</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scale & Favicon Test -->
+            <div class="flex items-center justify-between text-xs font-mono text-ink-muted pt-1">
+                <span>Scale Verification:</span>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 border border-border-subtle rounded bg-white p-1" title="40px App Icon">
+                        <img src="/static/logos/logo_waveform_spark.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-6 h-6 border border-border-subtle rounded bg-white p-0.5" title="24px Nav Icon">
+                        <img src="/static/logos/logo_waveform_spark.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-4 h-4 border border-border-subtle rounded bg-white" title="16px Favicon">
+                        <img src="/static/logos/logo_waveform_spark.svg" class="w-full h-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex items-center gap-3 border-t border-border-subtle">
+                <a href="/static/logos/logo_waveform_spark.svg" download="fra_intelligence_waveform_spark.svg" class="flex-1 text-center py-2 bg-ink-primary text-white text-xs font-mono font-medium rounded-lg hover:bg-ink-secondary transition shadow-soft-xs">
+                    Download SVG
+                </a>
+                <button onclick="copySvgCode('logo_waveform_spark.svg', this)" class="px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium rounded-lg text-xs font-mono transition">
+                    Copy SVG
+                </button>
+            </div>
+        </div>
+
+        <!-- CONCEPT 4: THE PRISM CORE -->
+        <div class="logo-card p-6 sm:p-8 space-y-6">
+            <!-- Header Tag -->
+            <div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-ink-primary">CONCEPT 04</span>
+                    <span class="text-ink-muted">·</span>
+                    <h2 class="font-serif text-xl font-semibold text-ink-primary">The Prism Core</h2>
+                </div>
+                <span class="text-[11px] font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle">
+                    Isometric 3D Apex
+                </span>
+            </div>
+
+            <!-- Preview Chamber -->
+            <div class="preview-stage rounded-xl border border-border-subtle p-8 flex items-center justify-center min-h-[220px] bg-[#FAF8F5]">
+                <div class="w-36 h-36 drop-shadow-sm hover:scale-105 transition-transform duration-300">
+                    <img src="/static/logos/logo_prism_core.svg" alt="Concept 4: The Prism Core" class="w-full h-full">
+                </div>
+            </div>
+
+            <!-- Design Rationale -->
+            <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                An isometric faceted 3D geometric spark with 4 triangular faces meeting at a central apex pin. The cardinal axes feature discrete sub-band nodes representing the four IEEE frequency milestones: 20 Hz, 2 kHz, 100 kHz, and 2 MHz within an ultra-fine editorial delimiter ring.
+            </p>
+
+            <!-- Wordmark Lockup Preview -->
+            <div class="p-4 rounded-lg bg-canvas-subtle border border-border-subtle space-y-2">
+                <div class="text-[10px] font-mono uppercase text-ink-muted">Horizontal Wordmark Lockup</div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 shrink-0">
+                        <img src="/static/logos/logo_prism_core.svg" alt="Icon" class="w-full h-full">
+                    </div>
+                    <div>
+                        <div class="font-serif font-semibold text-base text-ink-primary leading-none">FRA Intelligence</div>
+                        <div class="text-[11px] font-sans text-ink-muted mt-0.5 font-mono">High-Voltage SFRA Diagnostics</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scale & Favicon Test -->
+            <div class="flex items-center justify-between text-xs font-mono text-ink-muted pt-1">
+                <span>Scale Verification:</span>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 border border-border-subtle rounded bg-white p-1" title="40px App Icon">
+                        <img src="/static/logos/logo_prism_core.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-6 h-6 border border-border-subtle rounded bg-white p-0.5" title="24px Nav Icon">
+                        <img src="/static/logos/logo_prism_core.svg" class="w-full h-full">
+                    </div>
+                    <div class="w-4 h-4 border border-border-subtle rounded bg-white" title="16px Favicon">
+                        <img src="/static/logos/logo_prism_core.svg" class="w-full h-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex items-center gap-3 border-t border-border-subtle">
+                <a href="/static/logos/logo_prism_core.svg" download="fra_intelligence_prism_core.svg" class="flex-1 text-center py-2 bg-ink-primary text-white text-xs font-mono font-medium rounded-lg hover:bg-ink-secondary transition shadow-soft-xs">
+                    Download SVG
+                </a>
+                <button onclick="copySvgCode('logo_prism_core.svg', this)" class="px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium rounded-lg text-xs font-mono transition">
+                    Copy SVG
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- COMPARISON MATRIX: ALL 4 ON CONTRAST SUBSTRATES -->
+    <div class="bg-surface border border-border-subtle rounded-2xl p-6 sm:p-8 space-y-6 shadow-soft-card">
+        <div class="border-b border-border-subtle pb-4">
+            <h3 class="font-serif text-2xl font-medium text-ink-primary">
+                Side-by-Side Substrate Evaluation
+            </h3>
+            <p class="text-xs text-ink-secondary mt-1 font-sans">
+                Direct comparison of all four candidates on light linen and deep ink substrates for UI adaptability.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Light Substrate Bay -->
+            <div class="p-6 rounded-xl bg-[#FAF8F5] border border-border-subtle space-y-4">
+                <div class="text-xs font-mono font-semibold text-ink-secondary uppercase">
+                    Light / Linen Ground (#FAF8F5)
+                </div>
+                <div class="grid grid-cols-4 gap-4 items-center justify-items-center py-4">
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16"><img src="/static/logos/logo_harmonic_compass.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-ink-muted">01 Compass</span>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16"><img src="/static/logos/logo_resonant_octagram.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-ink-muted">02 Octagram</span>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16"><img src="/static/logos/logo_waveform_spark.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-ink-muted">03 Waveform</span>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16"><img src="/static/logos/logo_prism_core.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-ink-muted">04 Prism</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dark Substrate Bay -->
+            <div class="p-6 rounded-xl bg-[#1F1E1D] border border-[#383531] space-y-4">
+                <div class="text-xs font-mono font-semibold text-[#D8D2C5] uppercase">
+                    Dark / Deep Ink Ground (#1F1E1D)
+                </div>
+                <div class="grid grid-cols-4 gap-4 items-center justify-items-center py-4">
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16 bg-[#2C2926] p-2 rounded-lg border border-[#443F3A]"><img src="/static/logos/logo_harmonic_compass.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-[#8D877E]">01 Compass</span>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16 bg-[#2C2926] p-2 rounded-lg border border-[#443F3A]"><img src="/static/logos/logo_resonant_octagram.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-[#8D877E]">02 Octagram</span>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16 bg-[#2C2926] p-2 rounded-lg border border-[#443F3A]"><img src="/static/logos/logo_waveform_spark.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-[#8D877E]">03 Waveform</span>
+                    </div>
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16 bg-[#2C2926] p-2 rounded-lg border border-[#443F3A]"><img src="/static/logos/logo_prism_core.svg" class="w-full h-full"></div>
+                        <span class="text-[10px] font-mono text-[#8D877E]">04 Prism</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast notification for copy SVG -->
+<div id="copyToast" class="fixed bottom-6 right-6 bg-ink-primary text-white px-4 py-2 rounded-lg text-xs font-mono shadow-soft-elevated hidden transition-all duration-300 z-50 flex items-center gap-2">
+    <i data-lucide="check" class="w-4 h-4 text-sage"></i>
+    <span>SVG Vector Code copied to clipboard!</span>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function setSubstrate(mode) {
+        const stages = document.querySelectorAll('.preview-stage');
+        const btnLinen = document.getElementById('btnLinen');
+        const btnWhite = document.getElementById('btnWhite');
+        const btnCharcoal = document.getElementById('btnCharcoal');
+
+        // Reset button states
+        [btnLinen, btnWhite, btnCharcoal].forEach(b => {
+            b.className = "px-3 py-1 rounded-full bg-surface text-ink-secondary border border-border-medium hover:text-ink-primary transition";
+        });
+
+        if (mode === 'linen') {
+            stages.forEach(s => {
+                s.style.backgroundColor = '#FAF8F5';
+                s.style.borderColor = '#E8E3DA';
+            });
+            btnLinen.className = "px-3 py-1 rounded-full bg-ink-primary text-white font-medium transition shadow-soft-xs";
+        } else if (mode === 'white') {
+            stages.forEach(s => {
+                s.style.backgroundColor = '#FFFFFF';
+                s.style.borderColor = '#E8E3DA';
+            });
+            btnWhite.className = "px-3 py-1 rounded-full bg-ink-primary text-white font-medium transition shadow-soft-xs";
+        } else if (mode === 'charcoal') {
+            stages.forEach(s => {
+                s.style.backgroundColor = '#1F1E1D';
+                s.style.borderColor = '#383531';
+            });
+            btnCharcoal.className = "px-3 py-1 rounded-full bg-terracotta text-white font-medium transition shadow-soft-xs";
+        }
+    }
+
+    async function copySvgCode(filename, btn) {
+        try {
+            const res = await fetch(`/static/logos/${filename}`);
+            const svgText = await res.text();
+            await navigator.clipboard.writeText(svgText);
+
+            const toast = document.getElementById('copyToast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2500);
+
+            const origText = btn.textContent;
+            btn.textContent = "Copied!";
+            setTimeout(() => { btn.textContent = origText; }, 1800);
+        } catch (e) {
+            console.error('Failed to copy SVG:', e);
+            alert('Unable to copy SVG code automatically. Please use the Download SVG button.');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ws-terracotta" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E88D70"/>
+      <stop offset="50%" stop-color="#CC785C"/>
+      <stop offset="100%" stop-color="#AD563B"/>
+    </linearGradient>
+    <linearGradient id="ws-charcoal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3D3A36"/>
+      <stop offset="100%" stop-color="#141312"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wing 1: Top-Right Sine-Curve Ray (Terracotta) -->
+  <path d="M 50,6 
+           C 51,24 64,36 82,40 
+           L 54,48 
+           L 50,50 
+           L 48,54 
+           L 40,82 
+           C 36,64 24,51 6,50 
+           L 46,46 
+           Z" 
+        fill="url(#ws-terracotta)" />
+
+  <!-- Wing 2: Complementary Interlocking Wave Ray (Deep Charcoal Ink) -->
+  <path d="M 94,50 
+           C 76,51 64,64 60,82 
+           L 52,54 
+           L 50,50 
+           L 46,48 
+           L 18,60 
+           C 24,42 36,29 50,94 
+           L 54,52 
+           Z" 
+        fill="url(#ws-charcoal)" />
+
+  <!-- Harmonic Electrical Isolation Seam (Negative Space Glow) -->
+  <circle cx="50" cy="50" r="12" fill="#FAF8F5" stroke="#E8E3DA" stroke-width="1"/>
+  
+  <!-- Central Pulse Nucleus -->
+  <circle cx="50" cy="50" r="7" fill="#CC785C"/>
+  <!-- Mini sine curve cutout inside nucleus -->
+  <path d="M 45,50 Q 47.5,46 50,50 T 55,50" fill="none" stroke="#FAF8F5" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Dynamic Harmonic Orbit Accents -->
+  <circle cx="50" cy="18" r="2.5" fill="#CC785C"/>
+  <circle cx="82" cy="50" r="2.5" fill="#1F1E1D"/>
+  <circle cx="50" cy="82" r="2.5" fill="#CC785C"/>
+  <circle cx="18" cy="50" r="2.5" fill="#1F1E1D"/>
+</svg>

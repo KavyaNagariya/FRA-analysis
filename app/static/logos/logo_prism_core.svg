@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <!-- Facet 1: Terracotta Apex Gradient -->
+    <linearGradient id="pc-north" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#EAA187"/>
+      <stop offset="100%" stop-color="#CC785C"/>
+    </linearGradient>
+    <!-- Facet 2: Terracotta Shadow Gradient -->
+    <linearGradient id="pc-east" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#BA5F42"/>
+      <stop offset="100%" stop-color="#9C4C32"/>
+    </linearGradient>
+    <!-- Facet 3: Charcoal Deep Base -->
+    <linearGradient id="pc-south" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#2D2B28"/>
+      <stop offset="100%" stop-color="#141312"/>
+    </linearGradient>
+    <!-- Facet 4: Charcoal Mid Tone -->
+    <linearGradient id="pc-west" x1="100%" y1="50%" x2="0%" y2="50%">
+      <stop offset="0%" stop-color="#47433E"/>
+      <stop offset="100%" stop-color="#262421"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 4-Faceted 3D Apex Geometry -->
+  <!-- Top Facet (North Ray) -->
+  <polygon points="50,8 50,50 14,50" fill="url(#pc-north)"/>
+
+  <!-- Right Facet (East Ray) -->
+  <polygon points="50,8 86,50 50,50" fill="url(#pc-east)"/>
+
+  <!-- Bottom Facet (South Ray) -->
+  <polygon points="50,92 86,50 50,50" fill="url(#pc-south)"/>
+
+  <!-- Left Facet (West Ray) -->
+  <polygon points="50,92 14,50 50,50" fill="url(#pc-west)"/>
+
+  <!-- Secondary Inner Facets (Octahedral Depth) -->
+  <polygon points="50,50 32,32 50,8" fill="#EFA992" opacity="0.35"/>
+  <polygon points="50,50 68,32 86,50" fill="#8C3F27" opacity="0.35"/>
+  <polygon points="50,50 68,68 50,92" fill="#0C0B0A" opacity="0.4"/>
+  <polygon points="50,50 32,68 14,50" fill="#3D3934" opacity="0.4"/>
+
+  <!-- Central Apex Diamond Pin -->
+  <polygon points="50,44 56,50 50,56 44,50" fill="#FAF8F5"/>
+  <polygon points="50,46 54,50 50,54 46,50" fill="#CC785C"/>
+
+  <!-- Logarithmic Sub-Band Frequency Markers (20Hz, 2kHz, 100kHz, 2MHz) -->
+  <!-- North (2 MHz) -->
+  <circle cx="50" cy="18" r="2" fill="#FAF8F5"/>
+  <!-- East (100 kHz) -->
+  <circle cx="78" cy="50" r="2" fill="#FAF8F5"/>
+  <!-- South (2 kHz) -->
+  <circle cx="50" cy="82" r="2" fill="#CC785C"/>
+  <!-- West (20 Hz) -->
+  <circle cx="22" cy="50" r="2" fill="#CC785C"/>
+
+  <!-- Outer Delimiter Ring (Ultra Fine Editorial Hairline) -->
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#D8D2C5" stroke-width="0.75" stroke-dasharray="2,3"/>
+</svg>

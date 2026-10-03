@@ -246,6 +246,11 @@ def inspect_asset(asset_id):
 def about():
     return render_template("about.html", active_page='standards')
 
+@app.route("/logos")
+def logos():
+    """Renders the Anthropic Logo Concepts Showcase & Selection Gallery."""
+    return render_template("logos.html", active_page='logos')
+
 @app.route("/prototype/layout")
 def prototype_layout():
     variant = request.args.get("variant", "A").upper()
