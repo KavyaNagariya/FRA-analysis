@@ -1,868 +1,633 @@
 {% extends "base.html" %}
 
-{% block title %}SFRA Diagnostic Workbench | FRA Diagnostics{% endblock %}
+{% block title %}SFRA Diagnostic Workbench | FRA Intelligence{% endblock %}
 
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    .upload-dropzone {
-        border: 1px dashed #334155;
-        transition: border-color 0.2s, background-color 0.2s;
+    .workbench-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E8E3DA;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(31, 30, 29, 0.04), 0 4px 16px rgba(31, 30, 29, 0.02);
     }
-    .upload-dropzone:hover {
-        border-color: #06b6d4;
-        background-color: rgba(6, 182, 212, 0.03);
+    .dropzone-workbench {
+        border: 1.5px dashed #D8D2C5;
+        background-color: #FAF8F5;
+        transition: all 0.2s ease;
+    }
+    .dropzone-workbench:hover, .dropzone-workbench.drag-over {
+        border-color: #CC785C;
+        background-color: #FAF2EE;
     }
 </style>
 {% endblock %}
 
 {% block content %}
+{% set active_page = 'workbench' %}
 
 {% if status %}
-{# ═══════════════════════════════════════════════════════ #}
-{# RESULTS STATE — Diagnostic Telemetry Deck              #}
-{# ═══════════════════════════════════════════════════════ #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# ACTIVE TELEMETRY STATE — SFRA Diagnostic Console                   #}
+{# ═══════════════════════════════════════════════════════════════════ #}
 
-<!-- Compact Re-Upload Strip -->
-<div class="bg-surface/60 border border-border-subtle rounded-sm px-3 py-2 flex items-center justify-between mb-4">
-    <form action="/analyze" method="POST" enctype="multipart/form-data" class="flex items-center gap-3 w-full">
-        <i data-lucide="folder-open" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-        <label class="cursor-pointer flex items-center gap-2 font-mono text-[11px] text-slate-400 hover:text-telemetry-cyan transition flex-1 min-w-0">
-            <span id="reUploadLabel" class="truncate" aria-live="polite">Drop CSV or click to select new scan file…</span>
-            <input type="file" name="file" required class="hidden" id="reUploadInput" aria-label="Select new scan file for re-analysis"
-                   onchange="document.getElementById('reUploadLabel').textContent = this.files[0]?.name || 'Select file…'">
-        </label>
-        <button type="submit" class="shrink-0 px-3 py-1 bg-panel-elevated border border-border-interactive text-telemetry-cyan rounded-sm font-mono text-[11px] font-semibold hover:border-telemetry-cyan transition tactile-inset">
-            RE-SCAN
-        </button>
-    </form>
-</div>
+<div class="space-y-6">
 
-<!-- Metric Telemetry Ribbon: 4 columns -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-    <!-- Bandwidth -->
-    <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-        <div class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase mb-1">BANDWIDTH</div>
-        <div class="text-lg font-mono font-bold text-white">20 Hz – 2 MHz</div>
-    </div>
-    <!-- Correlation R² -->
-    <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-        <div class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase mb-1">CORRELATION R²</div>
-        <div class="text-lg font-mono font-bold {% if corr >= 0.95 %}text-telemetry-emerald{% elif corr >= 0.85 %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %}">
-            {{ corr }}
-        </div>
-    </div>
-    <!-- Max Shift ΔdB -->
-    <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-        <div class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase mb-1">MAX SHIFT ΔdB</div>
-        <div class="text-lg font-mono font-bold {% if status == 'Healthy' %}text-telemetry-emerald{% elif status == 'Warning' %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %}">
-            {{ shift }} dB
-        </div>
-    </div>
-    <!-- Diagnosis -->
-    <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-        <div class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase mb-1">DIAGNOSIS</div>
-        <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-telemetry-emerald{% elif status == 'Warning' %}bg-telemetry-amber{% else %}bg-telemetry-rose{% endif %}"></span>
-            <span class="text-lg font-mono font-bold {% if status == 'Healthy' %}text-telemetry-emerald{% elif status == 'Warning' %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %}">
-                {{ status | upper }}
-            </span>
-        </div>
-    </div>
-</div>
-
-<!-- Main Workbench Grid: Plot Canvas | Diagnostic Rail -->
-<div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4">
-
-    <!-- LEFT COLUMN: Bode Plot + Sub-band Cards -->
-    <div class="space-y-4">
-        <!-- Bode Plot Panel -->
-        <div class="bg-panel border border-border-subtle rounded-sm tactile-inset">
-            <!-- Plot Toolbar -->
-            <div class="px-4 py-2.5 border-b border-border-subtle flex flex-wrap items-center justify-between gap-2">
+    <!-- SUB-HEADER CONTEXT & RE-SCAN ACTION BAR -->
+    <div class="workbench-card p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-canvas-subtle border border-border-subtle flex items-center justify-center text-terracotta shrink-0">
+                <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
+            <div>
                 <div class="flex items-center gap-2">
-                    <i data-lucide="activity" class="w-4 h-4 text-telemetry-cyan"></i>
-                    <span class="font-mono text-xs font-semibold tracking-wide text-slate-200">MAGNITUDE RESPONSE — BODE PLOT</span>
-                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded-sm bg-panel-elevated border border-border-interactive text-[9px] font-mono text-slate-400">IEEE Std C57.149</span>
+                    <span class="text-xs font-mono font-semibold text-ink-muted uppercase">ASSET:</span>
+                    <h1 class="font-mono text-base sm:text-lg font-bold text-ink-primary">
+                        {{ transformerId if transformerId else 'TX-765KV-MAIN-01' }}
+                    </h1>
+                    <span class="text-xs text-ink-muted">·</span>
+                    <span class="text-xs text-ink-secondary font-mono">{{ date_now }}</span>
                 </div>
-
-                <!-- Band Focus / Zoom Controls -->
-                <div class="flex items-center gap-1 bg-chassis p-0.5 rounded-sm border border-border-subtle text-[10px] font-mono">
-                    <button type="button" id="btnZoomFull" onclick="setBandZoom('full')" class="px-2 py-0.5 rounded-xs font-semibold transition bg-panel-elevated text-telemetry-cyan border border-border-interactive">FULL</button>
-                    <button type="button" id="btnZoomLow" onclick="setBandZoom('low')" class="px-2 py-0.5 rounded-xs font-semibold transition text-slate-400 hover:text-slate-200">CORE &lt;2k</button>
-                    <button type="button" id="btnZoomMid" onclick="setBandZoom('mid')" class="px-2 py-0.5 rounded-xs font-semibold transition text-slate-400 hover:text-slate-200">WINDING 2k-100k</button>
-                    <button type="button" id="btnZoomHigh" onclick="setBandZoom('high')" class="px-2 py-0.5 rounded-xs font-semibold transition text-slate-400 hover:text-slate-200">LEADS &gt;100k</button>
-                </div>
-
-                <!-- Trace & Layer Toggles -->
-                <div class="flex items-center gap-2 text-[10px] font-mono">
-                    <button type="button" id="toggleBaseline" onclick="toggleTrace(0, this)" class="flex items-center gap-1.5 px-2 py-1 rounded-sm border border-telemetry-violet/40 bg-telemetry-violet/10 text-telemetry-violet font-semibold transition" title="Toggle Healthy Baseline">
-                        <span class="w-2.5 h-0.5 bg-telemetry-violet inline-block"></span> BASELINE
-                    </button>
-                    <button type="button" id="toggleTest" onclick="toggleTrace(1, this)" class="flex items-center gap-1.5 px-2 py-1 rounded-sm border border-telemetry-cyan/40 bg-telemetry-cyan/10 text-telemetry-cyan font-semibold transition" title="Toggle Test Sweep">
-                        <span class="w-2.5 h-0.5 bg-telemetry-cyan inline-block"></span> TEST SWEEP
-                    </button>
-                    <button type="button" id="toggleDelta" onclick="toggleResidualTrace(this)" class="flex items-center gap-1.5 px-2 py-1 rounded-sm border border-border-subtle bg-chassis text-slate-400 font-semibold hover:text-telemetry-amber transition" title="Toggle |ΔdB| Residual Trace">
-                        <span class="w-2.5 h-0.5 bg-telemetry-amber inline-block"></span> |ΔdB| RESIDUAL
-                    </button>
-                    <button type="button" id="toggleSubbands" onclick="toggleSubbandOverlay(this)" class="px-2 py-1 rounded-sm border border-border-interactive bg-panel-elevated text-telemetry-cyan font-semibold transition" title="Toggle IEEE Sub-band Shading">
-                        SUB-BANDS
-                    </button>
-                </div>
-            </div>
-
-            <!-- Dynamic Precision Cursor Telemetry HUD -->
-            <div id="plotHud" class="px-4 py-1.5 bg-chassis/90 border-b border-border-subtle flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-mono text-[11px] text-slate-400">
-                <div class="flex items-center gap-3">
-                    <span class="flex items-center gap-1.5">
-                        <span class="text-[9px] text-slate-400 uppercase tracking-wider">CURSOR FREQ:</span>
-                        <span id="hudFreq" class="font-bold text-slate-200">HOVER PLOT</span>
-                    </span>
-                    <span class="text-slate-700">|</span>
-                    <span class="flex items-center gap-1.5">
-                        <span class="text-[9px] text-slate-400 uppercase tracking-wider">SUB-BAND:</span>
-                        <span id="hudBand" class="font-bold text-slate-300">—</span>
-                    </span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="flex items-center gap-1.5">
-                        <span class="text-[9px] text-telemetry-violet uppercase tracking-wider">BASE:</span>
-                        <span id="hudBase" class="font-bold text-white">—</span>
-                    </span>
-                    <span class="flex items-center gap-1.5">
-                        <span class="text-[9px] text-telemetry-cyan uppercase tracking-wider">TEST:</span>
-                        <span id="hudTest" class="font-bold text-white">—</span>
-                    </span>
-                    <span class="flex items-center gap-1.5">
-                        <span class="text-[9px] text-telemetry-amber uppercase tracking-wider">|ΔdB|:</span>
-                        <span id="hudDelta" class="font-bold text-white">—</span>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Canvas Container -->
-            <div class="p-3 lg:p-4 relative" style="height: 460px;">
-                <canvas id="bodePlot" role="img" aria-label="Logarithmic Bode magnitude plot comparing healthy baseline and test sweep traces across IEEE C57.149 core, winding, and leads sub-bands"></canvas>
-            </div>
-        </div>
-
-        <!-- IEEE Sub-band Status Ribbon: 3 horizontal cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="subbandCards">
-            <!-- Low Frequency Band -->
-            <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] font-mono font-semibold tracking-widest text-slate-400">LOW FREQ — CORE</span>
-                    <span id="bandLowStatus" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-slate-700 text-slate-400">—</span>
-                </div>
-                <div class="text-[10px] font-mono text-slate-500 mb-2">&lt; 2 kHz · Magnetizing inductance</div>
-                <div class="flex items-center gap-5">
-                    <div>
-                        <div class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">R²</div>
-                        <div id="bandLowCorr" class="text-sm font-mono font-bold text-white">—</div>
-                    </div>
-                    <div>
-                        <div class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">MAX ΔdB</div>
-                        <div id="bandLowShift" class="text-sm font-mono font-bold text-white">—</div>
-                    </div>
-                </div>
-            </div>
-            <!-- Mid Frequency Band -->
-            <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] font-mono font-semibold tracking-widest text-slate-400">MID FREQ — WINDING</span>
-                    <span id="bandMidStatus" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-slate-700 text-slate-400">—</span>
-                </div>
-                <div class="text-[10px] font-mono text-slate-500 mb-2">2 kHz – 100 kHz · Winding L/C</div>
-                <div class="flex items-center gap-5">
-                    <div>
-                        <div class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">R²</div>
-                        <div id="bandMidCorr" class="text-sm font-mono font-bold text-white">—</div>
-                    </div>
-                    <div>
-                        <div class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">MAX ΔdB</div>
-                        <div id="bandMidShift" class="text-sm font-mono font-bold text-white">—</div>
-                    </div>
-                </div>
-            </div>
-            <!-- High Frequency Band -->
-            <div class="bg-panel border border-border-subtle rounded-sm p-3 tactile-inset">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[10px] font-mono font-semibold tracking-widest text-slate-400">HIGH FREQ — LEADS</span>
-                    <span id="bandHighStatus" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-slate-700 text-slate-400">—</span>
-                </div>
-                <div class="text-[10px] font-mono text-slate-500 mb-2">&gt; 100 kHz · Terminals &amp; tap changers</div>
-                <div class="flex items-center gap-5">
-                    <div>
-                        <div class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">R²</div>
-                        <div id="bandHighCorr" class="text-sm font-mono font-bold text-white">—</div>
-                    </div>
-                    <div>
-                        <div class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">MAX ΔdB</div>
-                        <div id="bandHighShift" class="text-sm font-mono font-bold text-white">—</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- RIGHT COLUMN: Diagnostic Rail (380px) -->
-    <div class="space-y-4">
-        <!-- Health Integrity Index Gauge -->
-        <div class="bg-panel border border-border-subtle rounded-sm p-4 tactile-inset">
-            <div class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase mb-3 text-center">
-                HEALTH INTEGRITY INDEX
-            </div>
-            <div class="relative mx-auto" style="width: 200px; height: 120px;">
-                <canvas id="healthGauge" role="img" aria-label="Health integrity index gauge showing composite transformer health percentage"></canvas>
-                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-                    <div class="text-2xl font-mono font-bold
-                        {% if confidence > 80 %}text-telemetry-emerald
-                        {% elif confidence > 60 %}text-telemetry-amber
-                        {% else %}text-telemetry-rose{% endif %}">
-                        {{ confidence }}%
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-3">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm border text-xs font-mono font-bold
-                    {% if status == 'Healthy' %}border-telemetry-emerald/30 text-telemetry-emerald bg-telemetry-emerald/5
-                    {% elif status == 'Warning' %}border-telemetry-amber/30 text-telemetry-amber bg-telemetry-amber/5
-                    {% else %}border-telemetry-rose/30 text-telemetry-rose bg-telemetry-rose/5{% endif %}">
-                    <span class="w-1.5 h-1.5 rounded-full
-                        {% if status == 'Healthy' %}bg-telemetry-emerald
-                        {% elif status == 'Warning' %}bg-telemetry-amber
-                        {% else %}bg-telemetry-rose{% endif %}"></span>
-                    {{ status | upper }}
-                </span>
-            </div>
-        </div>
-
-        <!-- ML Fault Classification -->
-        <div class="bg-panel border border-border-subtle rounded-sm tactile-inset">
-            <div class="px-4 py-2.5 border-b border-border-subtle flex items-center gap-2">
-                <i data-lucide="scan" class="w-4 h-4 text-telemetry-violet"></i>
-                <span class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase">ML CLASSIFICATION</span>
-            </div>
-            <div class="p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-semibold text-white">{{ fault_type }}</span>
-                    <span class="font-mono text-sm font-bold
-                        {% if status == 'Healthy' %}text-telemetry-emerald
-                        {% elif status == 'Warning' %}text-telemetry-amber
-                        {% else %}text-telemetry-rose{% endif %}">
-                        {{ confidence }}%
-                    </span>
-                </div>
-                <!-- Confidence bar -->
-                <div class="h-1.5 bg-chassis rounded-sm overflow-hidden">
-                    <div class="h-full rounded-sm transition-all duration-700
-                        {% if status == 'Healthy' %}bg-telemetry-emerald
-                        {% elif status == 'Warning' %}bg-telemetry-amber
-                        {% else %}bg-telemetry-rose{% endif %}"
-                         style="width: {{ confidence }}%"></div>
-                </div>
-                <div class="text-[10px] font-mono text-slate-500 mt-2 tracking-wider">CONFIDENCE MATCH</div>
-            </div>
-        </div>
-
-        <!-- Remediation / Recommendation -->
-        <div class="bg-panel border border-border-subtle rounded-sm tactile-inset">
-            <div class="px-4 py-2.5 border-b border-border-subtle flex items-center gap-2">
-                <i data-lucide="clipboard-list" class="w-4 h-4 text-telemetry-amber"></i>
-                <span class="text-[10px] font-mono font-semibold tracking-widest text-slate-400 uppercase">REMEDIATION</span>
-            </div>
-            <div class="p-4">
-                <div class="flex items-start gap-2.5">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 shrink-0
-                        {% if status == 'Healthy' %}text-telemetry-emerald
-                        {% elif status == 'Warning' %}text-telemetry-amber
-                        {% else %}text-telemetry-rose{% endif %}"></i>
-                    <p class="text-sm text-slate-300 leading-relaxed">{{ recommendation }}</p>
+                <div class="text-xs text-ink-muted mt-0.5 flex items-center gap-2">
+                    <span>IEEE Std C57.149-2012 Certified Sweep</span>
+                    <span>·</span>
+                    <span class="text-terracotta font-medium">Bode Magnitude Transfer Function</span>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="space-y-2">
-            <a href="/download-report"
-               class="flex items-center justify-center gap-2 px-4 py-2.5 bg-panel-elevated border border-border-interactive text-telemetry-cyan rounded-sm font-mono text-xs font-semibold hover:border-telemetry-cyan transition tactile-inset">
-                <i data-lucide="file-down" class="w-4 h-4"></i>
-                DOWNLOAD PDF REPORT
+        <!-- Quick Re-Upload Strip -->
+        <form action="/analyze" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+            <label class="cursor-pointer px-3 py-1.5 bg-canvas-subtle hover:bg-canvas-warm border border-border-medium rounded-lg text-xs font-mono text-ink-secondary hover:text-ink-primary transition flex items-center gap-2">
+                <i data-lucide="upload" class="w-3.5 h-3.5 text-ink-muted"></i>
+                <span id="reUploadLabel" class="truncate max-w-[180px]">Load New CSV…</span>
+                <input type="file" name="file" required class="hidden" id="reUploadInput"
+                       onchange="document.getElementById('reUploadLabel').textContent = this.files[0]?.name || 'File Selected'; document.getElementById('reScanSubmitBtn').classList.remove('hidden');">
+            </label>
+            <button type="submit" id="reScanSubmitBtn" class="hidden px-3 py-1.5 bg-ink-primary text-white text-xs font-mono font-medium rounded-lg hover:bg-ink-secondary transition shadow-soft-xs">
+                Run Analysis
+            </button>
+            <a href="/history" class="px-3 py-1.5 bg-surface border border-border-subtle text-xs font-mono text-ink-secondary hover:text-ink-primary rounded-lg transition" title="Audit Trail">
+                Fleet History
             </a>
-            <div class="flex items-center gap-3 text-[10px] font-mono text-slate-500 justify-center pt-1">
-                <span>TEST: {{ date_now }}</span>
-                <span class="text-slate-700">·</span>
-                <span>UNIT: {{ transformerId }}</span>
+        </form>
+    </div>
+
+    <!-- 4-COLUMN METRIC TELEMETRY STRIP -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Metric 1: Bandwidth -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>BANDWIDTH</span>
+                <i data-lucide="radio" class="w-3.5 h-3.5 text-ink-muted"></i>
+            </div>
+            <div class="text-xl font-mono font-bold text-ink-primary">20 Hz – 2 MHz</div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono">500 Log Points</div>
+        </div>
+
+        <!-- Metric 2: Correlation R² -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>CORRELATION (R²)</span>
+                <i data-lucide="git-commit" class="w-3.5 h-3.5 text-ink-muted"></i>
+            </div>
+            <div class="text-xl font-mono font-bold {% if corr >= 0.95 %}text-sage{% elif corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
+                {{ corr }}
+            </div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono">
+                {% if corr >= 0.95 %}Compliant Baseline (≥0.95){% elif corr >= 0.85 %}Advisory Drift (0.85–0.95){% else %}Significant Deviation (&lt;0.85){% endif %}
             </div>
         </div>
+
+        <!-- Metric 3: Max Shift ΔdB -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>MAX SHIFT (ΔdB)</span>
+                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-ink-muted"></i>
+            </div>
+            <div class="text-xl font-mono font-bold {% if status == 'Healthy' %}text-sage{% elif status == 'Warning' %}text-ochre{% else %}text-crimson{% endif %}">
+                {{ shift }} dB
+            </div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono">Peak Resonance Zero Drift</div>
+        </div>
+
+        <!-- Metric 4: Diagnosis Verdict -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>DIAGNOSTIC VERDICT</span>
+                <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+            </div>
+            <div class="text-xl font-mono font-bold {% if status == 'Healthy' %}text-sage{% elif status == 'Warning' %}text-ochre{% else %}text-crimson{% endif %}">
+                {{ status | upper }}
+            </div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono truncate">{{ fault_type }}</div>
+        </div>
     </div>
+
+    <!-- MAIN WORKBENCH GRID: BODE PLOT (LEFT) + DIAGNOSTIC ASSESSMENT RAIL (RIGHT) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT COLUMN: INTERACTIVE BODE PLOT & SUB-BAND CARDS (8 COLS) -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- Bode Plot Module -->
+            <div class="workbench-card overflow-hidden">
+                <!-- Toolbar -->
+                <div class="p-4 border-b border-border-subtle flex flex-wrap items-center justify-between gap-3 bg-canvas-warm/50">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-terracotta"></i>
+                        <span class="font-serif font-semibold text-sm text-ink-primary">Bode Magnitude Transfer Function</span>
+                        <span class="text-xs font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle hidden sm:inline">
+                            20 log₁₀(V_out / V_in)
+                        </span>
+                    </div>
+
+                    <!-- Band Zoom Buttons -->
+                    <div class="flex items-center gap-1 bg-canvas-subtle p-1 rounded-lg border border-border-subtle text-xs font-mono">
+                        <button type="button" id="btnZoomFull" onclick="setBandZoom('full')" class="px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs">FULL</button>
+                        <button type="button" id="btnZoomLow" onclick="setBandZoom('low')" class="px-2 py-1 rounded text-ink-secondary hover:text-ink-primary transition">CORE &lt;2k</button>
+                        <button type="button" id="btnZoomMid" onclick="setBandZoom('mid')" class="px-2 py-1 rounded text-ink-secondary hover:text-ink-primary transition">WINDING 2k-100k</button>
+                        <button type="button" id="btnZoomHigh" onclick="setBandZoom('high')" class="px-2 py-1 rounded text-ink-secondary hover:text-ink-primary transition">LEADS &gt;100k</button>
+                    </div>
+
+                    <!-- Trace Toggles -->
+                    <div class="flex items-center gap-2 text-xs font-mono">
+                        <button type="button" id="toggleBaseline" onclick="toggleTrace(0, this)" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-sage-border bg-sage-tint text-sage font-medium transition">
+                            <span class="w-2.5 h-0.5 bg-sage inline-block"></span> BASELINE
+                        </button>
+                        <button type="button" id="toggleTest" onclick="toggleTrace(1, this)" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border-medium bg-terracotta-tint text-terracotta font-medium transition">
+                            <span class="w-2.5 h-0.5 bg-terracotta inline-block"></span> TEST SWEEP
+                        </button>
+                        <button type="button" id="toggleDelta" onclick="toggleResidualTrace(this)" class="flex items-center gap-1.5 px-2 py-1 rounded-md border border-border-subtle bg-surface text-ink-muted hover:text-ochre transition">
+                            <span class="w-2.5 h-0.5 bg-ochre inline-block"></span> |ΔdB|
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cursor HUD Telemetry Bar -->
+                <div id="plotHud" class="px-4 py-2 bg-canvas-warm border-b border-border-subtle flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-ink-secondary">
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <span class="text-ink-muted uppercase text-[10px]">FREQ:</span>
+                            <span id="hudFreq" class="font-bold text-ink-primary ml-1">Hover over plot</span>
+                        </div>
+                        <div>
+                            <span class="text-ink-muted uppercase text-[10px]">BASELINE:</span>
+                            <span id="hudHealthy" class="font-medium text-sage ml-1">—</span>
+                        </div>
+                        <div>
+                            <span class="text-ink-muted uppercase text-[10px]">TEST:</span>
+                            <span id="hudTest" class="font-medium text-terracotta ml-1">—</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-ink-muted uppercase text-[10px]">DELTA:</span>
+                        <span id="hudDelta" class="font-bold text-ink-primary ml-1">—</span>
+                    </div>
+                </div>
+
+                <!-- Chart Canvas Container -->
+                <div class="p-4 sm:p-6 bg-surface">
+                    <div class="relative h-[420px] w-full">
+                        <canvas id="workbenchBodeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sub-band Region Labels Footnote -->
+                <div class="px-4 py-3 bg-canvas-warm/40 border-t border-border-subtle grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                    <div class="p-2 rounded bg-surface border border-border-subtle">
+                        <span class="text-ink-muted text-[10px] uppercase block">Sub-Band 1</span>
+                        <strong class="text-ink-primary text-xs">Low Core (&lt;2 kHz)</strong>
+                        <div class="text-[10px] text-ink-muted mt-0.5">Core & Grounding</div>
+                    </div>
+                    <div class="p-2 rounded bg-surface border border-border-subtle">
+                        <span class="text-ink-muted text-[10px] uppercase block">Sub-Band 2</span>
+                        <strong class="text-ink-primary text-xs">Mid Winding (2k–100 kHz)</strong>
+                        <div class="text-[10px] text-ink-muted mt-0.5">Axial & Radial Geometry</div>
+                    </div>
+                    <div class="p-2 rounded bg-surface border border-border-subtle">
+                        <span class="text-ink-muted text-[10px] uppercase block">Sub-Band 3</span>
+                        <strong class="text-ink-primary text-xs">High Leads (&gt;100 kHz)</strong>
+                        <div class="text-[10px] text-ink-muted mt-0.5">Bushings & Turret Leads</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IEEE C57.149 Sub-band Detail Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="workbench-card p-4 space-y-2">
+                    <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">01 // Low Frequency</div>
+                    <h4 class="font-serif font-semibold text-base text-ink-primary">Magnetic Core & Grounding</h4>
+                    <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Evaluates main core leg permeability ($\mu_r$), core grounding straps, and residual magnetization. Resonance zeros governed by open-circuit magnetizing inductance $L_m$.
+                    </p>
+                </div>
+
+                <div class="workbench-card p-4 space-y-2">
+                    <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">02 // Mid Frequency</div>
+                    <h4 class="font-serif font-semibold text-base text-ink-primary">Winding Geometry</h4>
+                    <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Evaluates radial hoop stress, axial tilt, and inter-disk coil spacing. Governed by leakage inductance and inter-winding capacitances ($C_s, C_g$).
+                    </p>
+                </div>
+
+                <div class="workbench-card p-4 space-y-2">
+                    <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">03 // High Frequency</div>
+                    <h4 class="font-serif font-semibold text-base text-ink-primary">Leads & Bushings</h4>
+                    <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Evaluates internal bushing connections, de-energized tap changers (DETC/OLTC), and measurement ground braid integrity up to 2 MHz.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: DIAGNOSTIC AUDIT & RECOMMENDATION RAIL (4 COLS) -->
+        <div class="lg:col-span-4 space-y-6">
+
+            <!-- Diagnostic Assessment Card -->
+            <div class="workbench-card p-6 space-y-5">
+                <div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+                    <span class="text-xs font-mono uppercase tracking-wider text-ink-muted font-semibold">Diagnostic Report</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold {% if status == 'Healthy' %}bg-sage-tint text-sage border border-sage-border{% elif status == 'Warning' %}bg-ochre-tint text-ochre border border-ochre-border{% else %}bg-crimson-tint text-crimson border border-crimson-border{% endif %}">
+                        <span class="w-1.5 h-1.5 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                        {{ status }}
+                    </span>
+                </div>
+
+                <!-- Confidence Gauge -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-mono">
+                        <span class="text-ink-secondary">Classification Confidence</span>
+                        <span class="font-bold text-ink-primary">{{ confidence }}%</span>
+                    </div>
+                    <div class="w-full bg-canvas-subtle rounded-full h-2 overflow-hidden border border-border-subtle">
+                        <div class="h-full rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}" style="width: {{ confidence }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Detected Fault -->
+                <div class="space-y-1 bg-canvas-warm p-3.5 rounded-lg border border-border-subtle">
+                    <div class="text-[10px] font-mono text-ink-muted uppercase">Detected Condition</div>
+                    <div class="font-serif font-semibold text-lg text-ink-primary">{{ fault_type }}</div>
+                    <div class="text-xs text-ink-secondary mt-1 font-sans">
+                        Spectral response indicates deviation in the characteristic IEEE transfer function compared against factory baseline.
+                    </div>
+                </div>
+
+                <!-- Recommended Engineering Action -->
+                <div class="space-y-2">
+                    <div class="text-xs font-mono text-ink-muted uppercase font-semibold flex items-center gap-1.5">
+                        <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-terracotta"></i>
+                        <span>Engineering Recommendation</span>
+                    </div>
+                    <p class="text-xs text-ink-secondary leading-relaxed font-sans bg-canvas-warm p-3.5 rounded-lg border border-border-subtle">
+                        {{ recommendation }}
+                    </p>
+                </div>
+
+                <!-- Actions: Download Certified PDF -->
+                <div class="pt-2 space-y-2">
+                    <a href="/download-report" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-ink-primary text-white text-xs font-medium rounded-lg hover:bg-ink-secondary shadow-soft-xs transition font-mono">
+                        <i data-lucide="download" class="w-4 h-4 text-terracotta"></i>
+                        <span>Download Certified IEEE PDF</span>
+                    </a>
+                    <a href="/history" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium text-xs font-medium rounded-lg hover:bg-canvas-subtle transition font-mono">
+                        <i data-lucide="database" class="w-4 h-4 text-ink-muted"></i>
+                        <span>View Fleet Audit Trail</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Apparatus Metadata Card -->
+            <div class="workbench-card p-5 space-y-3 font-mono text-xs">
+                <div class="font-serif font-semibold text-sm text-ink-primary pb-2 border-b border-border-subtle font-sans">
+                    Apparatus Test Setup
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Asset Identifier:</span>
+                    <span class="font-semibold text-ink-primary">{{ transformerId if transformerId else 'TX-765KV-MAIN-01' }}</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Test Protocol:</span>
+                    <span class="text-ink-secondary">End-to-End Open (EO)</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Source Impedance:</span>
+                    <span class="text-ink-secondary">50 Ω Coaxial</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Receiver Impedance:</span>
+                    <span class="text-ink-secondary">50 Ω Match</span>
+                </div>
+                <div class="flex items-center justify-between py-1">
+                    <span class="text-ink-muted">Standard Ref:</span>
+                    <span class="text-sage font-medium">IEEE C57.149 / IEC 60076-18</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 
 {% else %}
-{# ═══════════════════════════════════════════════════════ #}
-{# STANDBY STATE — Upload Station                         #}
-{# ═══════════════════════════════════════════════════════ #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# STANDBY EMPTY STATE — Workbench Ingestion & Asset Selection         #}
+{# ═══════════════════════════════════════════════════════════════════ #}
 
-<div class="flex items-center justify-center" style="min-height: calc(100vh - 140px);">
-    <div class="w-full max-w-xl">
-        <div class="bg-panel border border-border-subtle rounded-sm tactile-inset">
-            <!-- Station Header -->
-            <div class="px-6 py-4 border-b border-border-subtle">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-chassis border border-border-interactive rounded-sm flex items-center justify-center">
-                        <i data-lucide="cpu" class="w-5 h-5 text-telemetry-cyan"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-mono text-sm font-bold tracking-wider text-white">SFRA DIAGNOSTIC WORKBENCH</h2>
-                        <p class="text-[10px] font-mono text-slate-500 tracking-wide mt-0.5">
-                            SWEEP FREQUENCY RESPONSE ANALYSIS · IEEE STD C57.149
-                        </p>
-                    </div>
+<div class="max-w-4xl mx-auto space-y-8 py-6">
+
+    <div class="text-center space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border-subtle text-xs font-mono text-ink-secondary shadow-soft-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+            <span>SFRA Diagnostic Workbench</span>
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl font-medium text-ink-primary">
+            Ingest Frequency Response Data
+        </h1>
+        <p class="text-sm text-ink-secondary max-w-xl mx-auto font-sans leading-relaxed">
+            Upload raw Sweep Frequency Response Analysis curves to perform automated IEEE C57.149 sub-band cross-correlation, resonance shift detection, and mechanical winding diagnosis.
+        </p>
+    </div>
+
+    <!-- Dropzone Card -->
+    <div class="workbench-card p-6 sm:p-10">
+        <form action="/analyze" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <label for="workbenchDropzoneInput" class="dropzone-workbench block p-8 sm:p-12 rounded-xl cursor-pointer text-center group">
+                <input type="file" name="file" id="workbenchDropzoneInput" required class="hidden"
+                       onchange="document.getElementById('standbyFileName').textContent = this.files[0]?.name || 'File Selected'; document.getElementById('standbySubmitBtn').disabled = false;">
+                
+                <div class="w-14 h-14 rounded-2xl bg-terracotta-tint text-terracotta flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition shadow-soft-xs">
+                    <i data-lucide="upload-cloud" class="w-7 h-7"></i>
                 </div>
-            </div>
 
-            <!-- Upload Zone -->
-            <div class="p-6">
-                <form action="/analyze" method="POST" enctype="multipart/form-data">
-                    <div class="upload-dropzone rounded-sm p-8 text-center relative">
-                        <!-- Crosshair target corners -->
-                        <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-telemetry-cyan/30"></div>
-                        <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-telemetry-cyan/30"></div>
-                        <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-telemetry-cyan/30"></div>
-                        <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-telemetry-cyan/30"></div>
+                <div id="standbyFileName" class="text-base font-medium text-ink-primary">
+                    Drop test sweep CSV file here, or browse files
+                </div>
 
-                        <i data-lucide="upload" class="w-8 h-8 text-slate-500 mx-auto mb-3"></i>
-                        <p class="text-sm text-slate-400 mb-1">Drop frequency response CSV file or click to browse</p>
-                        <p id="uploadFormatHint" class="text-[10px] font-mono text-slate-500 tracking-wide">
-                            ACCEPTED: CSV, TXT · COLUMNS: FREQUENCY (Hz), MAGNITUDE (dB)
-                        </p>
+                <p class="text-xs text-ink-muted mt-2 max-w-md mx-auto leading-relaxed">
+                    Accepts two-column CSV frequency response files (Frequency in Hz, Magnitude in dB). Supports Omicron, Doble, and Megger sweep exports.
+                </p>
+            </label>
 
-                        <label class="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-panel-elevated border border-border-interactive text-telemetry-cyan rounded-sm font-mono text-xs font-semibold cursor-pointer hover:border-telemetry-cyan transition tactile-inset">
-                            <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
-                            <span id="uploadFileName" aria-live="polite">SELECT FILE</span>
-                            <input type="file" name="file" required class="hidden" id="uploadFileInput" aria-label="Select frequency response CSV file" aria-describedby="uploadFormatHint"
-                                   onchange="document.getElementById('uploadFileName').textContent = this.files[0]?.name || 'SELECT FILE'">
-                        </label>
-                    </div>
+            <button type="submit" id="standbySubmitBtn" disabled class="w-full py-3 bg-ink-primary text-white text-sm font-medium rounded-lg hover:bg-ink-secondary disabled:opacity-40 disabled:cursor-not-allowed transition shadow-soft-xs font-mono">
+                Ingest & Run Diagnostic Analysis
+            </button>
+        </form>
+    </div>
 
-                    <button type="submit"
-                            class="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 bg-telemetry-cyan/10 border border-telemetry-cyan/40 text-telemetry-cyan rounded-sm font-mono text-xs font-bold tracking-wider hover:bg-telemetry-cyan/20 hover:border-telemetry-cyan transition tactile-inset">
-                        <i data-lucide="zap" class="w-4 h-4"></i>
-                        INITIATE DIAGNOSTIC SCAN
-                    </button>
-                </form>
-            </div>
+    <!-- Benchmark Field Case Studies -->
+    <div class="space-y-3">
+        <div class="text-xs font-mono uppercase tracking-wider text-ink-muted font-semibold">
+            Or Inspect Pre-Loaded Apparatus Cases
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="/inspect/TX-765KV-MAIN-01" class="workbench-card p-4 hover:border-crimson-border hover:bg-crimson-tint/30 transition group space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-bold text-ink-primary">TX-765KV-MAIN-01</span>
+                    <span class="w-2 h-2 rounded-full bg-crimson"></span>
+                </div>
+                <div class="text-xs text-crimson font-medium">Critical: Axial Winding Displacement</div>
+                <div class="text-[11px] text-ink-muted">Significant resonance zero shift in mid frequency band (2k-100kHz).</div>
+                <div class="text-[11px] font-mono text-terracotta font-semibold group-hover:underline pt-1">Load Case &rarr;</div>
+            </a>
 
-            <!-- Station Footer -->
-            <div class="px-6 py-3 border-t border-border-subtle flex items-center justify-between text-[10px] font-mono text-slate-500">
-                <span>PIPELINE: HYBRID ML + IEEE C57.149 SUBBAND</span>
-                <span class="text-telemetry-emerald flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald beacon-active"></span>
-                    READY
-                </span>
-            </div>
+            <a href="/inspect/TX-400KV-GSU-02" class="workbench-card p-4 hover:border-ochre-border hover:bg-ochre-tint/30 transition group space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-bold text-ink-primary">TX-400KV-GSU-02</span>
+                    <span class="w-2 h-2 rounded-full bg-ochre"></span>
+                </div>
+                <div class="text-xs text-ochre font-medium">Warning: Core Laminate Looseness</div>
+                <div class="text-[11px] text-ink-muted">Moderate correlation drift in low frequency magnetizing band (<2kHz).</div>
+                <div class="text-[11px] font-mono text-terracotta font-semibold group-hover:underline pt-1">Load Case &rarr;</div>
+            </a>
+
+            <a href="/inspect/TX-220KV-AUTO-03" class="workbench-card p-4 hover:border-sage-border hover:bg-sage-tint/30 transition group space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-bold text-ink-primary">TX-220KV-AUTO-03</span>
+                    <span class="w-2 h-2 rounded-full bg-sage"></span>
+                </div>
+                <div class="text-xs text-sage font-medium">Healthy: Baseline Compliant</div>
+                <div class="text-[11px] text-ink-muted">High cross-correlation (R² = 0.989) across all three IEEE sub-bands.</div>
+                <div class="text-[11px] font-mono text-terracotta font-semibold group-hover:underline pt-1">Load Case &rarr;</div>
+            </a>
         </div>
     </div>
+
 </div>
 
 {% endif %}
+
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
 {% if status %}
-    // ═══════════════════════════════════════════════════
-    // DATA — Raw frequency/magnitude arrays from Flask
-    // ═══════════════════════════════════════════════════
-    const freqData    = {{ freq | tojson }};
-    const healthyData = {{ healthy | tojson }};
-    const faultyData  = {{ faulty | tojson }};
-    const deltaData   = healthyData.map((h, i) => Math.abs((faultyData[i] || 0) - h));
+<script>
+    // Ingest data passed from Flask template
+    const rawFreq = {{ freq | tojson if freq else '[]' }};
+    const healthyData = {{ healthy | tojson if healthy else '[]' }};
+    const faultyData = {{ faulty | tojson if faulty else '[]' }};
 
-    // State Variables
-    let subbandsVisible = true;
-    let mouseCrosshairX = null;
-    let mouseCrosshairY = null;
-    let currentHoverIdx = null;
+    let chartInstance = null;
 
-    // Frequency Formatting Helper
-    function fmtFreq(val) {
-        if (val >= 1000000) return (val / 1000000).toFixed(val % 1000000 === 0 ? 0 : 2) + ' MHz';
-        if (val >= 1000) return (val / 1000).toFixed(val % 1000 === 0 ? 0 : 2) + ' kHz';
-        return Math.round(val) + ' Hz';
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('workbenchBodeChart');
+        if (!ctx || rawFreq.length === 0) return;
 
-    function getSubbandName(f) {
-        if (f < 2000) return 'LOW FREQ: CORE INDUCTANCE (<2kHz)';
-        if (f < 100000) return 'MID FREQ: WINDING RESONANCE (2k–100kHz)';
-        return 'HIGH FREQ: LEADS & TERMINALS (>100kHz)';
-    }
+        // Compute residual |ΔdB| dataset
+        const deltaData = faultyData.map((val, idx) => {
+            const h = healthyData[idx];
+            return (h !== undefined && val !== undefined) ? Math.abs(val - h) : 0;
+        });
 
-    // ═══════════════════════════════════════════════════
-    // BODE PLOT — Custom Plugins (Subbands + Crosshairs)
-    // ═══════════════════════════════════════════════════
-    const subbandPlugin = {
-        id: 'subbandShading',
-        beforeDraw(chart) {
-            if (!subbandsVisible) return;
-            const { ctx, chartArea, scales: { x } } = chart;
-            if (!chartArea) return;
-            const { left, right, top, bottom } = chartArea;
-
-            const bands = [
-                { min: 20,     max: 2000,    color: 'rgba(245, 158, 11, 0.06)', label: 'CORE (<2kHz)' },
-                { min: 2000,   max: 100000,  color: 'rgba(6, 182, 212, 0.06)',  label: 'WINDING (2k–100kHz)' },
-                { min: 100000, max: 2000000, color: 'rgba(139, 92, 246, 0.06)', label: 'LEADS (>100kHz)' },
-            ];
-
-            bands.forEach(band => {
-                const x0 = Math.max(x.getPixelForValue(band.min), left);
-                const x1 = Math.min(x.getPixelForValue(band.max), right);
-                if (x1 > x0) {
-                    ctx.fillStyle = band.color;
-                    ctx.fillRect(x0, top, x1 - x0, bottom - top);
-                    ctx.save();
-                    ctx.font = '9px "JetBrains Mono"';
-                    ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
-                    ctx.fillText(band.label, x0 + 6, top + 14);
-                    ctx.restore();
-                }
-            });
-
-            // Sub-band boundary dividers at 2 kHz and 100 kHz
-            [2000, 100000].forEach(f => {
-                const px = x.getPixelForValue(f);
-                if (px >= left && px <= right) {
-                    ctx.save();
-                    ctx.setLineDash([4, 4]);
-                    ctx.strokeStyle = 'rgba(51, 65, 85, 0.8)';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(px, top);
-                    ctx.lineTo(px, bottom);
-                    ctx.stroke();
-                    ctx.restore();
-                }
-            });
-        }
-    };
-
-    const crosshairPlugin = {
-        id: 'crosshairOverlay',
-        afterDraw(chart) {
-            if (mouseCrosshairX === null || mouseCrosshairY === null) return;
-            const { ctx, chartArea } = chart;
-            if (!chartArea) return;
-            const { left, right, top, bottom } = chartArea;
-
-            if (mouseCrosshairX >= left && mouseCrosshairX <= right &&
-                mouseCrosshairY >= top && mouseCrosshairY <= bottom) {
-                
-                ctx.save();
-                ctx.setLineDash([3, 3]);
-                ctx.strokeStyle = 'rgba(6, 182, 212, 0.5)';
-                ctx.lineWidth = 1;
-
-                // Vertical crosshair
-                ctx.beginPath();
-                ctx.moveTo(mouseCrosshairX, top);
-                ctx.lineTo(mouseCrosshairX, bottom);
-                ctx.stroke();
-
-                // Horizontal crosshair
-                ctx.beginPath();
-                ctx.moveTo(left, mouseCrosshairY);
-                ctx.lineTo(right, mouseCrosshairY);
-                ctx.stroke();
-
-                // Draw snap reticles on active points
-                if (currentHoverIdx !== null && currentHoverIdx >= 0 && currentHoverIdx < freqData.length) {
-                    chart.data.datasets.forEach((dataset, i) => {
-                        const meta = chart.getDatasetMeta(i);
-                        if (!meta.hidden && meta.data[currentHoverIdx]) {
-                            const pt = meta.data[currentHoverIdx];
-                            ctx.beginPath();
-                            ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
-                            ctx.fillStyle = dataset.borderColor;
-                            ctx.fill();
-                            ctx.strokeStyle = '#090d16';
-                            ctx.lineWidth = 1.5;
-                            ctx.stroke();
-                        }
-                    });
-                }
-
-                ctx.restore();
-            }
-        }
-    };
-
-    // ═══════════════════════════════════════════════════
-    // BODE PLOT — Chart.js Initialization
-    // ═══════════════════════════════════════════════════
-    const bodeCanvas = document.getElementById('bodePlot');
-    const bodeCtx = bodeCanvas.getContext('2d');
-
-    const maxFreq = Math.max(...freqData, 2000000);
-    const minFreq = Math.min(...freqData, 20);
-
-    const bodeChart = new Chart(bodeCtx, {
-        type: 'line',
-        plugins: [subbandPlugin, crosshairPlugin],
-        data: {
-            labels: freqData,
-            datasets: [
-                {
-                    label: 'Healthy Baseline',
-                    data: healthyData,
-                    borderColor: '#8b5cf6',
-                    borderDash: [6, 3],
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    pointHoverRadius: 0,
-                    tension: 0.1,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Test Sweep',
-                    data: faultyData,
-                    borderColor: '#06b6d4',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    pointHoverRadius: 0,
-                    tension: 0.1,
-                    yAxisID: 'y'
-                },
-                {
-                    label: '|ΔdB| Residual',
-                    data: deltaData,
-                    borderColor: '#f59e0b',
-                    borderDash: [3, 2],
-                    borderWidth: 1.5,
-                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
-                    fill: true,
-                    pointRadius: 0,
-                    pointHoverRadius: 0,
-                    tension: 0.1,
-                    yAxisID: 'yDelta',
-                    hidden: true
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 700, easing: 'easeOutQuart' },
-            interaction: {
-                mode: 'index',
-                intersect: false
+        // Initialize Chart.js with Anthropic Editorial Palette
+        chartInstance = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: rawFreq,
+                datasets: [
+                    {
+                        label: 'Healthy Baseline',
+                        data: healthyData,
+                        borderColor: '#246B49', // Forest Sage
+                        backgroundColor: 'rgba(36, 107, 73, 0.04)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0.25,
+                        borderDash: [5, 4]
+                    },
+                    {
+                        label: 'Test Sweep',
+                        data: faultyData,
+                        borderColor: '#CC785C', // Claude Terracotta
+                        backgroundColor: 'rgba(204, 120, 92, 0.08)',
+                        borderWidth: 2.2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0.25
+                    },
+                    {
+                        label: '|ΔdB| Residual',
+                        data: deltaData,
+                        borderColor: '#A25807', // Warm Ochre
+                        backgroundColor: 'rgba(162, 88, 7, 0.06)',
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        hidden: true
+                    }
+                ]
             },
-            scales: {
-                x: {
-                    type: 'logarithmic',
-                    min: minFreq,
-                    max: maxFreq,
-                    grid: { color: 'rgba(30, 41, 59, 0.6)' },
-                    ticks: {
-                        color: '#94a3b8',
-                        font: { family: '"JetBrains Mono"', size: 10 },
-                        callback: function(value) {
-                            if ([20, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 2000000].includes(value)) {
-                                return fmtFreq(value);
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                onHover: (event, activeElements) => {
+                    if (activeElements && activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        const f = rawFreq[index];
+                        const h = healthyData[index];
+                        const t = faultyData[index];
+                        const d = (h !== undefined && t !== undefined) ? (t - h).toFixed(2) : '—';
+
+                        document.getElementById('hudFreq').textContent = f >= 1000000 ? (f/1000000).toFixed(2) + ' MHz' : (f >= 1000 ? (f/1000).toFixed(1) + ' kHz' : f + ' Hz');
+                        document.getElementById('hudHealthy').textContent = h !== undefined ? h.toFixed(2) + ' dB' : '—';
+                        document.getElementById('hudTest').textContent = t !== undefined ? t.toFixed(2) + ' dB' : '—';
+                        document.getElementById('hudDelta').textContent = d + ' dB';
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1F1E1D',
+                        titleColor: '#FAF8F5',
+                        bodyColor: '#FAF8F5',
+                        borderColor: '#E8E3DA',
+                        borderWidth: 1,
+                        padding: 10,
+                        titleFont: { family: 'JetBrains Mono', size: 12 },
+                        bodyFont: { family: 'JetBrains Mono', size: 11 },
+                        callbacks: {
+                            title: (items) => {
+                                const f = items[0].label;
+                                return f >= 1000000 ? (f/1000000) + ' MHz' : (f >= 1000 ? (f/1000) + ' kHz' : f + ' Hz');
+                            },
+                            label: (item) => ` ${item.dataset.label}: ${item.parsed.y.toFixed(2)} dB`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        min: 20,
+                        max: 2000000,
+                        title: {
+                            display: true,
+                            text: 'Frequency (Hz) — Logarithmic Grid',
+                            color: '#5C5852',
+                            font: { family: 'Inter', size: 11, weight: '500' }
+                        },
+                        grid: {
+                            color: '#E8E3DA',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#8D877E',
+                            font: { family: 'JetBrains Mono', size: 10 },
+                            callback: function(value) {
+                                if ([20, 100, 1000, 10000, 100000, 1000000].includes(value)) {
+                                    return value >= 1000000 ? (value/1000000) + 'M' : (value >= 1000 ? (value/1000) + 'k' : value);
+                                }
+                                return null;
                             }
-                            return null;
                         }
                     },
-                    title: {
-                        display: true,
-                        text: 'FREQUENCY (Hz)',
-                        color: '#94a3b8',
-                        font: { family: '"JetBrains Mono"', size: 10, weight: '600' }
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    position: 'left',
-                    grid: { color: 'rgba(30, 41, 59, 0.4)' },
-                    ticks: {
-                        color: '#94a3b8',
-                        font: { family: '"JetBrains Mono"', size: 10 }
-                    },
-                    title: {
-                        display: true,
-                        text: 'MAGNITUDE (dB)',
-                        color: '#94a3b8',
-                        font: { family: '"JetBrains Mono"', size: 10, weight: '600' }
-                    }
-                },
-                yDelta: {
-                    type: 'linear',
-                    position: 'right',
-                    display: false,
-                    min: 0,
-                    grid: { drawOnChartArea: false },
-                    ticks: {
-                        color: '#f59e0b',
-                        font: { family: '"JetBrains Mono"', size: 10 },
-                        callback: function(val) { return val + ' dB'; }
-                    },
-                    title: {
-                        display: true,
-                        text: 'RESIDUAL |ΔdB|',
-                        color: '#f59e0b',
-                        font: { family: '"JetBrains Mono"', size: 10, weight: '600' }
-                    }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    enabled: false // Telemetry HUD handles precision readouts
-                }
-            }
-        }
-    });
-
-    // ═══════════════════════════════════════════════════
-    // HUD TELEMETRY & CURSOR INTERACTION
-    // ═══════════════════════════════════════════════════
-    const hudFreq  = document.getElementById('hudFreq');
-    const hudBand  = document.getElementById('hudBand');
-    const hudBase  = document.getElementById('hudBase');
-    const hudTest  = document.getElementById('hudTest');
-    const hudDelta = document.getElementById('hudDelta');
-
-    bodeCanvas.addEventListener('mousemove', (e) => {
-        const rect = bodeCanvas.getBoundingClientRect();
-        mouseCrosshairX = e.clientX - rect.left;
-        mouseCrosshairY = e.clientY - rect.top;
-
-        const { left, right, top, bottom } = bodeChart.chartArea || {};
-        if (left && mouseCrosshairX >= left && mouseCrosshairX <= right &&
-            mouseCrosshairY >= top && mouseCrosshairY <= bottom) {
-            
-            const xVal = bodeChart.scales.x.getValueForPixel(mouseCrosshairX);
-            if (xVal !== undefined) {
-                // Find nearest frequency index
-                let closestIdx = 0;
-                let minDiff = Infinity;
-                for (let i = 0; i < freqData.length; i++) {
-                    const diff = Math.abs(Math.log10(freqData[i]) - Math.log10(xVal));
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        closestIdx = i;
-                    }
-                }
-
-                currentHoverIdx = closestIdx;
-                const f = freqData[closestIdx];
-                const b = healthyData[closestIdx];
-                const t = faultyData[closestIdx];
-                const d = Math.abs(t - b);
-
-                hudFreq.textContent = fmtFreq(f);
-                hudBand.textContent = getSubbandName(f);
-                hudBase.textContent = b !== undefined ? b.toFixed(2) + ' dB' : '—';
-                hudTest.textContent = t !== undefined ? t.toFixed(2) + ' dB' : '—';
-                
-                if (b !== undefined && t !== undefined) {
-                    const sign = (t >= b ? '+' : '');
-                    hudDelta.textContent = sign + (t - b).toFixed(2) + ' dB (' + d.toFixed(2) + ' dev)';
-                    if (d >= 6.0) {
-                        hudDelta.className = 'font-bold text-telemetry-rose';
-                    } else if (d >= 3.0) {
-                        hudDelta.className = 'font-bold text-telemetry-amber';
-                    } else {
-                        hudDelta.className = 'font-bold text-telemetry-emerald';
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Transfer Function Magnitude (dB)',
+                            color: '#5C5852',
+                            font: { family: 'Inter', size: 11, weight: '500' }
+                        },
+                        grid: {
+                            color: '#E8E3DA',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#8D877E',
+                            font: { family: 'JetBrains Mono', size: 10 }
+                        }
                     }
                 }
             }
-        }
-        bodeChart.draw();
+        });
     });
 
-    bodeCanvas.addEventListener('mouseleave', () => {
-        mouseCrosshairX = null;
-        mouseCrosshairY = null;
-        currentHoverIdx = null;
+    // Band Zoom Control
+    function setBandZoom(band) {
+        if (!chartInstance) return;
 
-        hudFreq.textContent = 'HOVER PLOT';
-        hudBand.textContent = '20 Hz – 2 MHz SPECTRUM';
-        hudBase.textContent = '—';
-        hudTest.textContent = '—';
-        hudDelta.textContent = '—';
-        hudDelta.className = 'font-bold text-white';
-
-        bodeChart.draw();
-    });
-
-    // ═══════════════════════════════════════════════════
-    // INTERACTIVE CONTROLS (Toggles & Zoom)
-    // ═══════════════════════════════════════════════════
-    window.toggleTrace = function(idx, btn) {
-        const meta = bodeChart.getDatasetMeta(idx);
-        meta.hidden = !meta.hidden;
-        
-        if (meta.hidden) {
-            btn.className = 'flex items-center gap-1.5 px-2 py-1 rounded-sm border border-border-subtle bg-chassis text-slate-400 font-semibold transition';
-        } else {
-            if (idx === 0) {
-                btn.className = 'flex items-center gap-1.5 px-2 py-1 rounded-sm border border-telemetry-violet/40 bg-telemetry-violet/10 text-telemetry-violet font-semibold transition';
-            } else {
-                btn.className = 'flex items-center gap-1.5 px-2 py-1 rounded-sm border border-telemetry-cyan/40 bg-telemetry-cyan/10 text-telemetry-cyan font-semibold transition';
-            }
-        }
-        bodeChart.update();
-    };
-
-    window.toggleResidualTrace = function(btn) {
-        const meta = bodeChart.getDatasetMeta(2);
-        meta.hidden = !meta.hidden;
-        const isShown = !meta.hidden;
-
-        bodeChart.options.scales.yDelta.display = isShown;
-
-        if (isShown) {
-            btn.className = 'flex items-center gap-1.5 px-2 py-1 rounded-sm border border-telemetry-amber/40 bg-telemetry-amber/10 text-telemetry-amber font-semibold transition';
-        } else {
-            btn.className = 'flex items-center gap-1.5 px-2 py-1 rounded-sm border border-border-subtle bg-chassis text-slate-400 font-semibold hover:text-telemetry-amber transition';
-        }
-        bodeChart.update();
-    };
-
-    window.toggleSubbandOverlay = function(btn) {
-        subbandsVisible = !subbandsVisible;
-        if (subbandsVisible) {
-            btn.className = 'px-2 py-1 rounded-sm border border-border-interactive bg-panel-elevated text-telemetry-cyan font-semibold transition';
-        } else {
-            btn.className = 'px-2 py-1 rounded-sm border border-border-subtle bg-chassis text-slate-400 font-semibold transition';
-        }
-        bodeChart.update();
-    };
-
-    window.setBandZoom = function(band) {
-        const buttons = {
-            'full': document.getElementById('btnZoomFull'),
-            'low':  document.getElementById('btnZoomLow'),
-            'mid':  document.getElementById('btnZoomMid'),
-            'high': document.getElementById('btnZoomHigh')
-        };
-
-        Object.keys(buttons).forEach(k => {
-            if (buttons[k]) {
-                if (k === band) {
-                    buttons[k].className = 'px-2 py-0.5 rounded-xs font-semibold transition bg-panel-elevated text-telemetry-cyan border border-border-interactive';
-                } else {
-                    buttons[k].className = 'px-2 py-0.5 rounded-xs font-semibold transition text-slate-400 hover:text-slate-200';
-                }
+        const zoomButtons = ['btnZoomFull', 'btnZoomLow', 'btnZoomMid', 'btnZoomHigh'];
+        zoomButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.className = "px-2.5 py-1 rounded text-ink-secondary hover:text-ink-primary transition";
             }
         });
 
         if (band === 'low') {
-            bodeChart.options.scales.x.min = 20;
-            bodeChart.options.scales.x.max = 2000;
+            chartInstance.options.scales.x.min = 20;
+            chartInstance.options.scales.x.max = 2000;
+            document.getElementById('btnZoomLow').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
         } else if (band === 'mid') {
-            bodeChart.options.scales.x.min = 2000;
-            bodeChart.options.scales.x.max = 100000;
+            chartInstance.options.scales.x.min = 2000;
+            chartInstance.options.scales.x.max = 100000;
+            document.getElementById('btnZoomMid').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
         } else if (band === 'high') {
-            bodeChart.options.scales.x.min = 100000;
-            bodeChart.options.scales.x.max = maxFreq;
+            chartInstance.options.scales.x.min = 100000;
+            chartInstance.options.scales.x.max = 2000000;
+            document.getElementById('btnZoomHigh').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
         } else {
-            bodeChart.options.scales.x.min = minFreq;
-            bodeChart.options.scales.x.max = maxFreq;
+            chartInstance.options.scales.x.min = 20;
+            chartInstance.options.scales.x.max = 2000000;
+            document.getElementById('btnZoomFull').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
         }
-        bodeChart.update();
-    };
-
-    // ═══════════════════════════════════════════════════
-    // HEALTH GAUGE — Half-Doughnut
-    // ═══════════════════════════════════════════════════
-    const gaugeCtx = document.getElementById('healthGauge').getContext('2d');
-    const score = {{ confidence }};
-    const gaugeColor = score > 80 ? '#10b981' : (score > 60 ? '#f59e0b' : '#f43f5e');
-
-    new Chart(gaugeCtx, {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [score, 100 - score],
-                backgroundColor: [gaugeColor, '#0c1017'],
-                borderWidth: 0,
-                circumference: 180,
-                rotation: 270
-            }]
-        },
-        options: {
-            cutout: '80%',
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { animateRotate: true, duration: 1000 },
-            plugins: { tooltip: { enabled: false }, legend: { display: false } }
-        }
-    });
-
-    // ═══════════════════════════════════════════════════
-    // PER-BAND IEEE STATUS — Client-side computation
-    // ═══════════════════════════════════════════════════
-    function computeBandStats(freqs, healthy, faulty, lo, hi) {
-        let maxDev = 0, sumProd = 0, sumH2 = 0, sumF2 = 0, n = 0;
-        for (let i = 0; i < freqs.length; i++) {
-            if (freqs[i] >= lo && freqs[i] < hi) {
-                const dev = Math.abs(faulty[i] - healthy[i]);
-                if (dev > maxDev) maxDev = dev;
-                sumProd += healthy[i] * faulty[i];
-                sumH2   += healthy[i] * healthy[i];
-                sumF2   += faulty[i] * faulty[i];
-                n++;
-            }
-        }
-        const denom = Math.sqrt(sumH2 * sumF2);
-        const corr = (n > 0 && denom > 0) ? Math.max(0, sumProd / denom) : 1;
-        return { maxDev: maxDev.toFixed(2), corr: corr.toFixed(4), count: n };
+        chartInstance.update();
     }
 
-    function applyBandCard(prefix, stats) {
-        const corrEl   = document.getElementById(prefix + 'Corr');
-        const shiftEl  = document.getElementById(prefix + 'Shift');
-        const statusEl = document.getElementById(prefix + 'Status');
+    // Toggle Baseline Trace
+    function toggleTrace(datasetIndex, btn) {
+        if (!chartInstance) return;
+        const meta = chartInstance.getDatasetMeta(datasetIndex);
+        meta.hidden = !meta.hidden;
+        chartInstance.update();
 
-        if (!corrEl || !shiftEl || !statusEl) return;
-
-        if (stats.count === 0) {
-            corrEl.textContent  = 'N/A';
-            shiftEl.textContent = 'N/A';
-            statusEl.textContent = 'NO DATA';
-            statusEl.className = 'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-slate-700 text-slate-400';
-            return;
-        }
-
-        corrEl.textContent  = stats.corr;
-        shiftEl.textContent = stats.maxDev + ' dB';
-
-        const c = parseFloat(stats.corr);
-        if (c >= 0.95) {
-            statusEl.textContent = 'NOMINAL';
-            statusEl.className = 'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-telemetry-emerald/30 text-telemetry-emerald bg-telemetry-emerald/5';
-            corrEl.className   = 'text-sm font-mono font-bold text-telemetry-emerald';
-        } else if (c >= 0.85) {
-            statusEl.textContent = 'DEVIATION';
-            statusEl.className = 'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-telemetry-amber/30 text-telemetry-amber bg-telemetry-amber/5';
-            corrEl.className   = 'text-sm font-mono font-bold text-telemetry-amber';
+        if (meta.hidden) {
+            btn.classList.add('opacity-40');
         } else {
-            statusEl.textContent = 'CRITICAL';
-            statusEl.className = 'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-sm border border-telemetry-rose/30 text-telemetry-rose bg-telemetry-rose/5';
-            corrEl.className   = 'text-sm font-mono font-bold text-telemetry-rose';
+            btn.classList.remove('opacity-40');
         }
     }
 
-    const bandLow  = computeBandStats(freqData, healthyData, faultyData, 0, 2000);
-    const bandMid  = computeBandStats(freqData, healthyData, faultyData, 2000, 100000);
-    const bandHigh = computeBandStats(freqData, healthyData, faultyData, 100000, Infinity);
+    // Toggle |ΔdB| Residual Trace
+    function toggleResidualTrace(btn) {
+        if (!chartInstance) return;
+        const meta = chartInstance.getDatasetMeta(2);
+        meta.hidden = !meta.hidden;
+        chartInstance.update();
 
-    applyBandCard('bandLow',  bandLow);
-    applyBandCard('bandMid',  bandMid);
-    applyBandCard('bandHigh', bandHigh);
-
-{% endif %}
+        if (meta.hidden) {
+            btn.classList.remove('border-ochre-border', 'bg-ochre-tint', 'text-ochre', 'font-medium');
+            btn.classList.add('border-border-subtle', 'bg-surface', 'text-ink-muted');
+        } else {
+            btn.classList.remove('border-border-subtle', 'bg-surface', 'text-ink-muted');
+            btn.classList.add('border-ochre-border', 'bg-ochre-tint', 'text-ochre', 'font-medium');
+        }
+    }
 </script>
+{% endif %}
 {% endblock %}

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FRA Diagnostics Workstation | Precision Industrial Instrument{% endblock %}</title>
+    <title>{% block title %}FRA Intelligence | High-Voltage Transformer Diagnostic Laboratory{% endblock %}</title>
 
-    <!-- Google Fonts: Inter (Prose) & JetBrains Mono (Telemetry) -->
+    <!-- Google Fonts: Newsreader (Editorial Serif), Source Sans 3 (Interface Sans), JetBrains Mono (Telemetry) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,28 +20,46 @@
             theme: {
                 extend: {
                     colors: {
-                        chassis: '#070a0f',
-                        surface: '#0c1017',
-                        panel: '#121824',
-                        'panel-elevated': '#172030',
-                        'border-subtle': '#1e293b',
-                        'border-interactive': '#334155',
-                        'border-emphasized': '#475569',
-                        'telemetry-cyan': '#06b6d4',
-                        'telemetry-emerald': '#10b981',
-                        'telemetry-amber': '#f59e0b',
-                        'telemetry-rose': '#f43f5e',
-                        'telemetry-violet': '#8b5cf6',
+                        'canvas-warm': '#FAF8F5',
+                        'canvas-subtle': '#F5F2EB',
+                        'surface': '#FFFFFF',
+                        'surface-inset': '#F0ECE1',
+                        'surface-hover': '#F7F4EE',
+                        'border-subtle': '#E8E3DA',
+                        'border-medium': '#D8D2C5',
+                        'ink-primary': '#1F1E1D',
+                        'ink-secondary': '#5C5852',
+                        'ink-muted': '#8D877E',
+                        'terracotta': '#CC785C',
+                        'terracotta-dark': '#B86347',
+                        'terracotta-tint': '#FAF2EE',
+                        'sage': '#246B49',
+                        'sage-tint': '#EFF7F2',
+                        'sage-border': '#C8E6D5',
+                        'ochre': '#A25807',
+                        'ochre-tint': '#FDF6E8',
+                        'ochre-border': '#F8DFB5',
+                        'crimson': '#B13628',
+                        'crimson-tint': '#FDF1F0',
+                        'crimson-border': '#F7CCC8',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
+                        serif: ['Newsreader', 'Georgia', 'serif'],
+                        sans: ['"Source Sans 3"', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    boxShadow: {
+                        'soft-xs': '0 1px 2px rgba(31, 30, 29, 0.04)',
+                        'soft-sm': '0 1px 3px rgba(31, 30, 29, 0.05), 0 2px 6px rgba(31, 30, 29, 0.02)',
+                        'soft-card': '0 1px 3px rgba(31, 30, 29, 0.04), 0 6px 18px rgba(31, 30, 29, 0.03)',
+                        'soft-elevated': '0 4px 14px rgba(31, 30, 29, 0.06), 0 16px 36px rgba(31, 30, 29, 0.03)',
                     },
                     borderRadius: {
-                        'sm': '2px',
-                        'DEFAULT': '4px',
-                        'md': '4px',
-                        'lg': '6px',
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                        '2xl': '20px',
                     }
                 }
             }
@@ -50,20 +68,22 @@
 
     <style>
         :root {
-            --canvas-chassis: #070a0f;
-            --canvas-surface: #0c1017;
-            --canvas-panel: #121824;
-            --border-subtle: #1e293b;
+            --canvas-warm: #FAF8F5;
+            --surface-card: #FFFFFF;
+            --border-subtle: #E8E3DA;
+            --text-primary: #1F1E1D;
+            --accent-terracotta: #CC785C;
         }
 
         body {
-            background-color: #070a0f;
-            color: #f8fafc;
-            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #FAF8F5;
+            color: #1F1E1D;
+            font-family: 'Source Sans 3', system-ui, sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         .font-mono-num {
@@ -71,214 +91,236 @@
             font-feature-settings: 'tnum' on, 'zero' on;
         }
 
-        .grid-frame {
-            border: 1px solid #1e293b;
+        /* Anthropic subtle paper texture / editorial lines */
+        .editorial-rule {
+            border-bottom: 1px solid #E8E3DA;
         }
 
-        .tactile-inset {
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-
-        @keyframes beacon-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.9); }
-        }
-        .beacon-active {
-            animation: beacon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        /* Custom scrollbars */
+        /* Custom warm scrollbars */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
         }
         ::-webkit-scrollbar-track {
-            background: #070a0f;
+            background: #FAF8F5;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 2px;
+            background: #D8D2C5;
+            border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
+            background: #B8B0A2;
         }
 
-        /* Browser surfaces: themed from the instrument palette */
+        /* Anthropic text selection */
         ::selection {
-            background: rgba(6, 182, 212, 0.35);
-            color: #f8fafc;
+            background: #F0D9D0;
+            color: #1F1E1D;
         }
+
         input, textarea {
-            caret-color: #06b6d4;
+            caret-color: #CC785C;
         }
         :focus-visible {
-            outline: 1px solid #06b6d4;
+            outline: 2px solid #CC785C;
             outline-offset: 2px;
         }
 
-        /* Skip link: instrument-styled, visible on keyboard focus only */
+        /* Accessible Skip Link */
         .skip-link {
             position: absolute;
-            left: 8px;
-            top: -48px;
-            z-index: 50;
-            padding: 8px 16px;
-            background: #172030;
-            border: 1px solid #06b6d4;
-            color: #06b6d4;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 2px;
-            transition: top 0.15s ease-out;
+            left: 16px;
+            top: -50px;
+            z-index: 100;
+            padding: 10px 18px;
+            background: #1F1E1D;
+            color: #FAF8F5;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: top 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .skip-link:focus {
-            top: 8px;
+            top: 16px;
         }
 
-        /* Motion: preserve state change without pulsing for reduced-motion users */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.92); }
+        }
+        .pulse-beacon {
+            animation: pulse-subtle 2.5s ease-in-out infinite;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-            .beacon-active {
-                animation: none;
-                opacity: 1;
-            }
+            .pulse-beacon { animation: none; }
             *, *::before, *::after {
                 scroll-behavior: auto !important;
                 transition-duration: 0.01ms !important;
             }
         }
-
-        /* Touch: guarantee 44px targets on coarse pointers without disturbing dense desktop layout */
-        @media (pointer: coarse) {
-            aside nav a {
-                min-height: 44px;
-            }
-            button, td a {
-                min-height: 44px;
-            }
-            td button {
-                min-height: 44px;
-                min-width: 44px;
-            }
-        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-chassis text-slate-100 flex min-h-screen">
-    <a href="#main-content" class="skip-link">SKIP TO MAIN CONTENT</a>
+<body class="bg-canvas-warm text-ink-primary flex flex-col min-h-screen">
+    <!--
+    THESIS: High-voltage transformer frequency response diagnostics reimagined with Anthropic's editorial research poise, replacing cold cyberpunk neon with warm linen substrates, scholarly serif typography, and calm scientific clarity.
+    OWN-WORLD: Warm unbleached paper (#FAF8F5), pure white floating cards (#FFFFFF), Claude signature terracotta (#CC785C), muted forest sage and ochre telemetry pills, and literary Newsreader serif paired with tabular JetBrains Mono.
+    STORY: Visitors enter a distinguished, peer-reviewed engineering platform, discovering transformer physics on the landing page, evaluating live frequency responses in the Workbench, auditing substation histories, and consulting IEEE C57.149 standards.
+    FIRST VIEWPORT: A welcoming, dignified editorial navigation bar, clear breadcrumbs and asset metadata, leading immediately into the dedicated research surfaces.
+    FORM: Editorial Research Lab, anthropic-warm-paper, seed key: anthropic-fra-v4.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
 
-    <!-- LEFT VERTICAL AVIONICS COMMAND RAIL -->
-    <aside class="w-16 lg:w-56 bg-surface border-r border-border-subtle flex flex-col justify-between shrink-0 tactile-inset z-40 sticky top-0 h-screen">
-        <div>
-            <!-- Instrument Brand & System State -->
-            <a href="/" class="h-14 border-b border-border-subtle flex items-center px-4 gap-3 hover:bg-panel transition group">
-                <div class="w-8 h-8 rounded-sm bg-panel border border-border-interactive flex items-center justify-center text-telemetry-cyan shrink-0 group-hover:border-telemetry-cyan transition">
-                    <i data-lucide="activity" class="w-4 h-4 text-telemetry-cyan"></i>
-                </div>
-                <div class="hidden lg:block overflow-hidden">
-                    <div class="font-mono font-bold text-xs tracking-wider text-white truncate">FRA-INSTRUMENT</div>
-                    <div class="text-[9px] font-mono text-telemetry-emerald flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-telemetry-emerald beacon-active"></span>
-                        ONLINE V4.1
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- TOP EDITORIAL NAVIGATION BAR -->
+    <header class="bg-canvas-warm/90 backdrop-blur-md border-b border-border-subtle sticky top-0 z-40 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Left: Brand Emblem & Title -->
+            <div class="flex items-center gap-6">
+                <a href="/" class="flex items-center gap-3 group">
+                    <!-- Claude-inspired Terracotta Geometric Star Emblem -->
+                    <div class="w-8 h-8 rounded-lg bg-terracotta flex items-center justify-center text-white shadow-soft-xs group-hover:bg-terracotta-dark transition">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z"/>
+                        </svg>
                     </div>
-                </div>
-            </a>
+                    <div>
+                        <div class="font-serif font-semibold text-lg text-ink-primary tracking-tight leading-none group-hover:text-terracotta transition">
+                            FRA Intelligence
+                        </div>
+                        <div class="text-[11px] font-sans text-ink-muted mt-0.5 tracking-normal">
+                            High-Voltage SFRA Diagnostics
+                        </div>
+                    </div>
+                </a>
 
-            <!-- Navigation Links -->
-            <nav class="p-2 space-y-1 font-mono text-xs">
-                <a href="/analysis" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'workbench' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="SFRA Diagnostic Workbench">
-                    <i data-lucide="cpu" class="w-4 h-4 shrink-0"></i>
-                    <span class="hidden lg:inline">WORKBENCH</span>
-                </a>
-                <a href="/history" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'history' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="Fleet Records & Baselines">
-                    <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
-                    <span class="hidden lg:inline">FLEET RECORDS</span>
-                </a>
-                <a href="/about" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'standards' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="IEEE Standards & Criteria">
-                    <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
-                    <span class="hidden lg:inline">STANDARDS KB</span>
-                </a>
-                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-sm transition-colors {% if active_page == 'landing' %}bg-panel-elevated text-telemetry-cyan border border-border-interactive font-semibold{% else %}text-slate-400 hover:text-white hover:bg-panel{% endif %}" title="Platform Overview">
-                    <i data-lucide="compass" class="w-4 h-4 shrink-0"></i>
-                    <span class="hidden lg:inline">OVERVIEW</span>
-                </a>
-            </nav>
-        </div>
-
-        <!-- Rail Bottom Hardware & Telemetry Status -->
-        <div class="p-3 border-t border-border-subtle font-mono text-[10px] text-slate-400 hidden lg:block bg-surface/50">
-            <div class="text-slate-400 font-semibold mb-1 flex items-center justify-between">
-                <span>RACK BUS:</span>
-                <span class="text-telemetry-emerald">SYNC</span>
+                <!-- Global Nav Links -->
+                <nav class="hidden md:flex items-center gap-1 ml-4 pl-4 border-l border-border-subtle text-sm font-medium">
+                    <a href="/" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'landing' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                        Overview
+                    </a>
+                    <a href="/analysis" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'workbench' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                        Workbench
+                    </a>
+                    <a href="/history" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'history' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                        Fleet Records
+                    </a>
+                    <a href="/about" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'standards' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                        Standards & Guide
+                    </a>
+                </nav>
             </div>
-            <div class="text-slate-400">GPIB / ETHERNET OK</div>
-            <div class="text-slate-400 mt-1 flex items-center justify-between">
-                <span>LATENCY:</span>
-                <span class="text-slate-300">14ms</span>
-            </div>
-        </div>
-    </aside>
 
-    <!-- MAIN APPLICATION WRAPPER -->
-    <div class="flex-1 flex flex-col min-w-0">
-        <!-- TOP CONTEXT TELEMETRY STRIP (56px Sticky Header) -->
-        <header class="h-14 bg-surface/95 backdrop-blur border-b border-border-subtle px-4 lg:px-6 flex items-center justify-between sticky top-0 z-30 tactile-inset">
-            <!-- Left: Asset Hierarchy Breadcrumb -->
-            <div class="flex items-center gap-3 lg:gap-4 overflow-hidden">
-                <div class="flex items-center gap-2 text-xs font-mono truncate">
-                    <span class="text-slate-400 hidden sm:inline">ASSET:</span>
-                    <span class="text-slate-400 hidden md:inline">SUBSTATION-01</span>
-                    <span class="text-slate-600 hidden md:inline">/</span>
-                    <span class="text-white font-bold bg-panel px-2 py-0.5 rounded-sm border border-border-subtle tracking-wide">
-                        {{ transformerId if transformerId else 'TX-765KV-MAIN-01' }}
-                    </span>
-                </div>
-
-                <div class="h-4 w-px bg-border-subtle hidden sm:block"></div>
-
-                <!-- IEEE Compliance Badge -->
-                <div class="hidden md:flex items-center gap-1.5 font-mono text-[11px] text-slate-400 bg-panel px-2 py-0.5 rounded-sm border border-border-subtle">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+            <!-- Right: Standards Badge, System State & Actions -->
+            <div class="flex items-center gap-3">
+                <!-- Compliance Pill -->
+                <div class="hidden lg:flex items-center gap-1.5 text-xs text-ink-secondary bg-surface border border-border-subtle px-2.5 py-1 rounded-full shadow-soft-xs font-mono">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-sage"></i>
                     <span>IEEE C57.149 / IEC 60076-18</span>
                 </div>
-            </div>
 
-            <!-- Right: Real-time Telemetry & Action Deck -->
-            <div class="flex items-center gap-3 lg:gap-4 font-mono text-xs">
                 {% if status %}
-                <div class="flex items-center gap-2 bg-panel px-2.5 py-1 rounded-sm border border-border-subtle">
-                    <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-telemetry-emerald{% elif status == 'Warning' %}bg-telemetry-amber{% else %}bg-telemetry-rose{% endif %}"></span>
-                    <span class="text-[11px] text-slate-400">STATE:</span>
-                    <strong class="{% if status == 'Healthy' %}text-telemetry-emerald{% elif status == 'Warning' %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %}">
-                        {{ status | upper }}
-                    </strong>
+                <div class="flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono font-medium {% if status == 'Healthy' %}bg-sage-tint text-sage border-sage-border{% elif status == 'Warning' %}bg-ochre-tint text-ochre border-ochre-border{% else %}bg-crimson-tint text-crimson border-crimson-border{% endif %}">
+                    <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                    <span>{{ status | upper }}</span>
                     {% if corr %}
-                    <span class="text-slate-600">|</span>
-                    <span class="text-[11px] text-slate-300">R² {{ corr }}</span>
+                    <span class="text-ink-muted">·</span>
+                    <span class="text-ink-secondary">R² {{ corr }}</span>
                     {% endif %}
                 </div>
                 {% else %}
-                <div class="hidden sm:flex items-center gap-2 bg-panel px-2.5 py-1 rounded-sm border border-border-subtle text-[11px] text-slate-400">
-                    <span class="w-2 h-2 rounded-full bg-telemetry-emerald beacon-active"></span>
-                    <span>STANDBY READY</span>
+                <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-ink-muted bg-surface border border-border-subtle px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sage pulse-beacon"></span>
+                    <span>LAB STANDBY</span>
                 </div>
                 {% endif %}
 
-                <a href="/analysis" class="flex items-center gap-1.5 px-3 py-1.5 bg-panel-elevated border border-border-interactive text-telemetry-cyan rounded-sm hover:border-telemetry-cyan transition font-semibold text-xs tactile-inset">
-                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                    <span class="hidden sm:inline">INGEST CSV</span>
+                <!-- Primary CTA -->
+                <a href="/analysis" class="inline-flex items-center gap-2 px-4 py-1.5 bg-ink-primary text-white text-xs font-medium rounded-lg hover:bg-ink-secondary shadow-soft-xs transition">
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5 text-terracotta"></i>
+                    <span>Run Diagnostics</span>
                 </a>
-            </div>
-        </header>
 
-        <!-- MAIN VIEW CONTENT CONTAINER -->
-        <main id="main-content" class="flex-1 p-4 lg:p-6 max-w-[1800px] w-full mx-auto">
-            {% block content %}{% endblock %}
-        </main>
-    </div>
+                <!-- Mobile Menu Toggle Button -->
+                <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden p-1.5 text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle rounded-md" aria-label="Toggle menu">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-border-subtle bg-canvas-warm px-4 pt-2 pb-4 space-y-1 text-sm font-medium">
+            <a href="/" class="block px-3 py-2 rounded-md {% if active_page == 'landing' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Overview</a>
+            <a href="/analysis" class="block px-3 py-2 rounded-md {% if active_page == 'workbench' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Diagnostic Workbench</a>
+            <a href="/history" class="block px-3 py-2 rounded-md {% if active_page == 'history' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Fleet Records</a>
+            <a href="/about" class="block px-3 py-2 rounded-md {% if active_page == 'standards' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Standards & Methodology</a>
+        </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main id="main-content" class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- EDITORIAL RESEARCH FOOTER -->
+    <footer class="border-t border-border-subtle bg-canvas-warm py-12 mt-16 text-xs text-ink-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-2 space-y-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded-md bg-terracotta flex items-center justify-center text-white">
+                            <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 2L13.8 8.2L20 10L13.8 11.8L12 18L10.2 11.8L4 10L10.2 8.2L12 2Z"/>
+                            </svg>
+                        </div>
+                        <span class="font-serif font-semibold text-base text-ink-primary">FRA Intelligence Workstation</span>
+                    </div>
+                    <p class="text-ink-muted leading-relaxed max-w-md">
+                        A rigorous, physics-grounded Sweep Frequency Response Analysis platform for high-voltage power apparatus. Built with Anthropic's editorial clarity, grounded in IEEE Std C57.149 and IEC 60076-18 international standards.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-ink-primary mb-3 uppercase tracking-wider text-[11px] font-mono">Worksurfaces</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="hover:text-terracotta transition">Overview & Mission</a></li>
+                        <li><a href="/analysis" class="hover:text-terracotta transition">Diagnostic Workbench</a></li>
+                        <li><a href="/history" class="hover:text-terracotta transition">Fleet Baseline Registry</a></li>
+                        <li><a href="/about" class="hover:text-terracotta transition">IEEE Standards Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-medium text-ink-primary mb-3 uppercase tracking-wider text-[11px] font-mono">Standards & Science</h4>
+                    <ul class="space-y-2 text-ink-muted">
+                        <li>IEEE Std C57.149-2012</li>
+                        <li>IEC 60076-18 Edition 1.0</li>
+                        <li>CIGRE Technical Brochure 342</li>
+                        <li>DL/T 911-2016 Criterion</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-border-subtle pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-ink-muted">
+                <div>
+                    &copy; 2026 FRA Intelligence Laboratory. Distributed under engineering license.
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
+                        Deterministic Physics Engine v4.2
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         lucide.createIcons();
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>

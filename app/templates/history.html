@@ -1,33 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}Fleet Records & Historical Telemetry | FRA Diagnostics Workstation{% endblock %}
+{% block title %}Fleet Telemetry & Baseline Registry | FRA Intelligence{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+{% set active_page = 'history' %}
 
-    <!-- SUB-HEADER CONTEXT & ACTION BAR -->
+<div class="space-y-8">
+
+    <!-- SUB-HEADER CONTEXT & ACTIONS -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
         <div>
-            <div class="flex items-center gap-2 font-mono text-[10px] text-telemetry-cyan tracking-wider uppercase">
-                <i data-lucide="database" class="w-3.5 h-3.5"></i>
-                <span>FLEET ASSET REGISTRY // IEEE C57.149 HISTORICAL TELEMETRY AUDIT TRAIL</span>
+            <div class="flex items-center gap-2 font-mono text-xs text-ink-muted uppercase">
+                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                <span>SUBSTATION FLEET REGISTRY // HISTORICAL AUDIT LOG</span>
             </div>
-            <h1 class="text-xl lg:text-2xl font-bold text-white tracking-tight mt-1">
-                Analysis History & Fleet Records Console
+            <h1 class="font-serif text-3xl font-medium text-ink-primary tracking-tight mt-1">
+                Fleet Records & Telemetry Registry
             </h1>
-            <p class="text-xs text-slate-400 mt-0.5">
-                Fleet-wide frequency response surveillance across monitored substation apparatus with IEEE C57.149 sub-band correlation audit trails.
+            <p class="text-sm text-ink-secondary mt-1 max-w-2xl font-sans">
+                Comprehensive audit trail of monitored high-voltage power apparatus, tracking longitudinal frequency response shifts and IEEE C57.149 baseline correlation scores.
             </p>
         </div>
 
-        <div class="flex items-center gap-3 font-mono text-xs">
-            <button onclick="exportFleetCSV()" class="flex items-center gap-1.5 px-3 py-1.5 bg-panel border border-border-interactive text-slate-300 rounded-sm hover:border-slate-400 hover:text-white transition tactile-inset">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
-                <span>EXPORT CSV</span>
+        <div class="flex items-center gap-3">
+            <button onclick="exportFleetCSV()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium rounded-lg text-xs font-mono font-medium shadow-soft-xs hover:bg-canvas-subtle transition">
+                <i data-lucide="download" class="w-4 h-4 text-ink-muted"></i>
+                <span>Export CSV</span>
             </button>
-            <a href="/analysis" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-panel-elevated border border-telemetry-cyan/50 text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-semibold tactile-inset">
-                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                <span>INGEST NEW SCAN</span>
+            <a href="/analysis" class="inline-flex items-center gap-2 px-4 py-2 bg-ink-primary text-white rounded-lg text-xs font-mono font-medium shadow-soft-xs hover:bg-ink-secondary transition">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-terracotta"></i>
+                <span>Ingest Sweep</span>
             </a>
         </div>
     </div>
@@ -35,508 +37,266 @@
     <!-- 5-COLUMN HIGH-DENSITY FLEET TELEMETRY RIBBON -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <!-- Metric 1: Total Fleet Units -->
-        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-border-interactive transition">
-            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
                 <span>TOTAL ASSETS</span>
-                <i data-lucide="cpu" class="w-3.5 h-3.5 text-slate-500"></i>
+                <i data-lucide="cpu" class="w-4 h-4 text-ink-muted"></i>
             </div>
-            <div class="mt-1 flex items-baseline gap-2">
-                <span class="text-2xl font-bold font-mono text-white">{{ stats.total }}</span>
-                <span class="text-[10px] font-mono text-slate-500">UNITS</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-ink-primary">{{ stats.total }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">UNITS</span>
             </div>
-            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
                 <span>REGISTRY</span>
-                <span class="text-slate-300">8 SUBSTATIONS</span>
+                <span class="text-ink-secondary">8 SUBSTATIONS</span>
             </div>
         </div>
 
         <!-- Metric 2: Nominal / Healthy -->
-        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-emerald/40 transition">
-            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
                 <span>NOMINAL BASELINE</span>
-                <span class="w-2 h-2 rounded-full bg-telemetry-emerald beacon-active"></span>
+                <span class="w-2 h-2 rounded-full bg-sage"></span>
             </div>
-            <div class="mt-1 flex items-baseline gap-2">
-                <span class="text-2xl font-bold font-mono text-telemetry-emerald">{{ stats.healthy }}</span>
-                <span class="text-[10px] font-mono text-slate-500">VERIFIED</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-sage">{{ stats.healthy }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">VERIFIED</span>
             </div>
-            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
                 <span>BENCHMARK</span>
-                <span class="text-telemetry-emerald">R² ≥ 0.95</span>
+                <span class="text-sage font-medium">R² ≥ 0.95</span>
             </div>
         </div>
 
         <!-- Metric 3: Warning / Advisory -->
-        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-amber/40 transition">
-            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
-                <span>ADVISORY WARNING</span>
-                <span class="w-2 h-2 rounded-full bg-telemetry-amber"></span>
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>ADVISORY WATCH</span>
+                <span class="w-2 h-2 rounded-full bg-ochre"></span>
             </div>
-            <div class="mt-1 flex items-baseline gap-2">
-                <span class="text-2xl font-bold font-mono text-telemetry-amber">{{ stats.warning }}</span>
-                <span class="text-[10px] font-mono text-slate-500">WATCHLIST</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-ochre">{{ stats.warning }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">WATCHLIST</span>
             </div>
-            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
                 <span>THRESHOLD</span>
-                <span class="text-telemetry-amber">0.85 ≤ R² &lt; 0.95</span>
+                <span class="text-ochre font-medium">0.85 ≤ R² &lt; 0.95</span>
             </div>
         </div>
 
         <!-- Metric 4: Critical / Urgent -->
-        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-rose/40 transition">
-            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
-                <span>CRITICAL ALARM</span>
-                <span class="w-2 h-2 rounded-full bg-telemetry-rose beacon-active"></span>
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>URGENT ACTION</span>
+                <span class="w-2 h-2 rounded-full bg-crimson"></span>
             </div>
-            <div class="mt-1 flex items-baseline gap-2">
-                <span class="text-2xl font-bold font-mono text-telemetry-rose">{{ stats.critical }}</span>
-                <span class="text-[10px] font-mono text-slate-500">ACTION REQ</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-crimson">{{ stats.critical }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">ACTION REQ</span>
             </div>
-            <div class="mt-2 text-[10px] font-mono text-slate-400 flex items-center justify-between border-t border-border-subtle pt-1.5">
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
                 <span>SEVERITY</span>
-                <span class="text-telemetry-rose">R² &lt; 0.85</span>
+                <span class="text-crimson font-medium">R² &lt; 0.85</span>
             </div>
         </div>
 
-        <!-- Metric 5: Fleet Mean Health & Correlation -->
-        <div class="bg-panel border border-border-subtle p-3.5 rounded-sm tactile-inset relative overflow-hidden group hover:border-telemetry-cyan/40 transition col-span-2 sm:col-span-1">
-            <div class="flex items-center justify-between font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+        <!-- Metric 5: Fleet Mean Correlation -->
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs col-span-2 sm:col-span-1">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
                 <span>FLEET MEAN R²</span>
-                <i data-lucide="gauge" class="w-3.5 h-3.5 text-telemetry-cyan"></i>
+                <i data-lucide="activity" class="w-4 h-4 text-terracotta"></i>
             </div>
-            <div class="mt-1 flex items-baseline gap-2">
-                <span class="text-2xl font-bold font-mono text-white">{{ stats.mean_corr }}</span>
-                <span class="text-[10px] font-mono text-telemetry-cyan">{{ stats.mean_health }}% HII</span>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-ink-primary">{{ stats.mean_corr }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">AVG</span>
             </div>
-            <div class="mt-2 border-t border-border-subtle pt-1.5">
-                <div class="w-full bg-surface h-1 rounded-sm overflow-hidden">
-                    <div class="bg-telemetry-cyan h-1 rounded-sm" style="width: {{ stats.mean_health }}%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- FILTER, SEARCH & SELECTION TOOLBAR -->
-    <div class="bg-panel border border-border-subtle p-3 rounded-sm space-y-3">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <!-- Search Input -->
-            <div class="relative flex-1 max-w-md">
-                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                <input 
-                    type="text" 
-                    id="tableSearch" 
-                    aria-label="Search fleet records by asset ID, substation, or fault mechanism"
-                    placeholder="Search by Asset ID, Substation, or Mechanism..." 
-                    class="w-full bg-surface border border-border-subtle rounded-sm pl-9 pr-3 py-1.5 text-xs font-mono text-slate-200 placeholder-slate-400 focus:outline-none focus:border-telemetry-cyan transition"
-                    oninput="filterTable()"
-                >
-            </div>
-
-            <!-- Severity Filter Pills -->
-            <div class="flex items-center gap-1.5 font-mono text-xs overflow-x-auto pb-1 lg:pb-0">
-                <span class="text-slate-500 text-[10px] uppercase mr-1 hidden sm:inline">STATE:</span>
-                <button onclick="setStatusFilter('ALL')" id="filter-status-ALL" class="filter-status-btn active px-2.5 py-1 rounded-sm bg-panel-elevated border border-telemetry-cyan text-telemetry-cyan font-semibold transition text-[11px]">
-                    ALL ({{ stats.total }})
-                </button>
-                <button onclick="setStatusFilter('Healthy')" id="filter-status-Healthy" class="filter-status-btn px-2.5 py-1 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-telemetry-emerald hover:border-telemetry-emerald/40 transition text-[11px]">
-                    NOMINAL ({{ stats.healthy }})
-                </button>
-                <button onclick="setStatusFilter('Warning')" id="filter-status-Warning" class="filter-status-btn px-2.5 py-1 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-telemetry-amber hover:border-telemetry-amber/40 transition text-[11px]">
-                    WARNING ({{ stats.warning }})
-                </button>
-                <button onclick="setStatusFilter('Critical')" id="filter-status-Critical" class="filter-status-btn px-2.5 py-1 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-telemetry-rose hover:border-telemetry-rose/40 transition text-[11px]">
-                    CRITICAL ({{ stats.critical }})
-                </button>
-            </div>
-        </div>
-
-        <!-- Secondary Toolbar: Sub-band Filter & Stats Counter -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-border-subtle/60 text-[11px] font-mono">
-            <div class="flex items-center gap-2">
-                <span class="text-slate-500 uppercase text-[10px]">SUB-BAND:</span>
-                <button onclick="setSubbandFilter('ALL')" id="filter-band-ALL" class="filter-band-btn active px-2 py-0.5 rounded-sm bg-panel-elevated border border-border-interactive text-white">ALL BANDS</button>
-                <button onclick="setSubbandFilter('low')" id="filter-band-low" class="filter-band-btn px-2 py-0.5 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-slate-200">CORE &lt;2kHz</button>
-                <button onclick="setSubbandFilter('mid')" id="filter-band-mid" class="filter-band-btn px-2 py-0.5 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-slate-200">WINDING 2k-100k</button>
-                <button onclick="setSubbandFilter('high')" id="filter-band-high" class="filter-band-btn px-2 py-0.5 rounded-sm bg-surface border border-border-subtle text-slate-400 hover:text-slate-200">LEADS &gt;100k</button>
-            </div>
-
-            <div class="text-slate-400 flex items-center gap-2" aria-live="polite" aria-atomic="true">
-                <span>SHOWING:</span>
-                <span id="counterDisplay" class="text-white font-bold">{{ records|length }}</span>
-                <span class="text-slate-500">/ {{ stats.total }} RECORDS</span>
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>INDEX</span>
+                <span class="text-ink-secondary">{{ stats.mean_health }}/100</span>
             </div>
         </div>
     </div>
 
-    <!-- HIGH-DENSITY FLEET RECORDS TABLE CONTAINER -->
-    <div class="bg-panel border border-border-subtle rounded-sm overflow-hidden tactile-inset">
+    <!-- FILTER & SEARCH STRIP -->
+    <div class="bg-surface border border-border-subtle p-3 rounded-xl shadow-soft-xs flex flex-col md:flex-row items-center justify-between gap-3">
+        <!-- Search Field -->
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search serial, substation, or fault…" 
+                   class="w-full pl-9 pr-3 py-1.5 bg-canvas-warm border border-border-subtle rounded-lg text-xs font-sans text-ink-primary placeholder-ink-muted focus:border-terracotta transition">
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 text-xs font-mono overflow-x-auto w-full md:w-auto">
+            <button onclick="setStatusFilter('ALL')" id="filterAll" class="px-3 py-1 rounded-full font-medium bg-ink-primary text-white transition shadow-soft-xs">
+                ALL ({{ stats.total }})
+            </button>
+            <button onclick="setStatusFilter('HEALTHY')" id="filterHealthy" class="px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition">
+                HEALTHY ({{ stats.healthy }})
+            </button>
+            <button onclick="setStatusFilter('WARNING')" id="filterWarning" class="px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition">
+                WARNING ({{ stats.warning }})
+            </button>
+            <button onclick="setStatusFilter('CRITICAL')" id="filterCritical" class="px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition">
+                CRITICAL ({{ stats.critical }})
+            </button>
+        </div>
+    </div>
+
+    <!-- FLEET RECORDS AUDIT TABLE -->
+    <div class="border border-border-subtle rounded-xl bg-surface overflow-hidden shadow-soft-card">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[980px]" id="fleetTable">
-                <thead>
-                    <tr class="bg-surface border-b border-border-subtle font-mono text-[10px] text-slate-400 uppercase tracking-wider">
-                        <th class="py-2.5 px-3 font-semibold">ASSET / SUBSTATION</th>
-                        <th class="py-2.5 px-3 font-semibold">TIMESTAMP</th>
-                        <th class="py-2.5 px-3 font-semibold">HEALTH</th>
-                        <th class="py-2.5 px-3 font-semibold">STATUS</th>
-                        <th class="py-2.5 px-3 font-semibold">IDENTIFIED MECHANISM</th>
-                        <th class="py-2.5 px-3 font-semibold">SUB-BAND</th>
-                        <th class="py-2.5 px-3 font-semibold text-right">R² / |ΔdB|</th>
-                        <th class="py-2.5 px-3 font-semibold text-center">ACTIONS</th>
+            <table class="w-full text-left text-xs font-sans" id="recordsTable">
+                <thead class="bg-canvas-subtle border-b border-border-subtle font-mono text-[11px] text-ink-muted uppercase">
+                    <tr>
+                        <th class="py-3.5 px-4 font-semibold">Asset ID & Substation</th>
+                        <th class="py-3.5 px-4 font-semibold">Apparatus Spec</th>
+                        <th class="py-3.5 px-4 font-semibold">Test Date</th>
+                        <th class="py-3.5 px-4 font-semibold">Correlation (R²)</th>
+                        <th class="py-3.5 px-4 font-semibold">Shift (ΔdB)</th>
+                        <th class="py-3.5 px-4 font-semibold">Diagnosed Condition</th>
+                        <th class="py-3.5 px-4 text-center font-semibold">Status</th>
+                        <th class="py-3.5 px-4 text-right font-semibold">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-border-subtle text-xs">
-                    {% for r in records %}
-                    <tr 
-                        class="fleet-row hover:bg-panel-elevated/60 transition-colors group cursor-pointer"
-                        data-id="{{ r.id }}"
-                        data-status="{{ r.status }}"
-                        data-subband="{{ r.subband_code }}"
-                        data-text="{{ r.id }} {{ r.substation }} {{ r.fault_type }} {{ r.voltage }}"
-                        data-fleet-row="drawer-{{ loop.index }}"
-                        tabindex="0"
-                        aria-expanded="false"
-                        title="Press Enter to toggle audit details for {{ r.id }}"
-                        onclick="toggleDrawer('drawer-{{ loop.index }}', event)"
-                        onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleDrawer('drawer-{{ loop.index }}', event); }"
-                    >
-                        <!-- Column 1: Asset Identifier & Substation -->
-                        <td class="py-2.5 px-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-7 h-7 rounded-sm bg-surface border border-border-subtle flex items-center justify-center text-slate-400 group-hover:border-telemetry-cyan group-hover:text-telemetry-cyan transition shrink-0">
-                                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-                                </div>
-                                <div>
-                                    <div class="font-mono font-bold text-white group-hover:text-telemetry-cyan transition tracking-wide flex items-center gap-2">
-                                        <span>{{ r.id }}</span>
-                                    </div>
-                                    <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
-                                        <span class="text-slate-300">{{ r.substation }}</span>
-                                        <span class="text-slate-600">•</span>
-                                        <span class="text-slate-500">{{ r.voltage }}</span>
-                                    </div>
-                                </div>
-                            </div>
+                <tbody class="divide-y divide-border-subtle" id="recordsTbody">
+                    {% for record in records %}
+                    <tr class="record-row hover:bg-canvas-subtle/50 transition cursor-pointer" 
+                        data-status="{{ record.status | upper }}"
+                        data-search="{{ record.id }} {{ record.substation }} {{ record.fault_type }} {{ record.voltage }}"
+                        onclick="if(!event.target.closest('a')) window.location='/inspect/{{ record.id }}'">
+                        
+                        <!-- Asset ID & Substation -->
+                        <td class="py-3.5 px-4">
+                            <div class="font-mono font-bold text-ink-primary text-xs">{{ record.id }}</div>
+                            <div class="text-[11px] text-ink-muted mt-0.5">{{ record.substation }}</div>
                         </td>
 
-                        <!-- Column 2: Timestamp -->
-                        <td class="py-2.5 px-3 font-mono text-[11px] text-slate-300 whitespace-nowrap">
-                            <div>{{ r.date }}</div>
-                            <div class="text-[9px] text-slate-500 uppercase">IEEE STANDARD SWEEP</div>
+                        <!-- Apparatus Spec -->
+                        <td class="py-3.5 px-4 font-mono text-ink-secondary">
+                            {{ record.voltage }}
                         </td>
 
-                        <!-- Column 3: Health Integrity Index Gauge -->
-                        <td class="py-2.5 px-3 whitespace-nowrap">
-                            <div class="flex items-center gap-2.5">
-                                <span class="font-mono font-bold text-xs {% if r.health >= 85 %}text-telemetry-emerald{% elif r.health >= 60 %}text-telemetry-amber{% else %}text-telemetry-rose{% endif %} w-7">
-                                    {{ r.health }}%
-                                </span>
-                                <div class="w-16 bg-surface h-1.5 rounded-sm overflow-hidden border border-border-subtle">
-                                    <div class="h-full rounded-sm {% if r.health >= 85 %}bg-telemetry-emerald{% elif r.health >= 60 %}bg-telemetry-amber{% else %}bg-telemetry-rose{% endif %}" style="width: {{ r.health }}%"></div>
-                                </div>
-                            </div>
+                        <!-- Test Date -->
+                        <td class="py-3.5 px-4 font-mono text-ink-muted">
+                            {{ record.date }}
                         </td>
 
-                        <!-- Column 4: Diagnostic Verdict Badge -->
-                        <td class="py-2.5 px-3 whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] font-mono text-[10px] font-semibold uppercase tracking-wider
-                                {% if r.status == 'Healthy' %}
-                                    bg-telemetry-emerald/10 text-telemetry-emerald border border-telemetry-emerald/30
-                                {% elif r.status == 'Warning' %}
-                                    bg-telemetry-amber/10 text-telemetry-amber border border-telemetry-amber/30
-                                {% else %}
-                                    bg-telemetry-rose/10 text-telemetry-rose border border-telemetry-rose/30
-                                {% endif %}
-                            ">
-                                <span class="w-1.5 h-1.5 rounded-full {% if r.status == 'Healthy' %}bg-telemetry-emerald{% elif r.status == 'Warning' %}bg-telemetry-amber{% else %}bg-telemetry-rose beacon-active{% endif %}"></span>
-                                {{ r.status | upper }}
+                        <!-- Correlation R² -->
+                        <td class="py-3.5 px-4 font-mono font-bold {% if record.corr >= 0.95 %}text-sage{% elif record.corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
+                            {{ record.corr }}
+                        </td>
+
+                        <!-- Peak Shift ΔdB -->
+                        <td class="py-3.5 px-4 font-mono text-ink-secondary">
+                            {{ record.shift }} dB
+                        </td>
+
+                        <!-- Diagnosed Condition -->
+                        <td class="py-3.5 px-4">
+                            <div class="font-medium text-ink-primary">{{ record.fault_type }}</div>
+                            <div class="text-[10px] font-mono text-ink-muted mt-0.5">{{ record.subband }}</div>
+                        </td>
+
+                        <!-- Status Pill -->
+                        <td class="py-3.5 px-4 text-center">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold {% if record.status == 'Healthy' %}bg-sage-tint text-sage border border-sage-border{% elif record.status == 'Warning' %}bg-ochre-tint text-ochre border border-ochre-border{% else %}bg-crimson-tint text-crimson border border-crimson-border{% endif %}">
+                                <span class="w-1.5 h-1.5 rounded-full {% if record.status == 'Healthy' %}bg-sage{% elif record.status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                                {{ record.status | upper }}
                             </span>
                         </td>
 
-                        <!-- Column 5: Multi-class Identified Mechanism -->
-                        <td class="py-2.5 px-3">
-                            <div class="font-medium text-slate-200">{{ r.fault_type }}</div>
-                            <div class="text-[10px] text-slate-400 font-mono truncate max-w-xs">{{ r.action }}</div>
-                        </td>
-
-                        <!-- Column 6: Affected Sub-band -->
-                        <td class="py-2.5 px-3 whitespace-nowrap">
-                            <span class="inline-block px-2 py-0.5 rounded-[2px] font-mono text-[10px] border
-                                {% if r.subband_code == 'low' %}
-                                    bg-amber-500/10 text-amber-300 border-amber-500/30
-                                {% elif r.subband_code == 'mid' %}
-                                    bg-cyan-500/10 text-cyan-300 border-cyan-500/30
-                                {% elif r.subband_code == 'high' %}
-                                    bg-purple-500/10 text-purple-300 border-purple-500/30
-                                {% else %}
-                                    bg-emerald-500/10 text-emerald-300 border-emerald-500/30
-                                {% endif %}
-                            ">
-                                {{ r.subband }}
-                            </span>
-                        </td>
-
-                        <!-- Column 7: Dual Telemetry Readout (R² & Shift) -->
-                        <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">
-                            <div class="text-xs text-white font-bold">R² {{ r.corr }}</div>
-                            <div class="text-[10px] {% if r.shift > 6.0 %}text-telemetry-rose{% elif r.shift > 3.0 %}text-telemetry-amber{% else %}text-slate-400{% endif %}">
-                                Δ {{ r.shift }} dB
-                            </div>
-                        </td>
-
-                        <!-- Column 8: Action Deck -->
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap" onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-center gap-1.5 font-mono">
-                                <a 
-                                    href="/inspect/{{ r.id }}" 
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 bg-surface border border-border-interactive hover:border-telemetry-cyan text-telemetry-cyan rounded-sm text-[11px] font-semibold transition"
-                                    title="Open interactive SFRA workbench for this asset"
-                                >
-                                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
-                                    <span>INSPECT</span>
-                                </a>
-                                <button 
-                                    type="button"
-                                    onclick="toggleDrawer('drawer-{{ loop.index }}', event)"
-                                    aria-label="Toggle audit details for {{ r.id }}"
-                                    aria-expanded="false"
-                                    aria-controls="drawer-{{ loop.index }}"
-                                    data-drawer-btn="drawer-{{ loop.index }}"
-                                    class="p-1 text-slate-400 hover:text-white rounded-sm hover:bg-surface border border-transparent hover:border-border-subtle transition"
-                                    title="View Audit Details Drawer"
-                                >
-                                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" id="icon-drawer-{{ loop.index }}"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- EXPANDABLE AUDIT & REASONING DRAWER -->
-                    <tr id="drawer-{{ loop.index }}" class="hidden bg-surface/90 border-b border-border-subtle font-mono text-xs">
-                        <td colspan="8" class="p-4 lg:p-5">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-l {% if r.status == 'Healthy' %}border-telemetry-emerald{% elif r.status == 'Warning' %}border-telemetry-amber{% else %}border-telemetry-rose{% endif %} pl-4">
-                                <!-- Bay A: Mechanical Diagnosis & Recommendation -->
-                                <div class="space-y-2">
-                                    <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">DIAGNOSTIC ASSESSMENT & RECOMMENDED ACTION</div>
-                                    <p class="font-sans text-xs text-slate-200 leading-relaxed">
-                                        {{ r.action }}
-                                    </p>
-                                    <div class="text-[10px] text-slate-400 pt-1">
-                                        AUTHORITY: <span class="text-slate-200">{{ r.engineer }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Bay B: IEEE C57.149 Sub-band Boundary Correlation -->
-                                <div class="space-y-1.5 text-[11px]">
-                                    <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">SUB-BAND CORRELATION MATRIX</div>
-                                    <div class="flex items-center justify-between bg-panel p-1.5 rounded-sm border border-border-subtle">
-                                        <span class="text-slate-400">LOW CORE (&lt;2 kHz):</span>
-                                        <span class="{% if r.subband_code == 'low' %}text-telemetry-amber font-bold{% else %}text-telemetry-emerald{% endif %}">
-                                            {% if r.subband_code == 'low' %}R² 0.8124 (Anomaly){% else %}R² 0.9912 (Nominal){% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-panel p-1.5 rounded-sm border border-border-subtle">
-                                        <span class="text-slate-400">MID WINDING (2k–100 kHz):</span>
-                                        <span class="{% if r.subband_code == 'mid' %}text-telemetry-rose font-bold{% else %}text-telemetry-emerald{% endif %}">
-                                            {% if r.subband_code == 'mid' %}R² {{ r.corr }} (Shift Peak){% else %}R² 0.9850 (Nominal){% endif %}
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-panel p-1.5 rounded-sm border border-border-subtle">
-                                        <span class="text-slate-400">HIGH LEADS (&gt;100 kHz):</span>
-                                        <span class="{% if r.subband_code == 'high' %}text-telemetry-amber font-bold{% else %}text-telemetry-emerald{% endif %}">
-                                            {% if r.subband_code == 'high' %}R² 0.8710 (Deviation){% else %}R² 0.9780 (Nominal){% endif %}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Bay C: Audit Trace & Instant Operations -->
-                                <div class="space-y-2 flex flex-col justify-between">
-                                    <div class="space-y-1 text-[11px]">
-                                        <div class="text-[10px] uppercase text-slate-400 font-bold tracking-wider">AUDIT ARTIFACTS</div>
-                                        <div class="text-slate-400 flex items-center justify-between">
-                                            <span>BASELINE FILE:</span>
-                                            <span class="text-slate-200">fra_healthy.csv</span>
-                                        </div>
-                                        <div class="text-slate-400 flex items-center justify-between">
-                                            <span>SOURCE SWEEP:</span>
-                                            <span class="text-slate-200 truncate max-w-[150px]">{{ r.filename }}</span>
-                                        </div>
-                                        <div class="text-slate-400 flex items-center justify-between">
-                                            <span>COMPLIANCE:</span>
-                                            <span class="text-telemetry-cyan">IEEE C57.149 / IEC 60076</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center gap-2 pt-2 border-t border-border-subtle">
-                                        <a href="/inspect/{{ r.id }}" class="flex-1 text-center py-1.5 bg-panel-elevated border border-telemetry-cyan text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-bold text-[11px]">
-                                            LOAD IN WORKBENCH
-                                        </a>
-                                        <a href="/download-report" class="flex items-center justify-center gap-1 px-3 py-1.5 bg-panel border border-border-interactive hover:border-slate-300 text-slate-200 rounded-sm transition text-[11px]">
-                                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                                            <span>PDF REPORT</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Action Link -->
+                        <td class="py-3.5 px-4 text-right">
+                            <a href="/inspect/{{ record.id }}" class="inline-flex items-center gap-1 px-3 py-1 bg-canvas-warm border border-border-medium rounded-md text-xs font-mono text-ink-secondary hover:text-ink-primary hover:border-terracotta transition shadow-soft-xs">
+                                <span>Inspect</span>
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <!-- Zero State Fallback -->
-        <div id="noRecordsRow" class="hidden p-12 text-center">
-            <div class="w-12 h-12 rounded-sm bg-surface border border-border-subtle flex items-center justify-center text-slate-500 mx-auto mb-3">
-                <i data-lucide="filter-x" class="w-6 h-6"></i>
-            </div>
-            <h3 class="font-mono text-sm font-bold text-white uppercase tracking-wider">No matching fleet records</h3>
-            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                No transformer records matched your search query or filter criteria. Try adjusting the status filter or clearing search text.
-            </p>
-            <button onclick="resetFilters()" class="mt-4 px-3 py-1.5 bg-panel-elevated border border-border-interactive text-telemetry-cyan text-xs font-mono rounded-sm hover:border-telemetry-cyan transition">
-                RESET FILTERS
-            </button>
-        </div>
-    </div>
-
-    <!-- QUICK FIELD INGESTION DROPZONE STRIP -->
-    <div class="border border-dashed border-border-interactive bg-surface/50 p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-sm bg-panel border border-border-subtle flex items-center justify-center text-telemetry-cyan shrink-0">
-                <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
-            </div>
-            <div>
-                <div class="font-mono font-bold text-xs text-white uppercase tracking-wider">Direct Substation Data Ingestion</div>
-                <div class="text-xs text-slate-400">Have a raw Omicron or Doble CSV frequency sweep file? Ingest directly into the SFRA Diagnostic Workbench.</div>
-            </div>
-        </div>
-        <a href="/analysis" class="shrink-0 flex items-center gap-2 px-4 py-2 bg-panel-elevated border border-telemetry-cyan text-telemetry-cyan rounded-sm hover:bg-telemetry-cyan hover:text-chassis transition font-mono font-semibold text-xs tracking-wider">
-            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            <span>OPEN WORKBENCH DROPZONE</span>
-        </a>
     </div>
 
 </div>
+
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
     let currentStatusFilter = 'ALL';
-    let currentSubbandFilter = 'ALL';
 
     function setStatusFilter(status) {
         currentStatusFilter = status;
-        document.querySelectorAll('.filter-status-btn').forEach(btn => {
-            btn.classList.remove('active', 'bg-panel-elevated', 'border-telemetry-cyan', 'text-telemetry-cyan', 'font-semibold');
-            btn.classList.add('bg-surface', 'border-border-subtle', 'text-slate-400');
-        });
-        const activeBtn = document.getElementById(`filter-status-${status}`);
-        if (activeBtn) {
-            activeBtn.classList.add('active', 'bg-panel-elevated', 'border-telemetry-cyan', 'text-telemetry-cyan', 'font-semibold');
-            activeBtn.classList.remove('bg-surface', 'border-border-subtle', 'text-slate-400');
-        }
-        filterTable();
-    }
-
-    function setSubbandFilter(band) {
-        currentSubbandFilter = band;
-        document.querySelectorAll('.filter-band-btn').forEach(btn => {
-            btn.classList.remove('active', 'bg-panel-elevated', 'border-border-interactive', 'text-white');
-            btn.classList.add('bg-surface', 'border-border-subtle', 'text-slate-400');
-        });
-        const activeBtn = document.getElementById(`filter-band-${band}`);
-        if (activeBtn) {
-            activeBtn.classList.add('active', 'bg-panel-elevated', 'border-border-interactive', 'text-white');
-            activeBtn.classList.remove('bg-surface', 'border-border-subtle', 'text-slate-400');
-        }
-        filterTable();
-    }
-
-    function filterTable() {
-        const query = (document.getElementById('tableSearch').value || '').toLowerCase().trim();
-        const rows = document.querySelectorAll('.fleet-row');
-        let visible = 0;
-
-        rows.forEach(row => {
-            const rowStatus = row.getAttribute('data-status');
-            const rowSubband = row.getAttribute('data-subband');
-            const rowText = (row.getAttribute('data-text') || '').toLowerCase();
-
-            const matchSearch = !query || rowText.includes(query);
-            const matchStatus = currentStatusFilter === 'ALL' || rowStatus.toLowerCase() === currentStatusFilter.toLowerCase();
-            const matchSubband = currentSubbandFilter === 'ALL' || rowSubband.toLowerCase() === currentSubbandFilter.toLowerCase();
-
-            if (matchSearch && matchStatus && matchSubband) {
-                row.classList.remove('hidden');
-                visible++;
-            } else {
-                row.classList.add('hidden');
-                // Also close corresponding drawer
-                const drawerId = row.getAttribute('onclick')?.match(/drawer-\d+/)?.[0];
-                if (drawerId) {
-                    const drawer = document.getElementById(drawerId);
-                    if (drawer) drawer.classList.add('hidden');
-                }
+        const filterBtns = ['filterAll', 'filterHealthy', 'filterWarning', 'filterCritical'];
+        filterBtns.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.className = "px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition";
             }
         });
 
-        document.getElementById('counterDisplay').innerText = visible;
-        const noRecords = document.getElementById('noRecordsRow');
-        if (visible === 0) {
-            noRecords.classList.remove('hidden');
-        } else {
-            noRecords.classList.add('hidden');
+        const activeId = status === 'ALL' ? 'filterAll' : (status === 'HEALTHY' ? 'filterHealthy' : (status === 'WARNING' ? 'filterWarning' : 'filterCritical'));
+        const activeBtn = document.getElementById(activeId);
+        if (activeBtn) {
+            activeBtn.className = "px-3 py-1 rounded-full font-medium bg-ink-primary text-white transition shadow-soft-xs";
         }
+
+        filterRecords();
     }
 
-    function resetFilters() {
-        document.getElementById('tableSearch').value = '';
-        setStatusFilter('ALL');
-        setSubbandFilter('ALL');
-    }
+    function filterRecords() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.record-row');
 
-    function toggleDrawer(drawerId, evt) {
-        if (evt) evt.stopPropagation();
-        const drawer = document.getElementById(drawerId);
-        const icon = document.getElementById(`icon-${drawerId}`);
-        if (!drawer) return;
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            const searchContent = row.getAttribute('data-search').toLowerCase();
 
-        const isHidden = drawer.classList.contains('hidden');
-        // Close all other open drawers first for clean inspection
-        document.querySelectorAll('[id^="drawer-"]').forEach(d => d.classList.add('hidden'));
-        document.querySelectorAll('[id^="icon-drawer-"]').forEach(i => i.classList.remove('rotate-180'));
-        document.querySelectorAll('[data-drawer-btn]').forEach(b => b.setAttribute('aria-expanded', 'false'));
-        document.querySelectorAll('[data-fleet-row]').forEach(r => r.setAttribute('aria-expanded', 'false'));
+            const statusMatches = (currentStatusFilter === 'ALL' || status === currentStatusFilter);
+            const queryMatches = (!query || searchContent.includes(query));
 
-        if (isHidden) {
-            drawer.classList.remove('hidden');
-            if (icon) icon.classList.add('rotate-180');
-            const btn = document.querySelector(`[data-drawer-btn="${drawerId}"]`);
-            if (btn) btn.setAttribute('aria-expanded', 'true');
-            const row = document.querySelector(`[data-fleet-row="${drawerId}"]`);
-            if (row) row.setAttribute('aria-expanded', 'true');
-        }
+            if (statusMatches && queryMatches) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
 
     function exportFleetCSV() {
-        const rows = [];
-        rows.push(["Asset ID", "Substation", "Voltage Rating", "Timestamp", "Health Index (%)", "Diagnostic Status", "Identified Fault", "Affected Sub-band", "Correlation (R2)", "Max Shift (dB)"]);
-        
-        document.querySelectorAll('.fleet-row').forEach(row => {
-            if (!row.classList.contains('hidden')) {
-                const cols = row.querySelectorAll('td');
-                const id = row.getAttribute('data-id');
-                const status = row.getAttribute('data-status');
-                const textCols = Array.from(cols).map(c => `"${c.innerText.replace(/"/g, '""').replace(/\n+/g, ' ').trim()}"`);
-                rows.push(textCols);
-            }
+        const records = {{ records | tojson if records else '[]' }};
+        if (!records || records.length === 0) {
+            alert('No records available to export.');
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Asset ID,Substation,Voltage Class,Test Date,Health Index,Status,Fault Type,Sub-band,Correlation R2,Max Shift dB,Engineer\n";
+
+        records.forEach(r => {
+            const row = [
+                `"${r.id}"`,
+                `"${r.substation}"`,
+                `"${r.voltage}"`,
+                `"${r.date}"`,
+                r.health,
+                `"${r.status}"`,
+                `"${r.fault_type}"`,
+                `"${r.subband}"`,
+                r.corr,
+                r.shift,
+                `"${r.engineer || ''}"`
+            ];
+            csvContent += row.join(",") + "\n";
         });
 
-        const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `FRA_Fleet_Records_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.setAttribute("download", `fleet_fra_records_${new Date().toISOString().slice(0,10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
