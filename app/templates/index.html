@@ -6,19 +6,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .workbench-card {
-        background-color: #FFFFFF;
-        border: 1px solid #E8E3DA;
+        background-color: var(--surface);
+        border: 1px solid var(--border-subtle);
         border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(31, 30, 29, 0.04), 0 4px 16px rgba(31, 30, 29, 0.02);
+        box-shadow: var(--shadow-soft-card);
     }
     .dropzone-workbench {
-        border: 1.5px dashed #D8D2C5;
-        background-color: #FAF8F5;
+        border: 1.5px dashed var(--border-medium);
+        background-color: var(--canvas-warm);
         transition: all 0.2s ease;
     }
     .dropzone-workbench:hover, .dropzone-workbench.drag-over {
-        border-color: #CC785C;
-        background-color: #FAF2EE;
+        border-color: var(--terracotta);
+        background-color: var(--terracotta-tint);
     }
 </style>
 {% endblock %}
@@ -64,7 +64,7 @@
                 <input type="file" name="file" required class="hidden" id="reUploadInput"
                        onchange="document.getElementById('reUploadLabel').textContent = this.files[0]?.name || 'File Selected'; document.getElementById('reScanSubmitBtn').classList.remove('hidden');">
             </label>
-            <button type="submit" id="reScanSubmitBtn" class="hidden px-3 py-1.5 bg-ink-primary text-white text-xs font-mono font-medium rounded-lg hover:bg-ink-secondary transition shadow-soft-xs">
+            <button type="submit" id="reScanSubmitBtn" class="hidden px-3 py-1.5 btn-primary text-xs font-mono font-medium rounded-lg shadow-soft-xs transition">
                 Run Analysis
             </button>
             <a href="/history" class="px-3 py-1.5 bg-surface border border-border-subtle text-xs font-mono text-ink-secondary hover:text-ink-primary rounded-lg transition" title="Audit Trail">
@@ -138,7 +138,7 @@
                         <i data-lucide="bar-chart-2" class="w-4 h-4 text-terracotta"></i>
                         <span class="font-serif font-semibold text-sm text-ink-primary">Bode Magnitude Transfer Function</span>
                         <span class="text-xs font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle hidden sm:inline">
-                            20 log₁₀(V_out / V_in)
+                            20 log₁₀(<i class="font-serif">V</i><sub>out</sub> / <i class="font-serif">V</i><sub>in</sub>)
                         </span>
                     </div>
 
@@ -219,7 +219,7 @@
                     <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">01 // Low Frequency</div>
                     <h4 class="font-serif font-semibold text-base text-ink-primary">Magnetic Core & Grounding</h4>
                     <p class="text-xs text-ink-secondary font-sans leading-relaxed">
-                        Evaluates main core leg permeability ($\mu_r$), core grounding straps, and residual magnetization. Resonance zeros governed by open-circuit magnetizing inductance $L_m$.
+                        Evaluates main core leg permeability (<span class="font-mono font-medium"><i>&mu;</i><sub>r</sub></span>), core grounding straps, and residual magnetization. Resonance zeros governed by open-circuit magnetizing inductance <span class="font-mono font-medium"><i>L</i><sub>m</sub></span>.
                     </p>
                 </div>
 
@@ -227,7 +227,7 @@
                     <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">02 // Mid Frequency</div>
                     <h4 class="font-serif font-semibold text-base text-ink-primary">Winding Geometry</h4>
                     <p class="text-xs text-ink-secondary font-sans leading-relaxed">
-                        Evaluates radial hoop stress, axial tilt, and inter-disk coil spacing. Governed by leakage inductance and inter-winding capacitances ($C_s, C_g$).
+                        Evaluates radial hoop stress, axial tilt, and inter-disk coil spacing. Governed by leakage inductance and inter-winding capacitances (<span class="font-mono font-medium"><i>C</i><sub>s</sub>, <i>C</i><sub>g</sub></span>).
                     </p>
                 </div>
 
@@ -287,7 +287,7 @@
 
                 <!-- Actions: Download Certified PDF -->
                 <div class="pt-2 space-y-2">
-                    <a href="/download-report" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-ink-primary text-white text-xs font-medium rounded-lg hover:bg-ink-secondary shadow-soft-xs transition font-mono">
+                    <a href="/download-report" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 btn-primary text-xs font-medium rounded-lg shadow-soft-xs transition font-mono">
                         <i data-lucide="download" class="w-4 h-4 text-terracotta"></i>
                         <span>Download Certified IEEE PDF</span>
                     </a>
@@ -370,7 +370,7 @@
                 </p>
             </label>
 
-            <button type="submit" id="standbySubmitBtn" disabled class="w-full py-3 bg-ink-primary text-white text-sm font-medium rounded-lg hover:bg-ink-secondary disabled:opacity-40 disabled:cursor-not-allowed transition shadow-soft-xs font-mono">
+            <button type="submit" id="standbySubmitBtn" disabled class="w-full py-3 btn-primary text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition shadow-soft-xs font-mono">
                 Ingest & Run Diagnostic Analysis
             </button>
         </form>
@@ -430,9 +430,37 @@
 
     let chartInstance = null;
 
+    function getChartThemeColors(isDark) {
+        return {
+            grid: isDark ? '#2C2C38' : '#E8E3DA',
+            text: isDark ? '#7E7B74' : '#8D877E',
+            title: isDark ? '#B4B0A7' : '#5C5852',
+            tooltipBg: isDark ? '#141417' : '#1F1E1D',
+            tooltipBorder: isDark ? '#363644' : '#E8E3DA'
+        };
+    }
+
+    window.syncChartTheme = function(theme) {
+        if (!chartInstance) return;
+        const isDark = theme === 'dark';
+        const colors = getChartThemeColors(isDark);
+        chartInstance.options.scales.x.grid.color = colors.grid;
+        chartInstance.options.scales.x.ticks.color = colors.text;
+        chartInstance.options.scales.x.title.color = colors.title;
+        chartInstance.options.scales.y.grid.color = colors.grid;
+        chartInstance.options.scales.y.ticks.color = colors.text;
+        chartInstance.options.scales.y.title.color = colors.title;
+        chartInstance.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+        chartInstance.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+        chartInstance.update();
+    };
+
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('workbenchBodeChart');
         if (!ctx || rawFreq.length === 0) return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const themeColors = getChartThemeColors(isDark);
 
         // Compute residual |ΔdB| dataset
         const deltaData = faultyData.map((val, idx) => {
@@ -503,10 +531,10 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#1F1E1D',
+                        backgroundColor: themeColors.tooltipBg,
                         titleColor: '#FAF8F5',
                         bodyColor: '#FAF8F5',
-                        borderColor: '#E8E3DA',
+                        borderColor: themeColors.tooltipBorder,
                         borderWidth: 1,
                         padding: 10,
                         titleFont: { family: 'JetBrains Mono', size: 12 },
@@ -528,15 +556,15 @@
                         title: {
                             display: true,
                             text: 'Frequency (Hz) — Logarithmic Grid',
-                            color: '#5C5852',
-                            font: { family: 'Inter', size: 11, weight: '500' }
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11, weight: '500' }
                         },
                         grid: {
-                            color: '#E8E3DA',
+                            color: themeColors.grid,
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#8D877E',
+                            color: themeColors.text,
                             font: { family: 'JetBrains Mono', size: 10 },
                             callback: function(value) {
                                 if ([20, 100, 1000, 10000, 100000, 1000000].includes(value)) {
@@ -550,15 +578,15 @@
                         title: {
                             display: true,
                             text: 'Transfer Function Magnitude (dB)',
-                            color: '#5C5852',
-                            font: { family: 'Inter', size: 11, weight: '500' }
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11, weight: '500' }
                         },
                         grid: {
-                            color: '#E8E3DA',
+                            color: themeColors.grid,
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#8D877E',
+                            color: themeColors.text,
                             font: { family: 'JetBrains Mono', size: 10 }
                         }
                     }

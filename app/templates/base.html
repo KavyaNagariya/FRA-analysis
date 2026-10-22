@@ -6,6 +6,24 @@
     <title>{% block title %}FRA Intelligence | High-Voltage Transformer Diagnostic Laboratory{% endblock %}</title>
     <link rel="icon" type="image/svg+xml" href="/static/logos/logo_waveform_spark.svg">
 
+    <!-- Pre-render theme check to prevent flash -->
+    <script>
+        (function() {
+            try {
+                const saved = localStorage.getItem('fra-theme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = saved || (prefersDark ? 'dark' : 'light');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Google Fonts: Newsreader (Editorial Serif), Source Sans 3 (Interface Sans), JetBrains Mono (Telemetry) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,31 +36,32 @@
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        'canvas-warm': '#FAF8F5',
-                        'canvas-subtle': '#F5F2EB',
-                        'surface': '#FFFFFF',
-                        'surface-inset': '#F0ECE1',
-                        'surface-hover': '#F7F4EE',
-                        'border-subtle': '#E8E3DA',
-                        'border-medium': '#D8D2C5',
-                        'ink-primary': '#1F1E1D',
-                        'ink-secondary': '#5C5852',
-                        'ink-muted': '#8D877E',
-                        'terracotta': '#CC785C',
-                        'terracotta-dark': '#B86347',
-                        'terracotta-tint': '#FAF2EE',
-                        'sage': '#246B49',
-                        'sage-tint': '#EFF7F2',
-                        'sage-border': '#C8E6D5',
-                        'ochre': '#A25807',
-                        'ochre-tint': '#FDF6E8',
-                        'ochre-border': '#F8DFB5',
-                        'crimson': '#B13628',
-                        'crimson-tint': '#FDF1F0',
-                        'crimson-border': '#F7CCC8',
+                        'canvas-warm': 'var(--canvas-warm)',
+                        'canvas-subtle': 'var(--canvas-subtle)',
+                        'surface': 'var(--surface)',
+                        'surface-inset': 'var(--surface-inset)',
+                        'surface-hover': 'var(--surface-hover)',
+                        'border-subtle': 'var(--border-subtle)',
+                        'border-medium': 'var(--border-medium)',
+                        'ink-primary': 'var(--ink-primary)',
+                        'ink-secondary': 'var(--ink-secondary)',
+                        'ink-muted': 'var(--ink-muted)',
+                        'terracotta': 'var(--terracotta)',
+                        'terracotta-dark': 'var(--terracotta-dark)',
+                        'terracotta-tint': 'var(--terracotta-tint)',
+                        'sage': 'var(--sage)',
+                        'sage-tint': 'var(--sage-tint)',
+                        'sage-border': 'var(--sage-border)',
+                        'ochre': 'var(--ochre)',
+                        'ochre-tint': 'var(--ochre-tint)',
+                        'ochre-border': 'var(--ochre-border)',
+                        'crimson': 'var(--crimson)',
+                        'crimson-tint': 'var(--crimson-tint)',
+                        'crimson-border': 'var(--crimson-border)',
                     },
                     fontFamily: {
                         serif: ['Newsreader', 'Georgia', 'serif'],
@@ -50,10 +69,10 @@
                         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
                     },
                     boxShadow: {
-                        'soft-xs': '0 1px 2px rgba(31, 30, 29, 0.04)',
-                        'soft-sm': '0 1px 3px rgba(31, 30, 29, 0.05), 0 2px 6px rgba(31, 30, 29, 0.02)',
-                        'soft-card': '0 1px 3px rgba(31, 30, 29, 0.04), 0 6px 18px rgba(31, 30, 29, 0.03)',
-                        'soft-elevated': '0 4px 14px rgba(31, 30, 29, 0.06), 0 16px 36px rgba(31, 30, 29, 0.03)',
+                        'soft-xs': 'var(--shadow-soft-xs)',
+                        'soft-sm': 'var(--shadow-soft-sm)',
+                        'soft-card': 'var(--shadow-soft-card)',
+                        'soft-elevated': 'var(--shadow-soft-elevated)',
                     },
                     borderRadius: {
                         'sm': '4px',
@@ -70,21 +89,91 @@
     <style>
         :root {
             --canvas-warm: #FAF8F5;
-            --surface-card: #FFFFFF;
+            --canvas-subtle: #F5F2EB;
+            --surface: #FFFFFF;
+            --surface-inset: #F0ECE1;
+            --surface-hover: #F7F4EE;
             --border-subtle: #E8E3DA;
-            --text-primary: #1F1E1D;
-            --accent-terracotta: #CC785C;
+            --border-medium: #D8D2C5;
+            --ink-primary: #1F1E1D;
+            --ink-secondary: #5C5852;
+            --ink-muted: #8D877E;
+            --terracotta: #CC785C;
+            --terracotta-dark: #B86347;
+            --terracotta-tint: #FAF2EE;
+            --sage: #246B49;
+            --sage-tint: #EFF7F2;
+            --sage-border: #C8E6D5;
+            --ochre: #A25807;
+            --ochre-tint: #FDF6E8;
+            --ochre-border: #F8DFB5;
+            --crimson: #B13628;
+            --crimson-tint: #FDF1F0;
+            --crimson-border: #F7CCC8;
+            --btn-primary-bg: #1F1E1D;
+            --btn-primary-text: #FAF8F5;
+            --btn-primary-hover: #383633;
+            --header-bg: rgba(250, 248, 245, 0.92);
+            --shadow-soft-xs: 0 1px 2px rgba(31, 30, 29, 0.04);
+            --shadow-soft-sm: 0 1px 3px rgba(31, 30, 29, 0.05), 0 2px 6px rgba(31, 30, 29, 0.02);
+            --shadow-soft-card: 0 1px 3px rgba(31, 30, 29, 0.04), 0 6px 18px rgba(31, 30, 29, 0.03);
+            --shadow-soft-elevated: 0 4px 14px rgba(31, 30, 29, 0.06), 0 16px 36px rgba(31, 30, 29, 0.03);
+            --selection-bg: #F0D9D0;
+            --scrollbar-track: #FAF8F5;
+            --scrollbar-thumb: #D8D2C5;
+            --scrollbar-thumb-hover: #B8B0A2;
+        }
+
+        html.dark {
+            --canvas-warm: #0E0E11;
+            --canvas-subtle: #16161B;
+            --surface: #1A1A22;
+            --surface-inset: #131317;
+            --surface-hover: #23232C;
+            --border-subtle: #2C2C38;
+            --border-medium: #3E3E4E;
+            --ink-primary: #F7F5F0;
+            --ink-secondary: #B4B0A7;
+            --ink-muted: #7E7B74;
+            --terracotta: #E08569;
+            --terracotta-dark: #CC785C;
+            --terracotta-tint: #2B1C18;
+            --sage: #38A169;
+            --sage-tint: #14281E;
+            --sage-border: #215137;
+            --ochre: #D69E2E;
+            --ochre-tint: #2D2311;
+            --ochre-border: #57411B;
+            --crimson: #E53E3E;
+            --crimson-tint: #2E1515;
+            --crimson-border: #5B2121;
+            --btn-primary-bg: #F7F5F0;
+            --btn-primary-text: #141417;
+            --btn-primary-hover: #E5E3DC;
+            --header-bg: rgba(14, 14, 17, 0.92);
+            --shadow-soft-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+            --shadow-soft-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+            --shadow-soft-card: 0 1px 4px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.3);
+            --shadow-soft-elevated: 0 4px 16px rgba(0, 0, 0, 0.5), 0 20px 48px rgba(0, 0, 0, 0.35);
+            --selection-bg: #4A2B22;
+            --scrollbar-track: #0E0E11;
+            --scrollbar-thumb: #363644;
+            --scrollbar-thumb-hover: #4E4E62;
+        }
+
+        html, body {
+            background-color: var(--canvas-warm);
+            color: var(--ink-primary);
         }
 
         body {
-            background-color: #FAF8F5;
-            color: #1F1E1D;
             font-family: 'Source Sans 3', system-ui, sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
         .font-mono-num {
@@ -92,38 +181,38 @@
             font-feature-settings: 'tnum' on, 'zero' on;
         }
 
-        /* Anthropic subtle paper texture / editorial lines */
+        /* Subtle editorial rules */
         .editorial-rule {
-            border-bottom: 1px solid #E8E3DA;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        /* Custom warm scrollbars */
+        /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 7px;
             height: 7px;
         }
         ::-webkit-scrollbar-track {
-            background: #FAF8F5;
+            background: var(--scrollbar-track);
         }
         ::-webkit-scrollbar-thumb {
-            background: #D8D2C5;
+            background: var(--scrollbar-thumb);
             border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #B8B0A2;
+            background: var(--scrollbar-thumb-hover);
         }
 
-        /* Anthropic text selection */
+        /* Text selection */
         ::selection {
-            background: #F0D9D0;
-            color: #1F1E1D;
+            background: var(--selection-bg);
+            color: var(--ink-primary);
         }
 
         input, textarea {
-            caret-color: #CC785C;
+            caret-color: var(--terracotta);
         }
         :focus-visible {
-            outline: 2px solid #CC785C;
+            outline: 2px solid var(--terracotta);
             outline-offset: 2px;
         }
 
@@ -134,8 +223,8 @@
             top: -50px;
             z-index: 100;
             padding: 10px 18px;
-            background: #1F1E1D;
-            color: #FAF8F5;
+            background: var(--ink-primary);
+            color: var(--canvas-warm);
             font-size: 13px;
             font-weight: 500;
             border-radius: 8px;
@@ -146,44 +235,33 @@
             top: 16px;
         }
 
-        @keyframes pulse-subtle {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.92); }
-        }
-        .pulse-beacon {
-            animation: pulse-subtle 2.5s ease-in-out infinite;
+        .header-blur {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .pulse-beacon { animation: none; }
-            *, *::before, *::after {
-                scroll-behavior: auto !important;
-                transition-duration: 0.01ms !important;
-            }
+        .btn-primary {
+            background-color: var(--btn-primary-bg) !important;
+            color: var(--btn-primary-text) !important;
+        }
+        .btn-primary:hover {
+            background-color: var(--btn-primary-hover) !important;
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-canvas-warm text-ink-primary flex flex-col min-h-screen">
-    <!--
-    THESIS: High-voltage transformer frequency response diagnostics reimagined with Anthropic's editorial research poise, replacing cold cyberpunk neon with warm linen substrates, scholarly serif typography, and calm scientific clarity.
-    OWN-WORLD: Warm unbleached paper (#FAF8F5), pure white floating cards (#FFFFFF), Claude signature terracotta (#CC785C), muted forest sage and ochre telemetry pills, and literary Newsreader serif paired with tabular JetBrains Mono.
-    STORY: Visitors enter a distinguished, peer-reviewed engineering platform, discovering transformer physics on the landing page, evaluating live frequency responses in the Workbench, auditing substation histories, and consulting IEEE C57.149 standards.
-    FIRST VIEWPORT: A welcoming, dignified editorial navigation bar, clear breadcrumbs and asset metadata, leading immediately into the dedicated research surfaces.
-    FORM: Editorial Research Lab, anthropic-warm-paper, seed key: anthropic-fra-v4.
-    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
-    -->
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- TOP EDITORIAL NAVIGATION BAR -->
-    <header class="bg-canvas-warm/90 backdrop-blur-md border-b border-border-subtle sticky top-0 z-40 transition-colors">
+    <!-- TOP EDITORIAL NAVIGATION BAR (DEBLOATED & HARMONIZED) -->
+    <header class="header-blur border-b border-border-subtle sticky top-0 z-40 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Left: Brand Emblem & Title -->
             <div class="flex items-center gap-6">
                 <a href="/" class="flex items-center gap-3 group">
-                    <!-- The Waveform Spark Vector Emblem -->
-                    <div class="w-9 h-9 rounded-lg bg-surface border border-border-subtle p-1 flex items-center justify-center shadow-soft-xs group-hover:border-terracotta group-hover:shadow-soft-sm transition">
+                    <div class="w-9 h-9 rounded-lg bg-surface border border-border-subtle p-1.5 flex items-center justify-center shadow-soft-xs group-hover:border-terracotta group-hover:shadow-soft-sm transition duration-200">
                         <img src="/static/logos/logo_waveform_spark.svg" alt="FRA Intelligence Emblem" class="w-full h-full">
                     </div>
                     <div>
@@ -196,58 +274,49 @@
                     </div>
                 </a>
 
-                <!-- Global Nav Links -->
+                <!-- Streamlined Nav Links -->
                 <nav class="hidden md:flex items-center gap-1 ml-4 pl-4 border-l border-border-subtle text-sm font-medium">
-                    <a href="/" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'landing' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                    <a href="/" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'landing' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle{% endif %}">
                         Overview
                     </a>
-                    <a href="/analysis" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'workbench' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                    <a href="/analysis" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'workbench' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle{% endif %}">
                         Workbench
                     </a>
-                    <a href="/history" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'history' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                    <a href="/history" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'history' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle{% endif %}">
                         Fleet Records
                     </a>
-                    <a href="/about" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'standards' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
+                    <a href="/about" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'standards' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle{% endif %}">
                         Standards & Guide
-                    </a>
-                    <a href="/diagram" target="_blank" class="px-3 py-1.5 rounded-md transition-colors text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60 flex items-center gap-1">
-                        <span>Anatomy Diagram</span>
-                        <i data-lucide="external-link" class="w-3 h-3 text-ink-muted"></i>
-                    </a>
-                    <a href="/logos" class="px-3 py-1.5 rounded-md transition-colors {% if active_page == 'logos' %}text-ink-primary bg-canvas-subtle font-semibold{% else %}text-ink-secondary hover:text-ink-primary hover:bg-canvas-subtle/60{% endif %}">
-                        Logos
                     </a>
                 </nav>
             </div>
 
-            <!-- Right: Standards Badge, System State & Actions -->
-            <div class="flex items-center gap-3">
-                <!-- Compliance Pill -->
-                <div class="hidden lg:flex items-center gap-1.5 text-xs text-ink-secondary bg-surface border border-border-subtle px-2.5 py-1 rounded-full shadow-soft-xs font-mono">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-sage"></i>
-                    <span>IEEE C57.149 / IEC 60076-18</span>
-                </div>
-
+            <!-- Right: Status, Theme Toggle & Primary Action -->
+            <div class="flex items-center gap-2.5">
                 {% if status %}
                 <div class="flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-mono font-medium {% if status == 'Healthy' %}bg-sage-tint text-sage border-sage-border{% elif status == 'Warning' %}bg-ochre-tint text-ochre border-ochre-border{% else %}bg-crimson-tint text-crimson border-crimson-border{% endif %}">
-                    <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                    <span class="w-1.5 h-1.5 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
                     <span>{{ status | upper }}</span>
                     {% if corr %}
                     <span class="text-ink-muted">·</span>
-                    <span class="text-ink-secondary">R² {{ corr }}</span>
+                    <span class="text-ink-secondary font-mono-num">R² {{ corr }}</span>
                     {% endif %}
-                </div>
-                {% else %}
-                <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-ink-muted bg-surface border border-border-subtle px-2.5 py-1 rounded-full">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sage pulse-beacon"></span>
-                    <span>LAB STANDBY</span>
                 </div>
                 {% endif %}
 
+                <!-- Dark / Light Mode Toggle Button -->
+                <button type="button" id="themeToggleBtn" onclick="toggleTheme()" 
+                        class="w-9 h-9 rounded-lg border border-border-subtle bg-surface text-ink-secondary hover:text-ink-primary hover:border-border-medium hover:bg-surface-hover shadow-soft-xs flex items-center justify-center transition-all duration-200" 
+                        aria-label="Toggle dark / light mode" title="Toggle dark / light mode">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-ochre"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-ink-secondary"></i>
+                </button>
+
                 <!-- Primary CTA -->
-                <a href="/analysis" class="inline-flex items-center gap-2 px-4 py-1.5 bg-ink-primary text-white text-xs font-medium rounded-lg hover:bg-ink-secondary shadow-soft-xs transition">
-                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5 text-terracotta"></i>
-                    <span>Run Diagnostics</span>
+                <a href="/analysis" class="inline-flex items-center gap-2 px-3.5 py-1.5 btn-primary text-xs font-medium rounded-lg shadow-soft-xs transition">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5 text-terracotta"></i>
+                    <span class="hidden sm:inline">Diagnostic Workbench</span>
+                    <span class="sm:hidden">Workbench</span>
                 </a>
 
                 <!-- Mobile Menu Toggle Button -->
@@ -263,7 +332,13 @@
             <a href="/analysis" class="block px-3 py-2 rounded-md {% if active_page == 'workbench' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Diagnostic Workbench</a>
             <a href="/history" class="block px-3 py-2 rounded-md {% if active_page == 'history' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Fleet Records</a>
             <a href="/about" class="block px-3 py-2 rounded-md {% if active_page == 'standards' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Standards & Methodology</a>
-            <a href="/logos" class="block px-3 py-2 rounded-md {% if active_page == 'logos' %}bg-canvas-subtle text-ink-primary font-semibold{% else %}text-ink-secondary hover:bg-canvas-subtle{% endif %}">Logos & Identity</a>
+            <div class="pt-2 border-t border-border-subtle flex items-center justify-between px-3">
+                <span class="text-xs text-ink-muted">Display Theme</span>
+                <button type="button" onclick="toggleTheme()" class="flex items-center gap-2 text-xs font-medium text-ink-secondary hover:text-ink-primary py-1 px-2.5 rounded border border-border-subtle bg-surface">
+                    <span class="dark:hidden flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i> Light</span>
+                    <span class="hidden dark:flex items-center gap-1.5"><i data-lucide="sun" class="w-3.5 h-3.5 text-ochre"></i> Dark</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -273,7 +348,7 @@
     </main>
 
     <!-- EDITORIAL RESEARCH FOOTER -->
-    <footer class="border-t border-border-subtle bg-canvas-warm py-12 mt-16 text-xs text-ink-secondary">
+    <footer class="border-t border-border-subtle bg-canvas-warm py-12 mt-16 text-xs text-ink-secondary transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div class="md:col-span-2 space-y-3">
@@ -294,6 +369,7 @@
                         <li><a href="/analysis" class="hover:text-terracotta transition">Diagnostic Workbench</a></li>
                         <li><a href="/history" class="hover:text-terracotta transition">Fleet Baseline Registry</a></li>
                         <li><a href="/about" class="hover:text-terracotta transition">IEEE Standards Guide</a></li>
+                        <li><a href="/diagram" class="hover:text-terracotta transition">Apparatus Anatomy Spec</a></li>
                         <li><a href="/logos" class="hover:text-terracotta transition">Brand Identity & Logos</a></li>
                     </ul>
                 </div>
@@ -323,9 +399,49 @@
 
     <script>
         lucide.createIcons();
+
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('hidden');
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const nextTheme = isDark ? 'light' : 'dark';
+            
+            if (nextTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+            try {
+                localStorage.setItem('fra-theme', nextTheme);
+            } catch(e) {}
+
+            // Recreate icons so Lucide picks up visible/hidden state
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+            // Sync embedded anatomy diagram
+            syncDiagramTheme(nextTheme);
+
+            // Sync Chart.js if present
+            if (window.syncChartTheme) {
+                window.syncChartTheme(nextTheme);
+            }
+        }
+
+        function syncDiagramTheme(theme) {
+            const frame = document.getElementById('anatomyDiagramFrame');
+            if (!frame) return;
+            try {
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage({ type: 'setTheme', theme: theme }, '*');
+                }
+            } catch (e) {}
         }
     </script>
     {% block extra_scripts %}{% endblock %}

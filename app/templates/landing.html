@@ -6,26 +6,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .warm-card {
-        background-color: #FFFFFF;
-        border: 1px solid #E8E3DA;
-        box-shadow: 0 1px 3px rgba(31, 30, 29, 0.04), 0 4px 16px rgba(31, 30, 29, 0.02);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        background-color: var(--surface);
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-soft-card);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
     }
     .warm-card:hover {
-        border-color: #D8D2C5;
-        box-shadow: 0 4px 12px rgba(31, 30, 29, 0.06), 0 12px 28px rgba(31, 30, 29, 0.04);
-    }
-    .hero-gradient {
-        background: radial-gradient(circle at 50% 0%, #F5EFEB 0%, #FAF8F5 70%);
+        border-color: var(--border-medium);
+        box-shadow: var(--shadow-soft-elevated);
     }
     .dropzone-anthropic {
-        border: 1.5px dashed #D8D2C5;
-        background-color: #FAF8F5;
+        border: 1.5px dashed var(--border-medium);
+        background-color: var(--canvas-warm);
         transition: all 0.2s ease;
     }
     .dropzone-anthropic:hover, .dropzone-anthropic.drag-over {
-        border-color: #CC785C;
-        background-color: #FAF2EE;
+        border-color: var(--terracotta);
+        background-color: var(--terracotta-tint);
+    }
+    .diagram-container {
+        box-shadow: inset 0 0 0 1px var(--border-subtle);
     }
 </style>
 {% endblock %}
@@ -33,19 +33,12 @@
 {% block content %}
 {% set active_page = 'landing' %}
 
-<div class="space-y-16">
+<div class="space-y-14">
 
-    <!-- HERO SECTION: CALM EDITORIAL SCHOLARSHIP -->
-    <section class="text-center pt-4 pb-4 max-w-4xl mx-auto space-y-5">
-        <!-- Brand Emblem Hero Accent -->
-        <div class="inline-flex items-center justify-center">
-            <div class="w-16 h-16 rounded-2xl bg-surface border border-border-subtle p-2.5 shadow-soft-card flex items-center justify-center hover:scale-105 transition-transform duration-300">
-                <img src="/static/logos/logo_waveform_spark.svg" alt="FRA Intelligence Emblem" class="w-full h-full">
-            </div>
-        </div>
-
+    <!-- HERO SECTION: CALM EDITORIAL SCHOLARSHIP (DEBLOATED & CENTERED) -->
+    <section class="text-center pt-2 pb-2 max-w-4xl mx-auto space-y-4">
         <!-- Sub-eyebrow pill -->
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border-subtle shadow-soft-xs text-xs font-mono text-ink-secondary">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border-subtle shadow-soft-xs text-xs font-mono text-ink-secondary">
             <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
             <span>IEEE Std C57.149 & IEC 60076-18 Research Platform</span>
         </div>
@@ -60,7 +53,7 @@
 
         <!-- Primary Navigation Actions -->
         <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <a href="/analysis" class="inline-flex items-center gap-2 px-5 py-2.5 bg-ink-primary text-white text-sm font-medium rounded-lg hover:bg-ink-secondary shadow-soft-sm transition">
+            <a href="/analysis" class="inline-flex items-center gap-2 px-5 py-2.5 btn-primary text-sm font-medium rounded-lg shadow-soft-sm transition">
                 <i data-lucide="cpu" class="w-4 h-4 text-terracotta"></i>
                 <span>Open Diagnostic Workbench</span>
             </a>
@@ -83,7 +76,7 @@
                     <span>Total Fleet</span>
                     <i data-lucide="cpu" class="w-3.5 h-3.5 text-ink-muted"></i>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-ink-primary">{{ stats.total }}</div>
+                <div class="mt-2 text-2xl font-bold font-mono text-ink-primary font-mono-num">{{ stats.total }}</div>
                 <div class="mt-1 text-xs text-ink-muted">Monitored Transformers</div>
             </div>
             <div class="warm-card p-4 rounded-xl">
@@ -91,7 +84,7 @@
                     <span>Healthy Units</span>
                     <span class="w-2 h-2 rounded-full bg-sage"></span>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-sage">{{ stats.healthy }}</div>
+                <div class="mt-2 text-2xl font-bold font-mono text-sage font-mono-num">{{ stats.healthy }}</div>
                 <div class="mt-1 text-xs text-ink-muted">R² ≥ 0.95 Baseline Match</div>
             </div>
             <div class="warm-card p-4 rounded-xl">
@@ -99,7 +92,7 @@
                     <span>Advisory Watch</span>
                     <span class="w-2 h-2 rounded-full bg-ochre"></span>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-ochre">{{ stats.warning }}</div>
+                <div class="mt-2 text-2xl font-bold font-mono text-ochre font-mono-num">{{ stats.warning }}</div>
                 <div class="mt-1 text-xs text-ink-muted">Sub-band Drift Detected</div>
             </div>
             <div class="warm-card p-4 rounded-xl">
@@ -107,7 +100,7 @@
                     <span>Urgent Action</span>
                     <span class="w-2 h-2 rounded-full bg-crimson"></span>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-crimson">{{ stats.critical }}</div>
+                <div class="mt-2 text-2xl font-bold font-mono text-crimson font-mono-num">{{ stats.critical }}</div>
                 <div class="mt-1 text-xs text-ink-muted">Deformation Indicated</div>
             </div>
             <div class="warm-card p-4 rounded-xl col-span-2 md:col-span-1">
@@ -115,9 +108,110 @@
                     <span>Mean Fleet R²</span>
                     <i data-lucide="activity" class="w-3.5 h-3.5 text-terracotta"></i>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-ink-primary">{{ stats.mean_corr }}</div>
+                <div class="mt-2 text-2xl font-bold font-mono text-ink-primary font-mono-num">{{ stats.mean_corr }}</div>
                 <div class="mt-1 text-xs text-ink-muted">Correlation Integrity</div>
             </div>
+        </div>
+    </section>
+
+    <!-- SIGNATURE ANATOMY DIAGRAM SHOWCASE: SFRA DIAGNOSTIC COMPARATOR -->
+    <section class="max-w-6xl mx-auto">
+        <div class="border border-border-subtle rounded-2xl bg-surface p-6 sm:p-8 shadow-soft-card">
+            
+            <!-- Showcase Top Control Bar -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-6 mb-6 border-b border-border-subtle gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="px-2.5 py-0.5 rounded-full bg-terracotta-tint text-terracotta border border-border-subtle text-[11px] font-mono font-medium tracking-wide uppercase">
+                            Apparatus Anatomy · IEEE C57.149 Spec
+                        </span>
+                        <span class="text-xs font-mono text-ink-muted hidden sm:inline">
+                            Interactive Physical Model
+                        </span>
+                    </div>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary tracking-tight">
+                        The SFRA Diagnostic Comparator
+                    </h2>
+                    <p class="text-xs sm:text-sm text-ink-secondary mt-1 max-w-2xl">
+                        A cutaway transformer core and disc winding specimen excited by sweep frequency generator. A tuned resonance carriage glides across calibrated guide rails to evaluate sub-band mechanical deviations against deterministic standards.
+                    </p>
+                </div>
+
+                <!-- Interactive Sub-band Glide Controls & Inspector Link -->
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                    <div class="inline-flex items-center rounded-lg border border-border-subtle bg-canvas-warm p-1 gap-1 text-xs font-mono">
+                        <button type="button" onclick="glideToSubband(0)" class="px-2.5 py-1 rounded hover:bg-surface text-ink-secondary hover:text-ink-primary transition flex items-center gap-1.5 whitespace-nowrap" title="Jump to Low Band: Core & Magnetization">
+                            <span class="w-1.5 h-1.5 rounded-full bg-ochre"></span>
+                            <span>Low (Core)</span>
+                        </button>
+                        <button type="button" onclick="glideToSubband(1)" class="px-2.5 py-1 rounded hover:bg-surface text-ink-secondary hover:text-ink-primary transition flex items-center gap-1.5 whitespace-nowrap" title="Jump to Mid Band: Winding Structure">
+                            <span class="w-1.5 h-1.5 rounded-full bg-crimson"></span>
+                            <span>Mid (Winding)</span>
+                        </button>
+                        <button type="button" onclick="glideToSubband(2)" class="px-2.5 py-1 rounded hover:bg-surface text-ink-secondary hover:text-ink-primary transition flex items-center gap-1.5 whitespace-nowrap" title="Jump to High Band: Leads & Bushings">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
+                            <span>High (Leads)</span>
+                        </button>
+                        <button type="button" onclick="toggleDiagramTour()" class="px-2 py-1 rounded hover:bg-surface text-ink-muted hover:text-ink-primary transition" title="Toggle Auto Sweep Tour">
+                            <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <a href="/diagram" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded-lg border border-border-subtle bg-surface text-ink-secondary hover:text-ink-primary hover:border-border-medium hover:bg-canvas-subtle transition shadow-soft-xs whitespace-nowrap">
+                        <span>Full Apparatus View</span>
+                        <i data-lucide="external-link" class="w-3 h-3 text-ink-muted"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- The Anatomy Diagram Embedded Frame -->
+            <div id="anatomyDiagramWrapper" class="relative w-full rounded-xl overflow-hidden bg-surface border border-border-subtle flex items-center justify-center transition-all duration-300 shadow-soft-xs">
+                <iframe id="anatomyDiagramFrame" 
+                        src="/diagram?embed=true" 
+                        title="Interactive SFRA Diagnostic Comparator Anatomy Diagram" 
+                        class="w-full border-0 select-none transition-all duration-300 min-h-[500px]"
+                        style="height: 620px;"
+                        loading="eager">
+                </iframe>
+            </div>
+
+            <!-- Physical-to-Circuit Mapping Explainer Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border-subtle">
+                <div class="p-4 rounded-xl bg-canvas-warm border border-border-subtle flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border-subtle/60 text-xs font-mono">
+                            <span class="font-semibold text-ink-primary whitespace-nowrap">Sub-Band I (&lt;2 kHz)</span>
+                            <span class="px-2 py-0.5 rounded bg-ochre/10 text-ochre text-[11px] font-medium tracking-wide whitespace-nowrap">Core &amp; Flux</span>
+                        </div>
+                        <p class="text-xs text-ink-secondary leading-relaxed">
+                            Evaluates magnetic core laminations, ground straps, and core magnetizing inductance (<span class="font-mono text-ink-primary font-medium"><i>L</i><sub>m</sub></span>). Physical core shifts or residual DC magnetization produce low-frequency anti-resonance drifts.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-canvas-warm border border-border-subtle flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border-subtle/60 text-xs font-mono">
+                            <span class="font-semibold text-ink-primary whitespace-nowrap">Sub-Band II (2–100 kHz)</span>
+                            <span class="px-2 py-0.5 rounded bg-crimson/10 text-crimson text-[11px] font-medium tracking-wide whitespace-nowrap">Winding Mechanics</span>
+                        </div>
+                        <p class="text-xs text-ink-secondary leading-relaxed">
+                            Direct distributed RLC network: series inductance (<span class="font-mono text-ink-primary font-medium"><i>L</i><sub>s</sub></span>), turn-to-turn capacitance (<span class="font-mono text-ink-primary font-medium"><i>C</i><sub>s</sub></span>), and shunt ground capacitance (<span class="font-mono text-ink-primary font-medium"><i>C</i><sub>g</sub></span>). Radial buckling and axial compression alter geometric spacing, shifting notch resonances.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-canvas-warm border border-border-subtle flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border-subtle/60 text-xs font-mono">
+                            <span class="font-semibold text-ink-primary whitespace-nowrap">Sub-Band III (&gt;100 kHz)</span>
+                            <span class="px-2 py-0.5 rounded bg-sage/10 text-sage text-[11px] font-medium tracking-wide whitespace-nowrap">Leads &amp; Bushings</span>
+                        </div>
+                        <p class="text-xs text-ink-secondary leading-relaxed">
+                            Dominated by internal lead inductances (<span class="font-mono text-ink-primary font-medium"><i>L</i><sub>lead</sub></span>) and bushing capacitive grading (<span class="font-mono text-ink-primary font-medium"><i>C</i><sub>1</sub>, <i>C</i><sub>2</sub></span>). Highly sensitive to turret connection looseness, tap changer lead orientation, and test lead earthing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -166,7 +260,7 @@
                                     Compatible with Omicron, Doble, and custom 2-column CSV sweeps
                                 </div>
                             </label>
-                            <button type="submit" id="landingUploadBtn" disabled class="w-full py-2 bg-ink-primary text-white text-xs font-medium rounded-lg hover:bg-ink-secondary disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            <button type="submit" id="landingUploadBtn" disabled class="w-full py-2 btn-primary text-xs font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition shadow-soft-xs">
                                 Run IEEE C57.149 Analysis
                             </button>
                         </form>
@@ -187,7 +281,7 @@
                                     <div class="text-[11px] text-ink-muted mt-0.5">Axial Winding Displacement (Mid-Band Shift)</div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-xs font-mono font-bold text-crimson">R² 0.742</span>
+                                    <span class="text-xs font-mono font-bold text-crimson font-mono-num">R² 0.742</span>
                                     <div class="text-[10px] text-ink-muted">Inspect &rarr;</div>
                                 </div>
                             </a>
@@ -201,7 +295,7 @@
                                     <div class="text-[11px] text-ink-muted mt-0.5">Core Laminate Looseness (Low-Band Drift)</div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-xs font-mono font-bold text-ochre">R² 0.884</span>
+                                    <span class="text-xs font-mono font-bold text-ochre font-mono-num">R² 0.884</span>
                                     <div class="text-[10px] text-ink-muted">Inspect &rarr;</div>
                                 </div>
                             </a>
@@ -215,7 +309,7 @@
                                     <div class="text-[11px] text-ink-muted mt-0.5">Healthy Commissioning Baseline (Nominal)</div>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-xs font-mono font-bold text-sage">R² 0.989</span>
+                                    <span class="text-xs font-mono font-bold text-sage font-mono-num">R² 0.989</span>
                                     <div class="text-[10px] text-ink-muted">Inspect &rarr;</div>
                                 </div>
                             </a>
@@ -284,7 +378,7 @@
                 </div>
                 <h3 class="font-serif text-xl font-medium text-ink-primary">Distributed RLC Ladder</h3>
                 <p class="text-xs text-ink-secondary leading-relaxed font-sans">
-                    Every transformer winding acts as a distributed passive ladder of series inductance ($L_s$), mutual coupling ($M$), and disk capacitances ($C_s, C_g$). Mechanical shifts change geometry, which directly alters resonant frequencies.
+                    Every transformer winding acts as a distributed passive ladder of series inductance (<span class="font-mono font-medium"><i>L</i><sub>s</sub></span>), mutual coupling (<span class="font-mono font-medium"><i>M</i></span>), and disk capacitances (<span class="font-mono font-medium"><i>C</i><sub>s</sub>, <i>C</i><sub>g</sub></span>). Mechanical shifts change geometry, which directly alters resonant frequencies.
                 </p>
                 <div class="pt-2 text-xs font-mono text-terracotta">
                     <a href="/about#rlc-model" class="hover:underline flex items-center gap-1">
@@ -301,7 +395,7 @@
                 </div>
                 <h3 class="font-serif text-xl font-medium text-ink-primary">IEEE Sub-Band Standards</h3>
                 <p class="text-xs text-ink-secondary leading-relaxed font-sans">
-                    Strict adherence to IEEE Std C57.149-2012 and IEC 60076-18 sub-band criteria isolates core displacement (< 2 kHz) from winding axial/radial distortion (2 kHz – 100 kHz) and lead looseness (> 100 kHz).
+                    Strict adherence to IEEE Std C57.149-2012 and IEC 60076-18 sub-band criteria isolates core displacement (&lt;2 kHz) from winding axial/radial distortion (2 kHz – 100 kHz) and lead looseness (&gt;100 kHz).
                 </p>
                 <div class="pt-2 text-xs font-mono text-sage">
                     <a href="/about#subbands" class="hover:underline flex items-center gap-1">
@@ -318,7 +412,7 @@
                 </div>
                 <h3 class="font-serif text-xl font-medium text-ink-primary">Defensible Audit Trail</h3>
                 <p class="text-xs text-ink-secondary leading-relaxed font-sans">
-                    Decisions to de-tank or mobilize cranes require defensible documentation. Every analysis generates a downloadable, certified PDF audit report complete with mathematical cross-correlation scores ($R^2, \rho$).
+                    Decisions to de-tank or mobilize cranes require defensible documentation. Every analysis generates a downloadable, certified PDF audit report complete with mathematical cross-correlation scores (<span class="font-mono font-medium"><i>R</i><sup>2</sup>, &rho;</span>).
                 </p>
                 <div class="pt-2 text-xs font-mono text-ochre">
                     <a href="/history" class="hover:underline flex items-center gap-1">
@@ -365,10 +459,10 @@
                             <td class="py-3 px-4 text-ink-secondary">
                                 {{ record.substation }}
                             </td>
-                            <td class="py-3 px-4 text-ink-muted font-mono">
+                            <td class="py-3 px-4 text-ink-muted font-mono font-mono-num">
                                 {{ record.voltage }}
                             </td>
-                            <td class="py-3 px-4 font-mono font-medium {% if record.corr >= 0.95 %}text-sage{% elif record.corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
+                            <td class="py-3 px-4 font-mono font-medium font-mono-num {% if record.corr >= 0.95 %}text-sage{% elif record.corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
                                 {{ record.corr }}
                             </td>
                             <td class="py-3 px-4 text-ink-secondary">
@@ -381,7 +475,7 @@
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-right">
-                                <a href="/inspect/{{ record.id }}" class="inline-flex items-center gap-1 text-xs font-mono font-medium text-terracotta hover:text-terracotta-dark">
+                                <a href="/inspect/{{ record.id }}" class="inline-flex items-center gap-1 text-xs font-mono font-medium text-terracotta hover:opacity-80">
                                     <span>Workbench</span>
                                     <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                                 </a>
@@ -403,7 +497,7 @@
             Ingest raw sweep frequencies or explore the interactive physics standards manual to discover how sub-band cross-correlation safeguards critical grid infrastructure.
         </p>
         <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <a href="/analysis" class="px-6 py-2.5 bg-ink-primary text-white text-sm font-medium rounded-lg hover:bg-ink-secondary shadow-soft-sm transition">
+            <a href="/analysis" class="px-6 py-2.5 btn-primary text-sm font-medium rounded-lg shadow-soft-sm transition">
                 Launch Diagnostic Workbench
             </a>
             <a href="/about" class="px-6 py-2.5 bg-surface text-ink-primary border border-border-medium text-sm font-medium rounded-lg hover:bg-canvas-subtle shadow-soft-xs transition">
@@ -418,17 +512,70 @@
 
 {% block extra_scripts %}
 <script>
-    // Initialize Anthropic-styled preview Bode plot
+    // Dynamic height synchronization from embedded Anatomy Diagram
+    window.addEventListener('message', function(event) {
+        if (!event.data) return;
+        if (event.data.type === 'diagramHeight' && typeof event.data.height === 'number') {
+            const frame = document.getElementById('anatomyDiagramFrame');
+            if (frame && event.data.height > 200) {
+                frame.style.height = event.data.height + 'px';
+            }
+        }
+    });
+
+    // Control helpers for the embedded Anatomy Diagram
+    function glideToSubband(index) {
+        const frame = document.getElementById('anatomyDiagramFrame');
+        if (!frame || !frame.contentWindow) return;
+        frame.contentWindow.postMessage({ type: 'stopIndex', index: index }, '*');
+    }
+
+    function toggleDiagramTour() {
+        const frame = document.getElementById('anatomyDiagramFrame');
+        if (!frame || !frame.contentWindow) return;
+        frame.contentWindow.postMessage({ type: 'toggleTour' }, '*');
+    }
+
+    // Chart.js Bode preview instance
+    let landingChart = null;
+
+    function getChartThemeColors(isDark) {
+        return {
+            grid: isDark ? '#2C2C38' : '#E8E3DA',
+            text: isDark ? '#7E7B74' : '#8D877E',
+            title: isDark ? '#B4B0A7' : '#5C5852',
+            tooltipBg: isDark ? '#141417' : '#1F1E1D',
+            tooltipBorder: isDark ? '#363644' : '#E8E3DA'
+        };
+    }
+
+    window.syncChartTheme = function(theme) {
+        if (!landingChart) return;
+        const isDark = theme === 'dark';
+        const colors = getChartThemeColors(isDark);
+        landingChart.options.scales.x.grid.color = colors.grid;
+        landingChart.options.scales.x.ticks.color = colors.text;
+        landingChart.options.scales.x.title.color = colors.title;
+        landingChart.options.scales.y.grid.color = colors.grid;
+        landingChart.options.scales.y.ticks.color = colors.text;
+        landingChart.options.scales.y.title.color = colors.title;
+        landingChart.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+        landingChart.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+        landingChart.update();
+    };
+
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('landingBodeChart');
         if (!ctx) return;
 
-        // Representative frequency sample points for preview
+        const isDark = document.documentElement.classList.contains('dark');
+        const themeColors = getChartThemeColors(isDark);
+
         const frequencies = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000];
         const healthyMags = [-42, -38, -35, -31, -26, -22, -30, -45, -55, -48, -42, -58, -62, -68, -75, -82];
         const fieldMags   = [-42, -38, -35, -31, -26, -23, -34, -58, -68, -56, -49, -60, -63, -69, -76, -83];
 
-        new Chart(ctx.getContext('2d'), {
+        landingChart = new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
                 labels: frequencies,
@@ -436,7 +583,7 @@
                     {
                         label: 'Healthy Baseline',
                         data: healthyMags,
-                        borderColor: '#246B49', // Forest Sage
+                        borderColor: '#246B49',
                         backgroundColor: 'rgba(36, 107, 73, 0.04)',
                         borderWidth: 2,
                         pointRadius: 2,
@@ -447,7 +594,7 @@
                     {
                         label: 'Field Test Sweep (Shifted)',
                         data: fieldMags,
-                        borderColor: '#CC785C', // Claude Terracotta
+                        borderColor: '#CC785C',
                         backgroundColor: 'rgba(204, 120, 92, 0.08)',
                         borderWidth: 2.2,
                         pointRadius: 2.5,
@@ -466,10 +613,10 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#1F1E1D',
+                        backgroundColor: themeColors.tooltipBg,
                         titleColor: '#FAF8F5',
                         bodyColor: '#FAF8F5',
-                        borderColor: '#E8E3DA',
+                        borderColor: themeColors.tooltipBorder,
                         borderWidth: 1,
                         padding: 10,
                         titleFont: { family: 'JetBrains Mono', size: 12 },
@@ -486,15 +633,15 @@
                         title: {
                             display: true,
                             text: 'Frequency (Hz)',
-                            color: '#5C5852',
-                            font: { family: 'Inter', size: 11 }
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11 }
                         },
                         grid: {
-                            color: '#E8E3DA',
+                            color: themeColors.grid,
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#8D877E',
+                            color: themeColors.text,
                             font: { family: 'JetBrains Mono', size: 10 },
                             callback: function(value) {
                                 if ([20, 100, 1000, 10000, 100000, 1000000].includes(value)) {
@@ -508,21 +655,32 @@
                         title: {
                             display: true,
                             text: 'Magnitude (dB)',
-                            color: '#5C5852',
-                            font: { family: 'Inter', size: 11 }
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11 }
                         },
                         grid: {
-                            color: '#E8E3DA',
+                            color: themeColors.grid,
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#8D877E',
+                            color: themeColors.text,
                             font: { family: 'JetBrains Mono', size: 10 }
                         }
                     }
                 }
             }
         });
+
+        // Initialize embedded diagram theme on iframe load
+        const frame = document.getElementById('anatomyDiagramFrame');
+        if (frame) {
+            frame.addEventListener('load', function() {
+                const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                try {
+                    frame.contentWindow.postMessage({ type: 'setTheme', theme: currentTheme }, '*');
+                } catch(e) {}
+            });
+        }
     });
 </script>
 {% endblock %}
