@@ -246,6 +246,16 @@ def inspect_asset(asset_id):
 def about():
     return render_template("about.html", active_page='standards')
 
+@app.route("/diagram")
+def diagram():
+    """Serves the interactive isometric SFRA Diagnostic Comparator anatomy diagram."""
+    theme = request.args.get("theme", "dark").lower()
+    filename = "sfra-comparator-light.html" if theme == "light" else "sfra-comparator.html"
+    diagram_path = os.path.join(BASE_DIR, "app", "static", "diagram", filename)
+    if os.path.exists(diagram_path):
+        return send_file(diagram_path)
+    return "Diagram not found", 404
+
 @app.route("/logos")
 def logos():
     """Renders the Anthropic Logo Concepts Showcase & Selection Gallery."""

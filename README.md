@@ -50,6 +50,20 @@ Unlike black-box AI tools or proprietary OEM desktop software, this platform enf
 
 ---
 
+### 🔬 Physical Machine Explainer: SFRA Diagnostic Comparator
+
+<div align="center">
+
+<img src="diagram/shots/sfra-comparator-dark.png" alt="SFRA Diagnostic Comparator Anatomy Diagram" width="720" />
+
+*Interactive isometric instrument explainer: Sweep Frequency Response Analysis (SFRA) comparator bench with cutaway transformer core-and-winding specimen, logarithmic frequency guide rails, and deterministic safety floor ratchet mechanism.*
+
+**[Open Interactive Dark Theme](diagram/sfra-comparator.html)** • **[Open Interactive Light Theme](diagram/sfra-comparator-light.html)**
+
+</div>
+
+---
+
 ## Key Features
 
 - **IEEE Std C57.149 & IEC 60076-18 Sub-Band Architecture**  
