@@ -1,210 +1,686 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRA Diagnostics | AI-Powered Transformer Analysis</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+{% extends "base.html" %}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap');
-        
-        :root {
-            --primary: #0ea5e9;
-            --background: #020617;
-            --card: #1e293b;
-        }
+{% block title %}FRA Intelligence | High-Voltage Transformer SFRA Diagnostics{% endblock %}
 
-        body {
-            background-color: var(--background);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-        }
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .warm-card {
+        background-color: var(--surface);
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-soft-card);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.25s ease;
+    }
+    .warm-card:hover {
+        border-color: var(--border-medium);
+        box-shadow: var(--shadow-soft-elevated);
+    }
+    .dropzone-anthropic {
+        border: 1.5px dashed var(--border-medium);
+        background-color: var(--canvas-warm);
+        transition: all 0.2s ease;
+    }
+    .dropzone-anthropic:hover, .dropzone-anthropic.drag-over {
+        border-color: var(--terracotta);
+        background-color: var(--terracotta-tint);
+    }
+    .diagram-container {
+        box-shadow: inset 0 0 0 1px var(--border-subtle);
+    }
+</style>
+{% endblock %}
 
-        .bg-card { background-color: #0f172a; border: 1px solid #1e293b; }
-        .text-primary { color: var(--primary); }
-        
-        .glow-active {
-            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-        }
+{% block content %}
+{% set active_page = 'landing' %}
 
-        .btn-glow {
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
-        }
+<div class="space-y-14">
 
-        .btn-glow:hover {
-            box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
-            transform: translateY(-1px);
-        }
-
-        .pulse-dot {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-    </style>
-</head>
-<body>
-
-    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-sky-500/20 flex items-center justify-center glow-active">
-                    <span class="text-sky-400 text-xl">⚡</span>
-                </div>
-                <div>
-                    <h1 class="text-base font-bold tracking-tight text-white uppercase">FRA Diagnostics</h1>
-                    <p class="text-[10px] text-slate-400 tracking-widest uppercase font-mono">AI-Powered Transformer Analysis</p>
-                </div>
-            </div>
-            
-            <nav class="flex items-center gap-2">
-                <a href="/" class="px-5 py-2 rounded-full text-xs font-semibold bg-sky-600 text-white">HOME</a>
-                <a href="/analysis" class="px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all">DIAGNOSTICS</a>
-                <a href="/history" class="px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all">HISTORY</a>
-                <a href="/about" class="px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all">ABOUT</a>
-            </nav>
-
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800">
-                <div class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></div>
-                <span class="text-xs text-slate-300">System Online</span>
-            </div>
+    <!-- HERO SECTION: CALM EDITORIAL SCHOLARSHIP (DEBLOATED & CENTERED) -->
+    <section class="text-center pt-2 pb-2 max-w-4xl mx-auto space-y-4">
+        <!-- Sub-eyebrow pill -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border-subtle shadow-soft-xs text-xs font-mono text-ink-secondary">
+            <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+            <span>IEEE Std C57.149 & IEC 60076-18 Research Platform</span>
         </div>
-    </header>
 
-    <section class="max-w-7xl mx-auto px-6 pt-24 pb-16 text-center border-b border-slate-900">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 mb-10">
-            <i data-lucide="brain-circuit" class="w-4 h-4 text-sky-400"></i>
-            <span class="text-xs font-bold text-sky-400 tracking-wider uppercase font-mono">AI-POWERED DIAGNOSTICS</span>
-        </div>
-        <h2 class="text-5xl font-extrabold text-white tracking-tighter leading-tight max-w-4xl mx-auto mb-6">
-            Intelligent Transformer <span class="text-primary">FRA Analysis</span>
-        </h2>
-        <p class="text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
-            Automated processing and interpretation of Frequency Response Analysis data from multiple vendors. Detect winding deformation, core displacement, and insulation degradation with machine learning precision.
+        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-ink-primary leading-[1.12]">
+            Understand transformer health through the physics of resonance.
+        </h1>
+
+        <p class="text-base sm:text-lg text-ink-secondary max-w-2xl mx-auto leading-relaxed font-sans">
+            Sweep Frequency Response Analysis (SFRA) for high-voltage grid apparatus. Combining deterministic distributed RLC network models with mathematical cross-correlation to detect mechanical winding shifts before catastrophic outage occurs.
         </p>
-        
-        <div class="flex gap-4 justify-center">
-            <a href="/analysis" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm px-8 py-3 rounded-lg btn-glow transition-all">START ANALYSIS</a>
-            <a href="/about" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm px-8 py-3 rounded-lg transition-all border border-slate-700">LEARN MORE</a>
-        </div>
-    </section>
 
-    <section class="border-b border-slate-900">
-        <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-slate-800">
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white">20Hz – 2MHz</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">FREQUENCY RANGE</p>
-            </div>
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white">4+</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">VENDOR FORMATS</p>
-            </div>
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white"><3s</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">ANALYSIS TIME</p>
-            </div>
-            <div class="px-4">
-                <p class="text-3xl font-extrabold text-white">95%+</p>
-                <p class="text-xs text-slate-500 uppercase font-mono mt-1">DETECTION ACCURACY</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-6 py-20 text-center">
-        <p class="text-[10px] text-sky-500 font-bold uppercase tracking-widest mb-2 font-mono">CAPABILITIES</p>
-        <h3 class="text-3xl font-bold text-white mb-16 tracking-tight">Platform Features</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="refresh-ccw" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Universal Data Parser</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Automatically process FRA data from OMICRON, Megger, Doble, and generic CSV formats into a standardized structure.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="brain" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">AI Fault Detection</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">CNN-based models and anomaly detection algorithms trained on curated FRA signatures to classify fault types with high accuracy.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="presentation" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Interactive Visualization</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Compare reference and test frequency response curves with logarithmic scaling, overlay analysis, and deviation highlighting.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="settings" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Expert System Logic</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Automated interpretation of results with severity-based maintenance recommendations and actionable insights.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="bar-chart-3" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Health Scoring</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Composite health index combining correlation coefficients, spectral deviation, and fault probability into a single score.</p>
-            </div>
-            <div class="bg-card p-8 rounded-2xl space-y-4">
-                <i data-lucide="server-crash" class="w-8 h-8 text-sky-400 p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20"></i>
-                <h4 class="text-lg font-bold text-white tracking-tight">Multi-Vendor Support</h4>
-                <p class="text-sm text-slate-400 leading-relaxed">Seamless compatibility with major FRA test equipment manufactures, eliminating vendor lock-in.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-6 py-20 text-center bg-slate-900 border border-slate-800 rounded-3xl mb-12">
-        <p class="text-[10px] text-sky-500 font-bold uppercase tracking-widest mb-2 font-mono">DETECTION</p>
-        <h3 class="text-3xl font-bold text-white mb-16 tracking-tight leading-normal max-w-3xl mx-auto">Analyze mechanical faults in seconds</h3>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="rotate-3d" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Winding Deformation</h4>
-                <p class="text-xs text-slate-500 font-mono">Mid-frequency (10kHz-500kHz)</p>
-            </div>
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="radio" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Core Displacement</h4>
-                <p class="text-xs text-slate-500 font-mono">Low-frequency (20Hz-2kHz)</p>
-            </div>
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="zap-off" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Insulation Degradation</h4>
-                <p class="text-xs text-slate-500 font-mono">High-frequency (500kHz-2MHz)</p>
-            </div>
-            <div class="bg-background border border-slate-800 p-8 rounded-2xl space-y-3">
-                <i data-lucide="server" class="w-8 h-8 text-sky-400 mx-auto"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Loose Clamping</h4>
-                <p class="text-xs text-slate-500 font-mono">Broad spectrum deviation</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="max-w-xl mx-auto px-6 py-20 text-center">
-        <h3 class="text-3xl font-bold text-white tracking-tight leading-normal mb-6 mx-auto">Ready to Analyze?</h3>
-        <p class="text-sm text-slate-400 max-w-sm mx-auto leading-relaxed mb-12">
-            Upload your FRA data and get AI-powered fault detection results in seconds.
-        </p>
-        
-        <div class="flex flex-col gap-6 items-center">
-            <a href="/analysis" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm px-10 py-4 rounded-lg btn-glow transition-all tracking-wider uppercase font-mono">
-                UPLOAD FRA DATA
+        <!-- Primary Navigation Actions -->
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <a href="/analysis" class="inline-flex items-center gap-2 px-5 py-2.5 btn-primary text-sm font-medium rounded-lg shadow-soft-sm transition">
+                <i data-lucide="cpu" class="w-4 h-4 text-terracotta"></i>
+                <span>Open Diagnostic Workbench</span>
             </a>
-            <div class="flex gap-10">
-                <a href="/history" class="text-slate-500 hover:text-sky-400 text-xs font-bold uppercase tracking-widest transition-all">ANALYSIS HISTORY</a>
-                <a href="/about" class="text-slate-500 hover:text-sky-400 text-xs font-bold uppercase tracking-widest transition-all">SYSTEM ABOUT</a>
+            <a href="/history" class="inline-flex items-center gap-2 px-5 py-2.5 bg-surface text-ink-primary border border-border-medium text-sm font-medium rounded-lg hover:bg-canvas-subtle shadow-soft-xs transition">
+                <i data-lucide="database" class="w-4 h-4 text-ink-muted"></i>
+                <span>Explore Fleet Registry</span>
+            </a>
+            <a href="/about" class="inline-flex items-center gap-2 px-4 py-2.5 text-ink-secondary hover:text-ink-primary text-sm font-medium rounded-lg hover:bg-canvas-subtle/80 transition">
+                <i data-lucide="book-open" class="w-4 h-4 text-ink-muted"></i>
+                <span>Standards & Physics Guide</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- FLEET TELEMETRY METRIC STRIP -->
+    <section class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="warm-card p-4 rounded-xl">
+                <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted flex items-center justify-between">
+                    <span>Total Fleet</span>
+                    <i data-lucide="cpu" class="w-3.5 h-3.5 text-ink-muted"></i>
+                </div>
+                <div class="mt-2 text-2xl font-bold font-mono text-ink-primary font-mono-num">{{ stats.total }}</div>
+                <div class="mt-1 text-xs text-ink-muted">Monitored Transformers</div>
+            </div>
+            <div class="warm-card p-4 rounded-xl">
+                <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted flex items-center justify-between">
+                    <span>Healthy Units</span>
+                    <span class="w-2 h-2 rounded-full bg-sage"></span>
+                </div>
+                <div class="mt-2 text-2xl font-bold font-mono text-sage font-mono-num">{{ stats.healthy }}</div>
+                <div class="mt-1 text-xs text-ink-muted">R² ≥ 0.95 Baseline Match</div>
+            </div>
+            <div class="warm-card p-4 rounded-xl">
+                <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted flex items-center justify-between">
+                    <span>Advisory Watch</span>
+                    <span class="w-2 h-2 rounded-full bg-ochre"></span>
+                </div>
+                <div class="mt-2 text-2xl font-bold font-mono text-ochre font-mono-num">{{ stats.warning }}</div>
+                <div class="mt-1 text-xs text-ink-muted">Sub-band Drift Detected</div>
+            </div>
+            <div class="warm-card p-4 rounded-xl">
+                <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted flex items-center justify-between">
+                    <span>Urgent Action</span>
+                    <span class="w-2 h-2 rounded-full bg-crimson"></span>
+                </div>
+                <div class="mt-2 text-2xl font-bold font-mono text-crimson font-mono-num">{{ stats.critical }}</div>
+                <div class="mt-1 text-xs text-ink-muted">Deformation Indicated</div>
+            </div>
+            <div class="warm-card p-4 rounded-xl col-span-2 md:col-span-1">
+                <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted flex items-center justify-between">
+                    <span>Mean Fleet R²</span>
+                    <i data-lucide="activity" class="w-3.5 h-3.5 text-terracotta"></i>
+                </div>
+                <div class="mt-2 text-2xl font-bold font-mono text-ink-primary font-mono-num">{{ stats.mean_corr }}</div>
+                <div class="mt-1 text-xs text-ink-muted">Correlation Integrity</div>
             </div>
         </div>
     </section>
 
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+    <!-- SIGNATURE ANATOMY DIAGRAM SHOWCASE: SFRA DIAGNOSTIC COMPARATOR -->
+    <section class="max-w-6xl mx-auto">
+        <div class="border border-border-subtle rounded-2xl bg-surface p-6 sm:p-8 shadow-soft-card">
+            
+            <!-- Showcase Top Control Bar -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-6 mb-6 border-b border-border-subtle gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="px-2.5 py-0.5 rounded-full bg-terracotta-tint text-terracotta border border-border-subtle text-[11px] font-mono font-medium tracking-wide uppercase">
+                            Apparatus Anatomy · IEEE C57.149 Spec
+                        </span>
+                        <span class="text-xs font-mono text-ink-muted hidden sm:inline">
+                            Interactive Physical Model
+                        </span>
+                    </div>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary tracking-tight">
+                        The SFRA Diagnostic Comparator
+                    </h2>
+                    <p class="text-xs sm:text-sm text-ink-secondary mt-1 max-w-2xl">
+                        A cutaway transformer core and disc winding specimen excited by sweep frequency generator. A tuned resonance carriage glides across calibrated guide rails to evaluate sub-band mechanical deviations against deterministic standards.
+                    </p>
+                </div>
+
+                <!-- Interactive Sub-band Glide Controls & Inspector Link -->
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                    <div class="inline-flex items-center rounded-lg border border-border-subtle bg-canvas-warm p-1 gap-1 text-xs font-mono">
+                        <button type="button" onclick="glideToSubband(0)" class="px-2.5 py-1 rounded hover:bg-surface text-ink-secondary hover:text-ink-primary transition flex items-center gap-1.5 whitespace-nowrap" title="Jump to Low Band: Core & Magnetization">
+                            <span class="w-1.5 h-1.5 rounded-full bg-ochre"></span>
+                            <span>Low (Core)</span>
+                        </button>
+                        <button type="button" onclick="glideToSubband(1)" class="px-2.5 py-1 rounded hover:bg-surface text-ink-secondary hover:text-ink-primary transition flex items-center gap-1.5 whitespace-nowrap" title="Jump to Mid Band: Winding Structure">
+                            <span class="w-1.5 h-1.5 rounded-full bg-crimson"></span>
+                            <span>Mid (Winding)</span>
+                        </button>
+                        <button type="button" onclick="glideToSubband(2)" class="px-2.5 py-1 rounded hover:bg-surface text-ink-secondary hover:text-ink-primary transition flex items-center gap-1.5 whitespace-nowrap" title="Jump to High Band: Leads & Bushings">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
+                            <span>High (Leads)</span>
+                        </button>
+                        <button type="button" onclick="toggleDiagramTour()" class="px-2 py-1 rounded hover:bg-surface text-ink-muted hover:text-ink-primary transition" title="Toggle Auto Sweep Tour">
+                            <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <a href="/diagram" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-medium rounded-lg border border-border-subtle bg-surface text-ink-secondary hover:text-ink-primary hover:border-border-medium hover:bg-canvas-subtle transition shadow-soft-xs whitespace-nowrap">
+                        <span>Full Apparatus View</span>
+                        <i data-lucide="external-link" class="w-3 h-3 text-ink-muted"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- The Anatomy Diagram Embedded Frame -->
+            <div id="anatomyDiagramWrapper" class="relative w-full rounded-xl overflow-hidden bg-surface border border-border-subtle flex items-center justify-center transition-all duration-300 shadow-soft-xs">
+                <iframe id="anatomyDiagramFrame" 
+                        src="/diagram?embed=true" 
+                        title="Interactive SFRA Diagnostic Comparator Anatomy Diagram" 
+                        class="w-full border-0 select-none transition-all duration-300 min-h-[500px]"
+                        style="height: 620px;"
+                        loading="eager">
+                </iframe>
+            </div>
+
+            <!-- Physical-to-Circuit Mapping Explainer Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border-subtle">
+                <div class="p-4 rounded-xl bg-canvas-warm border border-border-subtle flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border-subtle/60 text-xs font-mono">
+                            <span class="font-semibold text-ink-primary whitespace-nowrap">Sub-Band I (&lt;2 kHz)</span>
+                            <span class="px-2 py-0.5 rounded bg-ochre/10 text-ochre text-[11px] font-medium tracking-wide whitespace-nowrap">Core &amp; Flux</span>
+                        </div>
+                        <p class="text-xs text-ink-secondary leading-relaxed">
+                            Evaluates magnetic core laminations, ground straps, and core magnetizing inductance (<span class="font-mono text-ink-primary font-medium"><i>L</i><sub>m</sub></span>). Physical core shifts or residual DC magnetization produce low-frequency anti-resonance drifts.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-canvas-warm border border-border-subtle flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border-subtle/60 text-xs font-mono">
+                            <span class="font-semibold text-ink-primary whitespace-nowrap">Sub-Band II (2–100 kHz)</span>
+                            <span class="px-2 py-0.5 rounded bg-crimson/10 text-crimson text-[11px] font-medium tracking-wide whitespace-nowrap">Winding Mechanics</span>
+                        </div>
+                        <p class="text-xs text-ink-secondary leading-relaxed">
+                            Direct distributed RLC network: series inductance (<span class="font-mono text-ink-primary font-medium"><i>L</i><sub>s</sub></span>), turn-to-turn capacitance (<span class="font-mono text-ink-primary font-medium"><i>C</i><sub>s</sub></span>), and shunt ground capacitance (<span class="font-mono text-ink-primary font-medium"><i>C</i><sub>g</sub></span>). Radial buckling and axial compression alter geometric spacing, shifting notch resonances.
+                        </p>
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-canvas-warm border border-border-subtle flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-border-subtle/60 text-xs font-mono">
+                            <span class="font-semibold text-ink-primary whitespace-nowrap">Sub-Band III (&gt;100 kHz)</span>
+                            <span class="px-2 py-0.5 rounded bg-sage/10 text-sage text-[11px] font-medium tracking-wide whitespace-nowrap">Leads &amp; Bushings</span>
+                        </div>
+                        <p class="text-xs text-ink-secondary leading-relaxed">
+                            Dominated by internal lead inductances (<span class="font-mono text-ink-primary font-medium"><i>L</i><sub>lead</sub></span>) and bushing capacitive grading (<span class="font-mono text-ink-primary font-medium"><i>C</i><sub>1</sub>, <i>C</i><sub>2</sub></span>). Highly sensitive to turret connection looseness, tap changer lead orientation, and test lead earthing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DUAL BAY INTERACTIVE WORKBENCH PREVIEW & QUICK INGESTION -->
+    <section class="max-w-6xl mx-auto">
+        <div class="border border-border-subtle rounded-2xl bg-surface p-6 sm:p-8 shadow-soft-card">
+            <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-border-subtle gap-4">
+                <div>
+                    <h2 class="font-serif text-2xl font-medium text-ink-primary">
+                        Live Frequency Response Telemetry
+                    </h2>
+                    <p class="text-xs sm:text-sm text-ink-secondary mt-1">
+                        Select a transformer record or drag in a field CSV to immediately inspect logarithmic Bode transfer functions across IEEE sub-bands.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono text-ink-muted bg-canvas-subtle px-2.5 py-1 rounded-md border border-border-subtle">
+                        Standard Log Grid: 20 Hz – 2 MHz
+                    </span>
+                    <a href="/analysis" class="text-xs font-medium text-terracotta hover:text-terracotta-dark flex items-center gap-1">
+                        <span>Full Screen Workbench</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Left Column: Ingestion & Asset Selector (5 cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <!-- File Ingest Dropzone -->
+                    <div>
+                        <div class="text-xs font-mono font-medium text-ink-muted uppercase tracking-wider mb-2">
+                            Ingest Raw SFRA Sweep (.CSV)
+                        </div>
+                        <form action="/analyze" method="POST" enctype="multipart/form-data" class="space-y-3">
+                            <label for="landingDropzone" class="dropzone-anthropic block p-6 rounded-xl cursor-pointer text-center group">
+                                <input type="file" name="file" id="landingDropzone" required class="hidden"
+                                       onchange="document.getElementById('landingFileText').textContent = this.files[0]?.name || 'File Selected'; document.getElementById('landingUploadBtn').disabled = false;">
+                                <div class="w-10 h-10 rounded-full bg-terracotta-tint text-terracotta flex items-center justify-center mx-auto mb-2 group-hover:scale-105 transition">
+                                    <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                                </div>
+                                <div id="landingFileText" class="text-sm font-medium text-ink-primary">
+                                    Drop frequency response CSV here
+                                </div>
+                                <div class="text-xs text-ink-muted mt-1">
+                                    Compatible with Omicron, Doble, and custom 2-column CSV sweeps
+                                </div>
+                            </label>
+                            <button type="submit" id="landingUploadBtn" disabled class="w-full py-2 btn-primary text-xs font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition shadow-soft-xs">
+                                Run IEEE C57.149 Analysis
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Rapid Test Demonstrators -->
+                    <div>
+                        <div class="text-xs font-mono font-medium text-ink-muted uppercase tracking-wider mb-2.5">
+                            Or Load Benchmark Field Datasets
+                        </div>
+                        <div class="space-y-2">
+                            <a href="/inspect/TX-765KV-MAIN-01" class="flex items-center justify-between p-3 rounded-lg border border-border-subtle bg-canvas-warm hover:border-crimson-border hover:bg-crimson-tint/40 transition group">
+                                <div>
+                                    <div class="font-mono text-xs font-semibold text-ink-primary flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-crimson"></span>
+                                        <span>TX-765KV-MAIN-01</span>
+                                    </div>
+                                    <div class="text-[11px] text-ink-muted mt-0.5">Axial Winding Displacement (Mid-Band Shift)</div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-mono font-bold text-crimson font-mono-num">R² 0.742</span>
+                                    <div class="text-[10px] text-ink-muted">Inspect &rarr;</div>
+                                </div>
+                            </a>
+
+                            <a href="/inspect/TX-400KV-GSU-02" class="flex items-center justify-between p-3 rounded-lg border border-border-subtle bg-canvas-warm hover:border-ochre-border hover:bg-ochre-tint/40 transition group">
+                                <div>
+                                    <div class="font-mono text-xs font-semibold text-ink-primary flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-ochre"></span>
+                                        <span>TX-400KV-GSU-02</span>
+                                    </div>
+                                    <div class="text-[11px] text-ink-muted mt-0.5">Core Laminate Looseness (Low-Band Drift)</div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-mono font-bold text-ochre font-mono-num">R² 0.884</span>
+                                    <div class="text-[10px] text-ink-muted">Inspect &rarr;</div>
+                                </div>
+                            </a>
+
+                            <a href="/inspect/TX-220KV-AUTO-03" class="flex items-center justify-between p-3 rounded-lg border border-border-subtle bg-canvas-warm hover:border-sage-border hover:bg-sage-tint/40 transition group">
+                                <div>
+                                    <div class="font-mono text-xs font-semibold text-ink-primary flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-sage"></span>
+                                        <span>TX-220KV-AUTO-03</span>
+                                    </div>
+                                    <div class="text-[11px] text-ink-muted mt-0.5">Healthy Commissioning Baseline (Nominal)</div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-mono font-bold text-sage font-mono-num">R² 0.989</span>
+                                    <div class="text-[10px] text-ink-muted">Inspect &rarr;</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Bode Plot Visualization (7 cols) -->
+                <div class="lg:col-span-7 bg-canvas-warm rounded-xl border border-border-subtle p-5">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-border-subtle">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="line-chart" class="w-4 h-4 text-terracotta"></i>
+                            <span class="font-mono text-xs font-semibold text-ink-primary">BODE TRANSFER FUNCTION PREVIEW</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-mono">
+                            <span class="inline-flex items-center gap-1.5 text-sage font-medium">
+                                <span class="w-2.5 h-0.5 bg-sage inline-block"></span> Baseline
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-terracotta font-medium">
+                                <span class="w-2.5 h-0.5 bg-terracotta inline-block"></span> Field Sweep
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="relative h-64 sm:h-72 w-full">
+                        <canvas id="landingBodeChart"></canvas>
+                    </div>
+
+                    <!-- Sub-band Indicators -->
+                    <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-border-subtle text-center text-xs font-mono">
+                        <div class="p-2 rounded bg-surface border border-border-subtle">
+                            <div class="text-ink-muted text-[10px] uppercase">Low Band (&lt;2 kHz)</div>
+                            <div class="font-medium text-ink-primary mt-0.5">Core & Magnetization</div>
+                        </div>
+                        <div class="p-2 rounded bg-surface border border-border-subtle">
+                            <div class="text-ink-muted text-[10px] uppercase">Mid Band (2k–100 kHz)</div>
+                            <div class="font-medium text-ink-primary mt-0.5">Winding Structure</div>
+                        </div>
+                        <div class="p-2 rounded bg-surface border border-border-subtle">
+                            <div class="text-ink-muted text-[10px] uppercase">High Band (&gt;100 kHz)</div>
+                            <div class="font-medium text-ink-primary mt-0.5">Leads & Bushings</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCIENTIFIC PILLARS: ANTHROPIC RESEARCH EDITORIAL -->
+    <section class="max-w-6xl mx-auto space-y-8">
+        <div class="text-center max-w-2xl mx-auto">
+            <h2 class="font-serif text-3xl font-medium text-ink-primary">
+                Rigorous foundations in apparatus physics.
+            </h2>
+            <p class="text-sm text-ink-secondary mt-2 leading-relaxed">
+                Rather than treating diagnostics as a black-box machine learning classifier, FRA Intelligence grounds every finding in observable circuit parameters, resonance shifts, and international standards.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Pillar 1 -->
+            <div class="warm-card p-6 rounded-2xl space-y-3">
+                <div class="w-9 h-9 rounded-lg bg-canvas-subtle border border-border-subtle flex items-center justify-center text-terracotta">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </div>
+                <h3 class="font-serif text-xl font-medium text-ink-primary">Distributed RLC Ladder</h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Every transformer winding acts as a distributed passive ladder of series inductance (<span class="font-mono font-medium"><i>L</i><sub>s</sub></span>), mutual coupling (<span class="font-mono font-medium"><i>M</i></span>), and disk capacitances (<span class="font-mono font-medium"><i>C</i><sub>s</sub>, <i>C</i><sub>g</sub></span>). Mechanical shifts change geometry, which directly alters resonant frequencies.
+                </p>
+                <div class="pt-2 text-xs font-mono text-terracotta">
+                    <a href="/about#rlc-model" class="hover:underline flex items-center gap-1">
+                        <span>Read circuit derivation</span>
+                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="warm-card p-6 rounded-2xl space-y-3">
+                <div class="w-9 h-9 rounded-lg bg-canvas-subtle border border-border-subtle flex items-center justify-center text-sage">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <h3 class="font-serif text-xl font-medium text-ink-primary">IEEE Sub-Band Standards</h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Strict adherence to IEEE Std C57.149-2012 and IEC 60076-18 sub-band criteria isolates core displacement (&lt;2 kHz) from winding axial/radial distortion (2 kHz – 100 kHz) and lead looseness (&gt;100 kHz).
+                </p>
+                <div class="pt-2 text-xs font-mono text-sage">
+                    <a href="/about#subbands" class="hover:underline flex items-center gap-1">
+                        <span>Inspect sub-band thresholds</span>
+                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="warm-card p-6 rounded-2xl space-y-3">
+                <div class="w-9 h-9 rounded-lg bg-canvas-subtle border border-border-subtle flex items-center justify-center text-ochre">
+                    <i data-lucide="file-check-2" class="w-4 h-4"></i>
+                </div>
+                <h3 class="font-serif text-xl font-medium text-ink-primary">Defensible Audit Trail</h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Decisions to de-tank or mobilize cranes require defensible documentation. Every analysis generates a downloadable, certified PDF audit report complete with mathematical cross-correlation scores (<span class="font-mono font-medium"><i>R</i><sup>2</sup>, &rho;</span>).
+                </p>
+                <div class="pt-2 text-xs font-mono text-ochre">
+                    <a href="/history" class="hover:underline flex items-center gap-1">
+                        <span>Browse audit records</span>
+                        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RECENT FLEET SURVEILLANCE REGISTRY -->
+    <section class="max-w-6xl mx-auto space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border-subtle">
+            <div>
+                <h2 class="font-serif text-2xl font-medium text-ink-primary">Substation Fleet Surveillance</h2>
+                <p class="text-xs text-ink-secondary">Recent high-voltage transformers analyzed across utility switchyards.</p>
+            </div>
+            <a href="/history" class="text-xs font-mono text-terracotta hover:underline flex items-center gap-1">
+                <span>View complete history registry &rarr;</span>
+            </a>
+        </div>
+
+        <div class="border border-border-subtle rounded-xl bg-surface overflow-hidden shadow-soft-xs">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-sans">
+                    <thead class="bg-canvas-subtle border-b border-border-subtle font-mono text-[11px] text-ink-muted uppercase">
+                        <tr>
+                            <th class="py-3 px-4">Transformer ID</th>
+                            <th class="py-3 px-4">Substation</th>
+                            <th class="py-3 px-4">Voltage Class</th>
+                            <th class="py-3 px-4">Correlation (R²)</th>
+                            <th class="py-3 px-4">Diagnosed Condition</th>
+                            <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-subtle">
+                        {% for record in records[:5] %}
+                        <tr class="hover:bg-canvas-subtle/50 transition">
+                            <td class="py-3 px-4 font-mono font-semibold text-ink-primary">
+                                {{ record.id }}
+                            </td>
+                            <td class="py-3 px-4 text-ink-secondary">
+                                {{ record.substation }}
+                            </td>
+                            <td class="py-3 px-4 text-ink-muted font-mono font-mono-num">
+                                {{ record.voltage }}
+                            </td>
+                            <td class="py-3 px-4 font-mono font-medium font-mono-num {% if record.corr >= 0.95 %}text-sage{% elif record.corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
+                                {{ record.corr }}
+                            </td>
+                            <td class="py-3 px-4 text-ink-secondary">
+                                {{ record.fault_type }}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold {% if record.status == 'Healthy' %}bg-sage-tint text-sage border border-sage-border{% elif record.status == 'Warning' %}bg-ochre-tint text-ochre border border-ochre-border{% else %}bg-crimson-tint text-crimson border border-crimson-border{% endif %}">
+                                    <span class="w-1.5 h-1.5 rounded-full {% if record.status == 'Healthy' %}bg-sage{% elif record.status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                                    {{ record.status }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                <a href="/inspect/{{ record.id }}" class="inline-flex items-center gap-1 text-xs font-mono font-medium text-terracotta hover:opacity-80">
+                                    <span>Workbench</span>
+                                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION BANNER -->
+    <section class="max-w-4xl mx-auto text-center bg-terracotta-tint border border-border-subtle rounded-2xl p-8 sm:p-10 space-y-4">
+        <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary">
+            Ready to evaluate transformer baseline integrity?
+        </h2>
+        <p class="text-sm text-ink-secondary max-w-xl mx-auto font-sans leading-relaxed">
+            Ingest raw sweep frequencies or explore the interactive physics standards manual to discover how sub-band cross-correlation safeguards critical grid infrastructure.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <a href="/analysis" class="px-6 py-2.5 btn-primary text-sm font-medium rounded-lg shadow-soft-sm transition">
+                Launch Diagnostic Workbench
+            </a>
+            <a href="/about" class="px-6 py-2.5 bg-surface text-ink-primary border border-border-medium text-sm font-medium rounded-lg hover:bg-canvas-subtle shadow-soft-xs transition">
+                Read the Technical Manual
+            </a>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Dynamic height synchronization from embedded Anatomy Diagram
+    window.addEventListener('message', function(event) {
+        if (!event.data) return;
+        if (event.data.type === 'diagramHeight' && typeof event.data.height === 'number') {
+            const frame = document.getElementById('anatomyDiagramFrame');
+            if (frame && event.data.height > 200) {
+                frame.style.height = event.data.height + 'px';
+            }
+        }
+    });
+
+    // Control helpers for the embedded Anatomy Diagram
+    function glideToSubband(index) {
+        const frame = document.getElementById('anatomyDiagramFrame');
+        if (!frame || !frame.contentWindow) return;
+        frame.contentWindow.postMessage({ type: 'stopIndex', index: index }, '*');
+    }
+
+    function toggleDiagramTour() {
+        const frame = document.getElementById('anatomyDiagramFrame');
+        if (!frame || !frame.contentWindow) return;
+        frame.contentWindow.postMessage({ type: 'toggleTour' }, '*');
+    }
+
+    // Chart.js Bode preview instance
+    let landingChart = null;
+
+    function getChartThemeColors(isDark) {
+        return {
+            grid: isDark ? '#2C2C38' : '#E8E3DA',
+            text: isDark ? '#7E7B74' : '#8D877E',
+            title: isDark ? '#B4B0A7' : '#5C5852',
+            tooltipBg: isDark ? '#141417' : '#1F1E1D',
+            tooltipBorder: isDark ? '#363644' : '#E8E3DA'
+        };
+    }
+
+    window.syncChartTheme = function(theme) {
+        if (!landingChart) return;
+        const isDark = theme === 'dark';
+        const colors = getChartThemeColors(isDark);
+        landingChart.options.scales.x.grid.color = colors.grid;
+        landingChart.options.scales.x.ticks.color = colors.text;
+        landingChart.options.scales.x.title.color = colors.title;
+        landingChart.options.scales.y.grid.color = colors.grid;
+        landingChart.options.scales.y.ticks.color = colors.text;
+        landingChart.options.scales.y.title.color = colors.title;
+        landingChart.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+        landingChart.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+        landingChart.update();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('landingBodeChart');
+        if (!ctx) return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const themeColors = getChartThemeColors(isDark);
+
+        const frequencies = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000];
+        const healthyMags = [-42, -38, -35, -31, -26, -22, -30, -45, -55, -48, -42, -58, -62, -68, -75, -82];
+        const fieldMags   = [-42, -38, -35, -31, -26, -23, -34, -58, -68, -56, -49, -60, -63, -69, -76, -83];
+
+        landingChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: frequencies,
+                datasets: [
+                    {
+                        label: 'Healthy Baseline',
+                        data: healthyMags,
+                        borderColor: '#246B49',
+                        backgroundColor: 'rgba(36, 107, 73, 0.04)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                        tension: 0.35,
+                        borderDash: [5, 4]
+                    },
+                    {
+                        label: 'Field Test Sweep (Shifted)',
+                        data: fieldMags,
+                        borderColor: '#CC785C',
+                        backgroundColor: 'rgba(204, 120, 92, 0.08)',
+                        borderWidth: 2.2,
+                        pointRadius: 2.5,
+                        pointHoverRadius: 6,
+                        tension: 0.35
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: themeColors.tooltipBg,
+                        titleColor: '#FAF8F5',
+                        bodyColor: '#FAF8F5',
+                        borderColor: themeColors.tooltipBorder,
+                        borderWidth: 1,
+                        padding: 10,
+                        titleFont: { family: 'JetBrains Mono', size: 12 },
+                        bodyFont: { family: 'JetBrains Mono', size: 11 },
+                        callbacks: {
+                            title: (items) => `${items[0].label} Hz`,
+                            label: (item) => ` ${item.dataset.label}: ${item.parsed.y} dB`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        title: {
+                            display: true,
+                            text: 'Frequency (Hz)',
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11 }
+                        },
+                        grid: {
+                            color: themeColors.grid,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: themeColors.text,
+                            font: { family: 'JetBrains Mono', size: 10 },
+                            callback: function(value) {
+                                if ([20, 100, 1000, 10000, 100000, 1000000].includes(value)) {
+                                    return value >= 1000000 ? (value/1000000) + 'M' : (value >= 1000 ? (value/1000) + 'k' : value);
+                                }
+                                return null;
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Magnitude (dB)',
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11 }
+                        },
+                        grid: {
+                            color: themeColors.grid,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: themeColors.text,
+                            font: { family: 'JetBrains Mono', size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Initialize embedded diagram theme on iframe load
+        const frame = document.getElementById('anatomyDiagramFrame');
+        if (frame) {
+            frame.addEventListener('load', function() {
+                const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                try {
+                    frame.contentWindow.postMessage({ type: 'setTheme', theme: currentTheme }, '*');
+                } catch(e) {}
+            });
+        }
+    });
+</script>
+{% endblock %}

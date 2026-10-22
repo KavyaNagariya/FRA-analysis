@@ -1,254 +1,661 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRA DIAGNOSTICS | AI Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --bg-dark: #020617;
-            --card-bg: rgba(30, 41, 59, 0.4);
-            --accent-blue: #38bdf8;
-            --danger-red: #ef4444;
-            --warning-orange: #f59e0b;
-            --success-green: #22c55e;
-            --text-muted: #94a3b8;
-        }
+{% extends "base.html" %}
 
-        body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%);
-            color: #f8fafc;
-            font-family: 'Inter', system-ui, sans-serif;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
+{% block title %}SFRA Diagnostic Workbench | FRA Intelligence{% endblock %}
 
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
-        .brand h1 { font-size: 1.2rem; margin: 0; letter-spacing: 2px; color: white; }
-        
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .metric-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; backdrop-filter: blur(10px); }
-        .metric-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; }
-        .metric-value { font-size: 1.1rem; font-weight: bold; }
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .workbench-card {
+        background-color: var(--surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+        box-shadow: var(--shadow-soft-card);
+    }
+    .dropzone-workbench {
+        border: 1.5px dashed var(--border-medium);
+        background-color: var(--canvas-warm);
+        transition: all 0.2s ease;
+    }
+    .dropzone-workbench:hover, .dropzone-workbench.drag-over {
+        border-color: var(--terracotta);
+        background-color: var(--terracotta-tint);
+    }
+</style>
+{% endblock %}
 
-        .main-layout { display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; margin-bottom: 25px; }
-        .chart-container { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); min-height: 400px; }
-        .health-card { background: var(--card-bg); padding: 25px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        
-        .gauge-wrapper { position: relative; width: 180px; height: 180px; margin: 0 auto; }
-        .gauge-value { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); font-size: 1.8rem; font-weight: bold; }
-        
-        .fault-section { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .fault-item { border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 20px; margin-top: 10px; border-left: 5px solid var(--accent-blue); }
-        
-        /* Status Colors */
-        .status-Healthy { color: var(--success-green); }
-        .status-Warning { color: var(--warning-orange); }
-        .status-Danger { color: var(--danger-red); }
-        .border-Danger { border-left-color: var(--danger-red); }
-        .border-Warning { border-left-color: var(--warning-orange); }
-        .border-Healthy { border-left-color: var(--success-green); }
-
-        .progress-bg { height: 6px; background: rgba(255,255,255,0.1); width: 100%; margin: 15px 0; border-radius: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; transition: width 1s ease-in-out; }
-        
-        .upload-zone { 
-            border: 2px dashed rgba(255,255,255,0.1); 
-            padding: 40px; 
-            border-radius: 15px; 
-            transition: all 0.3s;
-            background: rgba(15, 23, 42, 0.5);
-        }
-        .upload-zone:hover { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.05); }
-
-        button { 
-            background: transparent; 
-            border: 1px solid var(--accent-blue); 
-            color: var(--accent-blue); 
-            padding: 12px 30px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        button:hover { background: var(--accent-blue); color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
-        
-        input[type="file"] { margin-bottom: 20px; color: var(--text-muted); }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <div class="brand">
-        <h1>FRA DIAGNOSTICS</h1>
-        <span style="font-size: 0.7rem; color: var(--text-muted);">AI-POWERED FREQUENCY RESPONSE ANALYSIS</span>
-    </div>
-    <div style="color: var(--success-green); font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
-        <i data-lucide="shield-check" size="14"></i> System Encryption Active
-    </div>
-</div>
+{% block content %}
+{% set active_page = 'workbench' %}
 
 {% if status %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <div>
-        <span style="color: var(--text-muted); font-size: 0.8rem;">UNIT IDENTIFIER:</span>
-        <span style="color:white; font-weight:bold; margin-left: 10px;">{{ transformerId }}</span>
-    </div>
-    <div style="text-align: right;">
-        <div style="font-size: 0.8rem; color: var(--text-muted);">{{ date_now }}</div>
-        <a href="/analysis" style="color: var(--accent-blue); text-decoration: none; font-size: 0.8rem; font-weight: bold;">+ NEW SCAN</a>
-    </div>
-</div>
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# ACTIVE TELEMETRY STATE — SFRA Diagnostic Console                   #}
+{# ═══════════════════════════════════════════════════════════════════ #}
 
-<div class="metrics-grid">
-    <div class="metric-card"><span class="metric-label">Bandwidth</span><div class="metric-value">20Hz - 2MHz</div></div>
-    <div class="metric-card"><span class="metric-label">Correlation (R²)</span><div class="metric-value">{{ corr }}</div></div>
-    <div class="metric-card"><span class="metric-label">Max Shift</span><div class="metric-value status-{{status}}">{{ shift }} dB</div></div>
-    <div class="metric-card"><span class="metric-label">Diagnosis</span><div class="metric-value status-{{status}}">{{ status }}</div></div>
-</div>
+<div class="space-y-6">
 
-<div class="main-layout">
-    <div class="chart-container">
-        <span class="metric-label">Bode Plot - Magnitude Response</span>
-        <div style="height: 350px; width: 100%;">
-            <canvas id="chart"></canvas>
+    <!-- SUB-HEADER CONTEXT & RE-SCAN ACTION BAR -->
+    <div class="workbench-card p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-canvas-subtle border border-border-subtle flex items-center justify-center text-terracotta shrink-0">
+                <i data-lucide="activity" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-semibold text-ink-muted uppercase">ASSET:</span>
+                    <h1 class="font-mono text-base sm:text-lg font-bold text-ink-primary">
+                        {{ transformerId if transformerId else 'TX-765KV-MAIN-01' }}
+                    </h1>
+                    <span class="text-xs text-ink-muted">·</span>
+                    <span class="text-xs text-ink-secondary font-mono">{{ date_now }}</span>
+                </div>
+                <div class="text-xs text-ink-muted mt-0.5 flex items-center gap-2">
+                    <span>IEEE Std C57.149-2012 Certified Sweep</span>
+                    <span>·</span>
+                    <span class="text-terracotta font-medium">Bode Magnitude Transfer Function</span>
+                </div>
+            </div>
         </div>
+
+        <!-- Quick Re-Upload Strip -->
+        <form action="/analyze" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+            <label class="cursor-pointer px-3 py-1.5 bg-canvas-subtle hover:bg-canvas-warm border border-border-medium rounded-lg text-xs font-mono text-ink-secondary hover:text-ink-primary transition flex items-center gap-2">
+                <i data-lucide="upload" class="w-3.5 h-3.5 text-ink-muted"></i>
+                <span id="reUploadLabel" class="truncate max-w-[180px]">Load New CSV…</span>
+                <input type="file" name="file" required class="hidden" id="reUploadInput"
+                       onchange="document.getElementById('reUploadLabel').textContent = this.files[0]?.name || 'File Selected'; document.getElementById('reScanSubmitBtn').classList.remove('hidden');">
+            </label>
+            <button type="submit" id="reScanSubmitBtn" class="hidden px-3 py-1.5 btn-primary text-xs font-mono font-medium rounded-lg shadow-soft-xs transition">
+                Run Analysis
+            </button>
+            <a href="/history" class="px-3 py-1.5 bg-surface border border-border-subtle text-xs font-mono text-ink-secondary hover:text-ink-primary rounded-lg transition" title="Audit Trail">
+                Fleet History
+            </a>
+        </form>
     </div>
 
-    <div class="health-card">
-        <span class="metric-label">Health Integrity Index</span>
-        <div class="gauge-wrapper">
-            <canvas id="healthGauge"></canvas>
-            <div class="gauge-value">{{ confidence }}%</div>
+    <!-- 4-COLUMN METRIC TELEMETRY STRIP -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Metric 1: Bandwidth -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>BANDWIDTH</span>
+                <i data-lucide="radio" class="w-3.5 h-3.5 text-ink-muted"></i>
+            </div>
+            <div class="text-xl font-mono font-bold text-ink-primary">20 Hz – 2 MHz</div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono">500 Log Points</div>
         </div>
-        <div style="margin-top:20px;">
-            <span class="status-{{status}}" style="font-size: 1.2rem; font-weight: 800; letter-spacing: 1px;">
+
+        <!-- Metric 2: Correlation R² -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>CORRELATION (R²)</span>
+                <i data-lucide="git-commit" class="w-3.5 h-3.5 text-ink-muted"></i>
+            </div>
+            <div class="text-xl font-mono font-bold {% if corr >= 0.95 %}text-sage{% elif corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
+                {{ corr }}
+            </div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono">
+                {% if corr >= 0.95 %}Compliant Baseline (≥0.95){% elif corr >= 0.85 %}Advisory Drift (0.85–0.95){% else %}Significant Deviation (&lt;0.85){% endif %}
+            </div>
+        </div>
+
+        <!-- Metric 3: Max Shift ΔdB -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>MAX SHIFT (ΔdB)</span>
+                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-ink-muted"></i>
+            </div>
+            <div class="text-xl font-mono font-bold {% if status == 'Healthy' %}text-sage{% elif status == 'Warning' %}text-ochre{% else %}text-crimson{% endif %}">
+                {{ shift }} dB
+            </div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono">Peak Resonance Zero Drift</div>
+        </div>
+
+        <!-- Metric 4: Diagnosis Verdict -->
+        <div class="workbench-card p-4">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1 flex items-center justify-between">
+                <span>DIAGNOSTIC VERDICT</span>
+                <span class="w-2 h-2 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+            </div>
+            <div class="text-xl font-mono font-bold {% if status == 'Healthy' %}text-sage{% elif status == 'Warning' %}text-ochre{% else %}text-crimson{% endif %}">
                 {{ status | upper }}
-            </span>
+            </div>
+            <div class="text-[11px] text-ink-muted mt-1 font-mono truncate">{{ fault_type }}</div>
         </div>
     </div>
-</div>
 
-<div class="fault-section">
-    <span class="metric-label">AI Logic & Recommendations</span>
-    <div class="fault-item border-{{status}}">
-        <div style="display:flex; justify-content:space-between; align-items: center;">
-            <span style="font-size: 1.1rem; font-weight:bold; color: white;">{{ fault_type }}</span>
-            <span class="status-{{status}}" style="font-weight: bold;">{{ confidence }}% MATCH</span>
+    <!-- MAIN WORKBENCH GRID: BODE PLOT (LEFT) + DIAGNOSTIC ASSESSMENT RAIL (RIGHT) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT COLUMN: INTERACTIVE BODE PLOT & SUB-BAND CARDS (8 COLS) -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- Bode Plot Module -->
+            <div class="workbench-card overflow-hidden">
+                <!-- Toolbar -->
+                <div class="p-4 border-b border-border-subtle flex flex-wrap items-center justify-between gap-3 bg-canvas-warm/50">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-terracotta"></i>
+                        <span class="font-serif font-semibold text-sm text-ink-primary">Bode Magnitude Transfer Function</span>
+                        <span class="text-xs font-mono text-ink-muted bg-canvas-subtle px-2 py-0.5 rounded border border-border-subtle hidden sm:inline">
+                            20 log₁₀(<i class="font-serif">V</i><sub>out</sub> / <i class="font-serif">V</i><sub>in</sub>)
+                        </span>
+                    </div>
+
+                    <!-- Band Zoom Buttons -->
+                    <div class="flex items-center gap-1 bg-canvas-subtle p-1 rounded-lg border border-border-subtle text-xs font-mono">
+                        <button type="button" id="btnZoomFull" onclick="setBandZoom('full')" class="px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs">FULL</button>
+                        <button type="button" id="btnZoomLow" onclick="setBandZoom('low')" class="px-2 py-1 rounded text-ink-secondary hover:text-ink-primary transition">CORE &lt;2k</button>
+                        <button type="button" id="btnZoomMid" onclick="setBandZoom('mid')" class="px-2 py-1 rounded text-ink-secondary hover:text-ink-primary transition">WINDING 2k-100k</button>
+                        <button type="button" id="btnZoomHigh" onclick="setBandZoom('high')" class="px-2 py-1 rounded text-ink-secondary hover:text-ink-primary transition">LEADS &gt;100k</button>
+                    </div>
+
+                    <!-- Trace Toggles -->
+                    <div class="flex items-center gap-2 text-xs font-mono">
+                        <button type="button" id="toggleBaseline" onclick="toggleTrace(0, this)" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-sage-border bg-sage-tint text-sage font-medium transition">
+                            <span class="w-2.5 h-0.5 bg-sage inline-block"></span> BASELINE
+                        </button>
+                        <button type="button" id="toggleTest" onclick="toggleTrace(1, this)" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border-medium bg-terracotta-tint text-terracotta font-medium transition">
+                            <span class="w-2.5 h-0.5 bg-terracotta inline-block"></span> TEST SWEEP
+                        </button>
+                        <button type="button" id="toggleDelta" onclick="toggleResidualTrace(this)" class="flex items-center gap-1.5 px-2 py-1 rounded-md border border-border-subtle bg-surface text-ink-muted hover:text-ochre transition">
+                            <span class="w-2.5 h-0.5 bg-ochre inline-block"></span> |ΔdB|
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cursor HUD Telemetry Bar -->
+                <div id="plotHud" class="px-4 py-2 bg-canvas-warm border-b border-border-subtle flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-ink-secondary">
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <span class="text-ink-muted uppercase text-[10px]">FREQ:</span>
+                            <span id="hudFreq" class="font-bold text-ink-primary ml-1">Hover over plot</span>
+                        </div>
+                        <div>
+                            <span class="text-ink-muted uppercase text-[10px]">BASELINE:</span>
+                            <span id="hudHealthy" class="font-medium text-sage ml-1">—</span>
+                        </div>
+                        <div>
+                            <span class="text-ink-muted uppercase text-[10px]">TEST:</span>
+                            <span id="hudTest" class="font-medium text-terracotta ml-1">—</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-ink-muted uppercase text-[10px]">DELTA:</span>
+                        <span id="hudDelta" class="font-bold text-ink-primary ml-1">—</span>
+                    </div>
+                </div>
+
+                <!-- Chart Canvas Container -->
+                <div class="p-4 sm:p-6 bg-surface">
+                    <div class="relative h-[420px] w-full">
+                        <canvas id="workbenchBodeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sub-band Region Labels Footnote -->
+                <div class="px-4 py-3 bg-canvas-warm/40 border-t border-border-subtle grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                    <div class="p-2 rounded bg-surface border border-border-subtle">
+                        <span class="text-ink-muted text-[10px] uppercase block">Sub-Band 1</span>
+                        <strong class="text-ink-primary text-xs">Low Core (&lt;2 kHz)</strong>
+                        <div class="text-[10px] text-ink-muted mt-0.5">Core & Grounding</div>
+                    </div>
+                    <div class="p-2 rounded bg-surface border border-border-subtle">
+                        <span class="text-ink-muted text-[10px] uppercase block">Sub-Band 2</span>
+                        <strong class="text-ink-primary text-xs">Mid Winding (2k–100 kHz)</strong>
+                        <div class="text-[10px] text-ink-muted mt-0.5">Axial & Radial Geometry</div>
+                    </div>
+                    <div class="p-2 rounded bg-surface border border-border-subtle">
+                        <span class="text-ink-muted text-[10px] uppercase block">Sub-Band 3</span>
+                        <strong class="text-ink-primary text-xs">High Leads (&gt;100 kHz)</strong>
+                        <div class="text-[10px] text-ink-muted mt-0.5">Bushings & Turret Leads</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IEEE C57.149 Sub-band Detail Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="workbench-card p-4 space-y-2">
+                    <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">01 // Low Frequency</div>
+                    <h4 class="font-serif font-semibold text-base text-ink-primary">Magnetic Core & Grounding</h4>
+                    <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Evaluates main core leg permeability (<span class="font-mono font-medium"><i>&mu;</i><sub>r</sub></span>), core grounding straps, and residual magnetization. Resonance zeros governed by open-circuit magnetizing inductance <span class="font-mono font-medium"><i>L</i><sub>m</sub></span>.
+                    </p>
+                </div>
+
+                <div class="workbench-card p-4 space-y-2">
+                    <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">02 // Mid Frequency</div>
+                    <h4 class="font-serif font-semibold text-base text-ink-primary">Winding Geometry</h4>
+                    <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Evaluates radial hoop stress, axial tilt, and inter-disk coil spacing. Governed by leakage inductance and inter-winding capacitances (<span class="font-mono font-medium"><i>C</i><sub>s</sub>, <i>C</i><sub>g</sub></span>).
+                    </p>
+                </div>
+
+                <div class="workbench-card p-4 space-y-2">
+                    <div class="text-[11px] font-mono font-semibold text-ink-muted uppercase">03 // High Frequency</div>
+                    <h4 class="font-serif font-semibold text-base text-ink-primary">Leads & Bushings</h4>
+                    <p class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Evaluates internal bushing connections, de-energized tap changers (DETC/OLTC), and measurement ground braid integrity up to 2 MHz.
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="progress-bg">
-            <div class="progress-fill" style="width: {{ confidence }}%; background: var(--accent-blue);"></div>
+
+        <!-- RIGHT COLUMN: DIAGNOSTIC AUDIT & RECOMMENDATION RAIL (4 COLS) -->
+        <div class="lg:col-span-4 space-y-6">
+
+            <!-- Diagnostic Assessment Card -->
+            <div class="workbench-card p-6 space-y-5">
+                <div class="flex items-center justify-between pb-3 border-b border-border-subtle">
+                    <span class="text-xs font-mono uppercase tracking-wider text-ink-muted font-semibold">Diagnostic Report</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold {% if status == 'Healthy' %}bg-sage-tint text-sage border border-sage-border{% elif status == 'Warning' %}bg-ochre-tint text-ochre border border-ochre-border{% else %}bg-crimson-tint text-crimson border border-crimson-border{% endif %}">
+                        <span class="w-1.5 h-1.5 rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                        {{ status }}
+                    </span>
+                </div>
+
+                <!-- Confidence Gauge -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-mono">
+                        <span class="text-ink-secondary">Classification Confidence</span>
+                        <span class="font-bold text-ink-primary">{{ confidence }}%</span>
+                    </div>
+                    <div class="w-full bg-canvas-subtle rounded-full h-2 overflow-hidden border border-border-subtle">
+                        <div class="h-full rounded-full {% if status == 'Healthy' %}bg-sage{% elif status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}" style="width: {{ confidence }}%"></div>
+                    </div>
+                </div>
+
+                <!-- Detected Fault -->
+                <div class="space-y-1 bg-canvas-warm p-3.5 rounded-lg border border-border-subtle">
+                    <div class="text-[10px] font-mono text-ink-muted uppercase">Detected Condition</div>
+                    <div class="font-serif font-semibold text-lg text-ink-primary">{{ fault_type }}</div>
+                    <div class="text-xs text-ink-secondary mt-1 font-sans">
+                        Spectral response indicates deviation in the characteristic IEEE transfer function compared against factory baseline.
+                    </div>
+                </div>
+
+                <!-- Recommended Engineering Action -->
+                <div class="space-y-2">
+                    <div class="text-xs font-mono text-ink-muted uppercase font-semibold flex items-center gap-1.5">
+                        <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-terracotta"></i>
+                        <span>Engineering Recommendation</span>
+                    </div>
+                    <p class="text-xs text-ink-secondary leading-relaxed font-sans bg-canvas-warm p-3.5 rounded-lg border border-border-subtle">
+                        {{ recommendation }}
+                    </p>
+                </div>
+
+                <!-- Actions: Download Certified PDF -->
+                <div class="pt-2 space-y-2">
+                    <a href="/download-report" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 btn-primary text-xs font-medium rounded-lg shadow-soft-xs transition font-mono">
+                        <i data-lucide="download" class="w-4 h-4 text-terracotta"></i>
+                        <span>Download Certified IEEE PDF</span>
+                    </a>
+                    <a href="/history" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium text-xs font-medium rounded-lg hover:bg-canvas-subtle transition font-mono">
+                        <i data-lucide="database" class="w-4 h-4 text-ink-muted"></i>
+                        <span>View Fleet Audit Trail</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Apparatus Metadata Card -->
+            <div class="workbench-card p-5 space-y-3 font-mono text-xs">
+                <div class="font-serif font-semibold text-sm text-ink-primary pb-2 border-b border-border-subtle font-sans">
+                    Apparatus Test Setup
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Asset Identifier:</span>
+                    <span class="font-semibold text-ink-primary">{{ transformerId if transformerId else 'TX-765KV-MAIN-01' }}</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Test Protocol:</span>
+                    <span class="text-ink-secondary">End-to-End Open (EO)</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Source Impedance:</span>
+                    <span class="text-ink-secondary">50 Ω Coaxial</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-border-subtle">
+                    <span class="text-ink-muted">Receiver Impedance:</span>
+                    <span class="text-ink-secondary">50 Ω Match</span>
+                </div>
+                <div class="flex items-center justify-between py-1">
+                    <span class="text-ink-muted">Standard Ref:</span>
+                    <span class="text-sage font-medium">IEEE C57.149 / IEC 60076-18</span>
+                </div>
+            </div>
         </div>
-        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
-            <i data-lucide="info" size="14" style="vertical-align: middle; margin-right: 5px;"></i>
-            {{ recommendation }}
-        </p>
+
     </div>
+
 </div>
 
 {% else %}
-<div class="health-card" style="padding: 60px; max-width: 600px; margin: 80px auto; border: 1px solid rgba(56, 189, 248, 0.2);">
-    <i data-lucide="activity" size="48" style="color: var(--accent-blue); margin: 0 auto 20px;"></i>
-    <h2 style="margin-bottom: 10px; font-size: 1.8rem;">Transformer AI Diagnostic</h2>
-    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 40px;">Please upload the Sweep Frequency Response (.csv) file for analysis.</p>
-    
-    <div class="upload-zone">
-        <form action="/analyze" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" required id="fileInput">
-            <br>
-            <button type="submit">GENERATE ANALYSIS</button>
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# STANDBY EMPTY STATE — Workbench Ingestion & Asset Selection         #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+
+<div class="max-w-4xl mx-auto space-y-8 py-6">
+
+    <div class="text-center space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border-subtle text-xs font-mono text-ink-secondary shadow-soft-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+            <span>SFRA Diagnostic Workbench</span>
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl font-medium text-ink-primary">
+            Ingest Frequency Response Data
+        </h1>
+        <p class="text-sm text-ink-secondary max-w-xl mx-auto font-sans leading-relaxed">
+            Upload raw Sweep Frequency Response Analysis curves to perform automated IEEE C57.149 sub-band cross-correlation, resonance shift detection, and mechanical winding diagnosis.
+        </p>
+    </div>
+
+    <!-- Dropzone Card -->
+    <div class="workbench-card p-6 sm:p-10">
+        <form action="/analyze" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <label for="workbenchDropzoneInput" class="dropzone-workbench block p-8 sm:p-12 rounded-xl cursor-pointer text-center group">
+                <input type="file" name="file" id="workbenchDropzoneInput" required class="hidden"
+                       onchange="document.getElementById('standbyFileName').textContent = this.files[0]?.name || 'File Selected'; document.getElementById('standbySubmitBtn').disabled = false;">
+                
+                <div class="w-14 h-14 rounded-2xl bg-terracotta-tint text-terracotta flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition shadow-soft-xs">
+                    <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+                </div>
+
+                <div id="standbyFileName" class="text-base font-medium text-ink-primary">
+                    Drop test sweep CSV file here, or browse files
+                </div>
+
+                <p class="text-xs text-ink-muted mt-2 max-w-md mx-auto leading-relaxed">
+                    Accepts two-column CSV frequency response files (Frequency in Hz, Magnitude in dB). Supports Omicron, Doble, and Megger sweep exports.
+                </p>
+            </label>
+
+            <button type="submit" id="standbySubmitBtn" disabled class="w-full py-3 btn-primary text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition shadow-soft-xs font-mono">
+                Ingest & Run Diagnostic Analysis
+            </button>
         </form>
     </div>
-    <p style="margin-top: 20px; font-size: 0.7rem; color: var(--text-muted);">Supported Formats: CSV, TXT (Frequency/Magnitude format)</p>
+
+    <!-- Benchmark Field Case Studies -->
+    <div class="space-y-3">
+        <div class="text-xs font-mono uppercase tracking-wider text-ink-muted font-semibold">
+            Or Inspect Pre-Loaded Apparatus Cases
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="/inspect/TX-765KV-MAIN-01" class="workbench-card p-4 hover:border-crimson-border hover:bg-crimson-tint/30 transition group space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-bold text-ink-primary">TX-765KV-MAIN-01</span>
+                    <span class="w-2 h-2 rounded-full bg-crimson"></span>
+                </div>
+                <div class="text-xs text-crimson font-medium">Critical: Axial Winding Displacement</div>
+                <div class="text-[11px] text-ink-muted">Significant resonance zero shift in mid frequency band (2k-100kHz).</div>
+                <div class="text-[11px] font-mono text-terracotta font-semibold group-hover:underline pt-1">Load Case &rarr;</div>
+            </a>
+
+            <a href="/inspect/TX-400KV-GSU-02" class="workbench-card p-4 hover:border-ochre-border hover:bg-ochre-tint/30 transition group space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-bold text-ink-primary">TX-400KV-GSU-02</span>
+                    <span class="w-2 h-2 rounded-full bg-ochre"></span>
+                </div>
+                <div class="text-xs text-ochre font-medium">Warning: Core Laminate Looseness</div>
+                <div class="text-[11px] text-ink-muted">Moderate correlation drift in low frequency magnetizing band (<2kHz).</div>
+                <div class="text-[11px] font-mono text-terracotta font-semibold group-hover:underline pt-1">Load Case &rarr;</div>
+            </a>
+
+            <a href="/inspect/TX-220KV-AUTO-03" class="workbench-card p-4 hover:border-sage-border hover:bg-sage-tint/30 transition group space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-bold text-ink-primary">TX-220KV-AUTO-03</span>
+                    <span class="w-2 h-2 rounded-full bg-sage"></span>
+                </div>
+                <div class="text-xs text-sage font-medium">Healthy: Baseline Compliant</div>
+                <div class="text-[11px] text-ink-muted">High cross-correlation (R² = 0.989) across all three IEEE sub-bands.</div>
+                <div class="text-[11px] font-mono text-terracotta font-semibold group-hover:underline pt-1">Load Case &rarr;</div>
+            </a>
+        </div>
+    </div>
+
 </div>
+
 {% endif %}
 
+{% endblock %}
+
+{% block extra_scripts %}
+{% if status %}
 <script>
-{% if freq %}
-    // 1. Magnitude Bode Plot
-    const ctx = document.getElementById('chart').getContext('2d');
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ freq | tojson }},
-            datasets: [
-                {
-                    label: 'Reference (Healthy)',
-                    data: {{ healthy | tojson }},
-                    borderColor: 'rgba(56, 189, 248, 0.4)',
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    tension: 0.1
+    // Ingest data passed from Flask template
+    const rawFreq = {{ freq | tojson if freq else '[]' }};
+    const healthyData = {{ healthy | tojson if healthy else '[]' }};
+    const faultyData = {{ faulty | tojson if faulty else '[]' }};
+
+    let chartInstance = null;
+
+    function getChartThemeColors(isDark) {
+        return {
+            grid: isDark ? '#2C2C38' : '#E8E3DA',
+            text: isDark ? '#7E7B74' : '#8D877E',
+            title: isDark ? '#B4B0A7' : '#5C5852',
+            tooltipBg: isDark ? '#141417' : '#1F1E1D',
+            tooltipBorder: isDark ? '#363644' : '#E8E3DA'
+        };
+    }
+
+    window.syncChartTheme = function(theme) {
+        if (!chartInstance) return;
+        const isDark = theme === 'dark';
+        const colors = getChartThemeColors(isDark);
+        chartInstance.options.scales.x.grid.color = colors.grid;
+        chartInstance.options.scales.x.ticks.color = colors.text;
+        chartInstance.options.scales.x.title.color = colors.title;
+        chartInstance.options.scales.y.grid.color = colors.grid;
+        chartInstance.options.scales.y.ticks.color = colors.text;
+        chartInstance.options.scales.y.title.color = colors.title;
+        chartInstance.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+        chartInstance.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+        chartInstance.update();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('workbenchBodeChart');
+        if (!ctx || rawFreq.length === 0) return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const themeColors = getChartThemeColors(isDark);
+
+        // Compute residual |ΔdB| dataset
+        const deltaData = faultyData.map((val, idx) => {
+            const h = healthyData[idx];
+            return (h !== undefined && val !== undefined) ? Math.abs(val - h) : 0;
+        });
+
+        // Initialize Chart.js with Anthropic Editorial Palette
+        chartInstance = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: rawFreq,
+                datasets: [
+                    {
+                        label: 'Healthy Baseline',
+                        data: healthyData,
+                        borderColor: '#246B49', // Forest Sage
+                        backgroundColor: 'rgba(36, 107, 73, 0.04)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0.25,
+                        borderDash: [5, 4]
+                    },
+                    {
+                        label: 'Test Sweep',
+                        data: faultyData,
+                        borderColor: '#CC785C', // Claude Terracotta
+                        backgroundColor: 'rgba(204, 120, 92, 0.08)',
+                        borderWidth: 2.2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0.25
+                    },
+                    {
+                        label: '|ΔdB| Residual',
+                        data: deltaData,
+                        borderColor: '#A25807', // Warm Ochre
+                        backgroundColor: 'rgba(162, 88, 7, 0.06)',
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                        hidden: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
                 },
-                {
-                    label: 'Measured Data',
-                    data: {{ faulty | tojson }},
-                    borderColor: '#f59e0b',
-                    borderWidth: 3,
-                    pointRadius: 0,
-                    tension: 0.1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    type: 'logarithmic', // CRITICAL FIX: Standard for FRA visualization
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { 
-                        color: '#64748b',
-                        callback: function(value) {
-                            return value.toExponential(); // Format as 1e3, 1e4, etc.
+                onHover: (event, activeElements) => {
+                    if (activeElements && activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        const f = rawFreq[index];
+                        const h = healthyData[index];
+                        const t = faultyData[index];
+                        const d = (h !== undefined && t !== undefined) ? (t - h).toFixed(2) : '—';
+
+                        document.getElementById('hudFreq').textContent = f >= 1000000 ? (f/1000000).toFixed(2) + ' MHz' : (f >= 1000 ? (f/1000).toFixed(1) + ' kHz' : f + ' Hz');
+                        document.getElementById('hudHealthy').textContent = h !== undefined ? h.toFixed(2) + ' dB' : '—';
+                        document.getElementById('hudTest').textContent = t !== undefined ? t.toFixed(2) + ' dB' : '—';
+                        document.getElementById('hudDelta').textContent = d + ' dB';
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: themeColors.tooltipBg,
+                        titleColor: '#FAF8F5',
+                        bodyColor: '#FAF8F5',
+                        borderColor: themeColors.tooltipBorder,
+                        borderWidth: 1,
+                        padding: 10,
+                        titleFont: { family: 'JetBrains Mono', size: 12 },
+                        bodyFont: { family: 'JetBrains Mono', size: 11 },
+                        callbacks: {
+                            title: (items) => {
+                                const f = items[0].label;
+                                return f >= 1000000 ? (f/1000000) + ' MHz' : (f >= 1000 ? (f/1000) + ' kHz' : f + ' Hz');
+                            },
+                            label: (item) => ` ${item.dataset.label}: ${item.parsed.y.toFixed(2)} dB`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        min: 20,
+                        max: 2000000,
+                        title: {
+                            display: true,
+                            text: 'Frequency (Hz) — Logarithmic Grid',
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11, weight: '500' }
+                        },
+                        grid: {
+                            color: themeColors.grid,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: themeColors.text,
+                            font: { family: 'JetBrains Mono', size: 10 },
+                            callback: function(value) {
+                                if ([20, 100, 1000, 10000, 100000, 1000000].includes(value)) {
+                                    return value >= 1000000 ? (value/1000000) + 'M' : (value >= 1000 ? (value/1000) + 'k' : value);
+                                }
+                                return null;
+                            }
                         }
                     },
-                    title: { display: true, text: 'Frequency (Hz)', color: '#94a3b8' }
-                },
-                y: {
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b' },
-                    title: { display: true, text: 'Magnitude (dB)', color: '#94a3b8' }
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Transfer Function Magnitude (dB)',
+                            color: themeColors.title,
+                            font: { family: 'Source Sans 3', size: 11, weight: '500' }
+                        },
+                        grid: {
+                            color: themeColors.grid,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: themeColors.text,
+                            font: { family: 'JetBrains Mono', size: 10 }
+                        }
+                    }
                 }
-            },
-            plugins: {
-                legend: { position: 'top', labels: { color: '#f8fafc', font: { family: 'JetBrains Mono' } } },
-                tooltip: { mode: 'index', intersect: false }
             }
-        }
+        });
     });
 
-    // 2. Health Gauge Fix
-    const gtx = document.getElementById('healthGauge').getContext('2d');
-    const score = {{ confidence }};
-    
-    new Chart(gtx, {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [score, 100 - score],
-                backgroundColor: [score > 80 ? '#22c55e' : '#f59e0b', '#1e293b'],
-                borderWidth: 0,
-                circumference: 180,
-                rotation: 270
-            }]
-        },
-        options: {
-            cutout: '85%',
-            aspectRatio: 2,
-            plugins: { tooltip: { enabled: false }, legend: { display: false } }
-        }
-    });
-{% endif %}
+    // Band Zoom Control
+    function setBandZoom(band) {
+        if (!chartInstance) return;
 
-// Initialize Lucide Icons
-lucide.createIcons();
+        const zoomButtons = ['btnZoomFull', 'btnZoomLow', 'btnZoomMid', 'btnZoomHigh'];
+        zoomButtons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.className = "px-2.5 py-1 rounded text-ink-secondary hover:text-ink-primary transition";
+            }
+        });
+
+        if (band === 'low') {
+            chartInstance.options.scales.x.min = 20;
+            chartInstance.options.scales.x.max = 2000;
+            document.getElementById('btnZoomLow').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
+        } else if (band === 'mid') {
+            chartInstance.options.scales.x.min = 2000;
+            chartInstance.options.scales.x.max = 100000;
+            document.getElementById('btnZoomMid').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
+        } else if (band === 'high') {
+            chartInstance.options.scales.x.min = 100000;
+            chartInstance.options.scales.x.max = 2000000;
+            document.getElementById('btnZoomHigh').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
+        } else {
+            chartInstance.options.scales.x.min = 20;
+            chartInstance.options.scales.x.max = 2000000;
+            document.getElementById('btnZoomFull').className = "px-2.5 py-1 rounded font-medium bg-surface text-ink-primary shadow-soft-xs";
+        }
+        chartInstance.update();
+    }
+
+    // Toggle Baseline Trace
+    function toggleTrace(datasetIndex, btn) {
+        if (!chartInstance) return;
+        const meta = chartInstance.getDatasetMeta(datasetIndex);
+        meta.hidden = !meta.hidden;
+        chartInstance.update();
+
+        if (meta.hidden) {
+            btn.classList.add('opacity-40');
+        } else {
+            btn.classList.remove('opacity-40');
+        }
+    }
+
+    // Toggle |ΔdB| Residual Trace
+    function toggleResidualTrace(btn) {
+        if (!chartInstance) return;
+        const meta = chartInstance.getDatasetMeta(2);
+        meta.hidden = !meta.hidden;
+        chartInstance.update();
+
+        if (meta.hidden) {
+            btn.classList.remove('border-ochre-border', 'bg-ochre-tint', 'text-ochre', 'font-medium');
+            btn.classList.add('border-border-subtle', 'bg-surface', 'text-ink-muted');
+        } else {
+            btn.classList.remove('border-border-subtle', 'bg-surface', 'text-ink-muted');
+            btn.classList.add('border-ochre-border', 'bg-ochre-tint', 'text-ochre', 'font-medium');
+        }
+    }
 </script>
-</body>
-</html>
+{% endif %}
+{% endblock %}

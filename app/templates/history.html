@@ -1,133 +1,305 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRA | Analysis History</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+{% extends "base.html" %}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap');
-        
-        body { background-color: #020617; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass-card { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.5); backdrop-filter: blur(10px); }
-        .text-mono { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.7rem; font-weight: bold; }
-        
-        /* Fixed colors from the image (sky, emerald, red, amber) */
-        .text-primary { color: #0ea5e9; } 
-    </style>
-</head>
-<body class="p-8 md:p-16">
-    <div class="max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-16 p-4 glass-card rounded-full px-8">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
-                    <span class="text-sky-400 text-sm">⚡</span>
-                </div>
-                <div>
-                    <h1 class="text-xs font-bold text-white uppercase tracking-tight">FRA Diagnostics</h1>
-                    <p class="text-[9px] text-slate-500 font-mono tracking-widest">AI Platform</p>
-                </div>
-            </div>
-            <nav class="flex gap-4 text-xs font-semibold">
-                <a href="/" class="text-slate-400 hover:text-white transition">Home</a>
-                <a href="/analysis" class="text-slate-400 hover:text-white transition">Analysis</a>
-                <a href="/history" class="text-white bg-sky-600 px-3 py-1 rounded-full">History</a>
-            </nav>
-            <a href="/about" class="text-xs font-mono text-slate-400 hover:text-white">ABOUT SYSTEM</a>
-        </header>
+{% block title %}Fleet Telemetry & Baseline Registry | FRA Intelligence{% endblock %}
 
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <div>
-                <p class="text-mono text-sky-500 mb-1">RECORDS</p>
-                <h1 class="text-4xl font-extrabold text-white tracking-tighter leading-tight">Analysis History</h1>
+{% block content %}
+{% set active_page = 'history' %}
+
+<div class="space-y-8">
+
+    <!-- SUB-HEADER CONTEXT & ACTIONS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
+        <div>
+            <div class="flex items-center gap-2 font-mono text-xs text-ink-muted uppercase">
+                <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+                <span>SUBSTATION FLEET REGISTRY // HISTORICAL AUDIT LOG</span>
             </div>
-            <a href="/analysis" class="tech-font inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 rounded-lg hover:bg-sky-500 transition text-sm font-bold text-white shadow-lg shadow-sky-900/40">
-                <i data-lucide="plus" class="w-4 h-4"></i> NEW ANALYSIS
+            <h1 class="font-serif text-3xl font-medium text-ink-primary tracking-tight mt-1">
+                Fleet Records & Telemetry Registry
+            </h1>
+            <p class="text-sm text-ink-secondary mt-1 max-w-2xl font-sans">
+                Comprehensive audit trail of monitored high-voltage power apparatus, tracking longitudinal frequency response shifts and IEEE C57.149 baseline correlation scores.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button onclick="exportFleetCSV()" class="inline-flex items-center gap-2 px-4 py-2 bg-surface text-ink-secondary hover:text-ink-primary border border-border-medium rounded-lg text-xs font-mono font-medium shadow-soft-xs hover:bg-canvas-subtle transition">
+                <i data-lucide="download" class="w-4 h-4 text-ink-muted"></i>
+                <span>Export CSV</span>
+            </button>
+            <a href="/analysis" class="inline-flex items-center gap-2 px-4 py-2 btn-primary rounded-lg text-xs font-mono font-medium shadow-soft-xs transition">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-terracotta"></i>
+                <span>Ingest Sweep</span>
             </a>
-        </header>
+        </div>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center">
-                <h2 class="text-4xl font-extrabold text-white">5</h2>
-                <p class="text-mono text-slate-500 mt-2">TOTAL ANALYSES</p>
+    <!-- 5-COLUMN HIGH-DENSITY FLEET TELEMETRY RIBBON -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <!-- Metric 1: Total Fleet Units -->
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>TOTAL ASSETS</span>
+                <i data-lucide="cpu" class="w-4 h-4 text-ink-muted"></i>
             </div>
-            
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center border-b-2 border-emerald-500">
-                <h2 class="text-4xl font-extrabold text-emerald-400">2</h2>
-                <p class="text-mono text-emerald-500 mt-2">HEALTHY</p>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-ink-primary">{{ stats.total }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">UNITS</span>
             </div>
-
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center border-b-2 border-amber-500">
-                <h2 class="text-4xl font-extrabold text-amber-400">2</h2>
-                <p class="text-mono text-amber-500 mt-2">WARNINGS</p>
-            </div>
-
-            <div class="glass-card p-6 rounded-xl flex flex-col items-center border-b-2 border-red-500">
-                <h2 class="text-4xl font-extrabold text-red-400">1</h2>
-                <p class="text-mono text-red-500 mt-2">FAULTS DETECTED</p>
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>REGISTRY</span>
+                <span class="text-ink-secondary">8 SUBSTATIONS</span>
             </div>
         </div>
 
-        <div class="glass-card rounded-xl overflow-hidden mb-20 shadow-xl shadow-black/30">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-900/50 text-mono text-slate-500">
+        <!-- Metric 2: Nominal / Healthy -->
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>NOMINAL BASELINE</span>
+                <span class="w-2 h-2 rounded-full bg-sage"></span>
+            </div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-sage">{{ stats.healthy }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">VERIFIED</span>
+            </div>
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>BENCHMARK</span>
+                <span class="text-sage font-medium">R² ≥ 0.95</span>
+            </div>
+        </div>
+
+        <!-- Metric 3: Warning / Advisory -->
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>ADVISORY WATCH</span>
+                <span class="w-2 h-2 rounded-full bg-ochre"></span>
+            </div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-ochre">{{ stats.warning }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">WATCHLIST</span>
+            </div>
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>THRESHOLD</span>
+                <span class="text-ochre font-medium">0.85 ≤ R² &lt; 0.95</span>
+            </div>
+        </div>
+
+        <!-- Metric 4: Critical / Urgent -->
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>URGENT ACTION</span>
+                <span class="w-2 h-2 rounded-full bg-crimson"></span>
+            </div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-crimson">{{ stats.critical }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">ACTION REQ</span>
+            </div>
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>SEVERITY</span>
+                <span class="text-crimson font-medium">R² &lt; 0.85</span>
+            </div>
+        </div>
+
+        <!-- Metric 5: Fleet Mean Correlation -->
+        <div class="bg-surface border border-border-subtle p-4 rounded-xl shadow-soft-xs col-span-2 sm:col-span-1">
+            <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted uppercase tracking-wider">
+                <span>FLEET MEAN R²</span>
+                <i data-lucide="activity" class="w-4 h-4 text-terracotta"></i>
+            </div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-2xl font-bold font-mono text-ink-primary">{{ stats.mean_corr }}</span>
+                <span class="text-[11px] font-mono text-ink-muted">AVG</span>
+            </div>
+            <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between border-t border-border-subtle pt-1.5">
+                <span>INDEX</span>
+                <span class="text-ink-secondary">{{ stats.mean_health }}/100</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER & SEARCH STRIP -->
+    <div class="bg-surface border border-border-subtle p-3 rounded-xl shadow-soft-xs flex flex-col md:flex-row items-center justify-between gap-3">
+        <!-- Search Field -->
+        <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search serial, substation, or fault…" 
+                   class="w-full pl-9 pr-3 py-1.5 bg-canvas-warm border border-border-subtle rounded-lg text-xs font-sans text-ink-primary placeholder-ink-muted focus:border-terracotta transition">
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 text-xs font-mono overflow-x-auto w-full md:w-auto">
+            <button onclick="setStatusFilter('ALL')" id="filterAll" class="px-3 py-1 rounded-full font-medium btn-primary transition shadow-soft-xs">
+                ALL ({{ stats.total }})
+            </button>
+            <button onclick="setStatusFilter('HEALTHY')" id="filterHealthy" class="px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition">
+                HEALTHY ({{ stats.healthy }})
+            </button>
+            <button onclick="setStatusFilter('WARNING')" id="filterWarning" class="px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition">
+                WARNING ({{ stats.warning }})
+            </button>
+            <button onclick="setStatusFilter('CRITICAL')" id="filterCritical" class="px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition">
+                CRITICAL ({{ stats.critical }})
+            </button>
+        </div>
+    </div>
+
+    <!-- FLEET RECORDS AUDIT TABLE -->
+    <div class="border border-border-subtle rounded-xl bg-surface overflow-hidden shadow-soft-card">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-sans" id="recordsTable">
+                <thead class="bg-canvas-subtle border-b border-border-subtle font-mono text-[11px] text-ink-muted uppercase">
                     <tr>
-                        <th class="p-5 border-b border-slate-800">Transformer</th>
-                        <th class="p-5 border-b border-slate-800">Date</th>
-                        <th class="p-5 border-b border-slate-800">Health</th>
-                        <th class="p-5 border-b border-slate-800">Status</th>
-                        <th class="p-5 border-b border-slate-800">Faults</th>
+                        <th class="py-3.5 px-4 font-semibold">Asset ID & Substation</th>
+                        <th class="py-3.5 px-4 font-semibold">Apparatus Spec</th>
+                        <th class="py-3.5 px-4 font-semibold">Test Date</th>
+                        <th class="py-3.5 px-4 font-semibold">Correlation (R²)</th>
+                        <th class="py-3.5 px-4 font-semibold">Shift (ΔdB)</th>
+                        <th class="py-3.5 px-4 font-semibold">Diagnosed Condition</th>
+                        <th class="py-3.5 px-4 text-center font-semibold">Status</th>
+                        <th class="py-3.5 px-4 text-right font-semibold">Action</th>
                     </tr>
                 </thead>
-                <tbody class="text-sm font-medium">
-                    <tr class="hover:bg-slate-800/30 transition">
-                        <td class="p-5 border-b border-slate-800 text-white font-bold">TX-2024-0847</td>
-                        <td class="p-5 border-b border-slate-800 font-mono text-slate-400">2026-03-25</td>
-                        <td class="p-5 border-b border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-20 bg-slate-800 h-1 rounded-full"><div class="bg-amber-500 h-1 rounded-full" style="width: 72%"></div></div>
-                                <span class="font-bold text-amber-400 font-mono">72</span>
-                            </div>
+                <tbody class="divide-y divide-border-subtle" id="recordsTbody">
+                    {% for record in records %}
+                    <tr class="record-row hover:bg-canvas-subtle/50 transition cursor-pointer" 
+                        data-status="{{ record.status | upper }}"
+                        data-search="{{ record.id }} {{ record.substation }} {{ record.fault_type }} {{ record.voltage }}"
+                        onclick="if(!event.target.closest('a')) window.location='/inspect/{{ record.id }}'">
+                        
+                        <!-- Asset ID & Substation -->
+                        <td class="py-3.5 px-4">
+                            <div class="font-mono font-bold text-ink-primary text-xs">{{ record.id }}</div>
+                            <div class="text-[11px] text-ink-muted mt-0.5">{{ record.substation }}</div>
                         </td>
-                        <td class="p-5 border-b border-slate-800"><span class="px-2 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono">Warning</span></td>
-                        <td class="p-5 border-b border-slate-800 text-amber-400 font-bold">3</td>
-                    </tr>
-                    <tr class="hover:bg-slate-800/30 transition">
-                        <td class="p-5 border-b border-slate-800 text-white font-bold">TX-2024-0612</td>
-                        <td class="p-5 border-b border-slate-800 font-mono text-slate-400">2026-03-20</td>
-                        <td class="p-5 border-b border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-20 bg-slate-800 h-1 rounded-full"><div class="bg-emerald-500 h-1 rounded-full" style="width: 94%"></div></div>
-                                <span class="font-bold text-emerald-400 font-mono">94</span>
-                            </div>
+
+                        <!-- Apparatus Spec -->
+                        <td class="py-3.5 px-4 font-mono text-ink-secondary">
+                            {{ record.voltage }}
                         </td>
-                        <td class="p-5 border-b border-slate-800"><span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono">Healthy</span></td>
-                        <td class="p-5 border-b border-slate-800 text-emerald-400 font-bold">0</td>
-                    </tr>
-                    <tr class="hover:bg-slate-800/30 transition">
-                        <td class="p-5 border-b border-slate-800 text-white font-bold">TX-2023-1134</td>
-                        <td class="p-5 border-b border-slate-800 font-mono text-slate-400">2026-03-15</td>
-                        <td class="p-5 border-b border-slate-800">
-                            <div class="flex items-center gap-3">
-                                <div class="w-20 bg-slate-800 h-1 rounded-full"><div class="bg-red-500 h-1 rounded-full" style="width: 45%"></div></div>
-                                <span class="font-bold text-red-400 font-mono">45</span>
-                            </div>
+
+                        <!-- Test Date -->
+                        <td class="py-3.5 px-4 font-mono text-ink-muted">
+                            {{ record.date }}
                         </td>
-                        <td class="p-5 border-b border-slate-800"><span class="px-2 py-1 bg-red-500/10 text-red-400 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono">Fault</span></td>
-                        <td class="p-5 border-b border-slate-800 text-red-400 font-bold">5</td>
+
+                        <!-- Correlation R² -->
+                        <td class="py-3.5 px-4 font-mono font-bold {% if record.corr >= 0.95 %}text-sage{% elif record.corr >= 0.85 %}text-ochre{% else %}text-crimson{% endif %}">
+                            {{ record.corr }}
+                        </td>
+
+                        <!-- Peak Shift ΔdB -->
+                        <td class="py-3.5 px-4 font-mono text-ink-secondary">
+                            {{ record.shift }} dB
+                        </td>
+
+                        <!-- Diagnosed Condition -->
+                        <td class="py-3.5 px-4">
+                            <div class="font-medium text-ink-primary">{{ record.fault_type }}</div>
+                            <div class="text-[10px] font-mono text-ink-muted mt-0.5">{{ record.subband }}</div>
+                        </td>
+
+                        <!-- Status Pill -->
+                        <td class="py-3.5 px-4 text-center">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold {% if record.status == 'Healthy' %}bg-sage-tint text-sage border border-sage-border{% elif record.status == 'Warning' %}bg-ochre-tint text-ochre border border-ochre-border{% else %}bg-crimson-tint text-crimson border border-crimson-border{% endif %}">
+                                <span class="w-1.5 h-1.5 rounded-full {% if record.status == 'Healthy' %}bg-sage{% elif record.status == 'Warning' %}bg-ochre{% else %}bg-crimson{% endif %}"></span>
+                                {{ record.status | upper }}
+                            </span>
+                        </td>
+
+                        <!-- Action Link -->
+                        <td class="py-3.5 px-4 text-right">
+                            <a href="/inspect/{{ record.id }}" class="inline-flex items-center gap-1 px-3 py-1 bg-canvas-warm border border-border-medium rounded-md text-xs font-mono text-ink-secondary hover:text-ink-primary hover:border-terracotta transition shadow-soft-xs">
+                                <span>Inspect</span>
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                            </a>
+                        </td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <footer class="mt-20 pt-8 border-t border-slate-900 text-center">
-            <p class="text-mono text-slate-700 font-semibold uppercase">FRA Diagnostics • industrial secure records v1.2</p>
-        </footer>
     </div>
-    
-    <script>lucide.createIcons();</script>
-</body>
-</html>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentStatusFilter = 'ALL';
+
+    function setStatusFilter(status) {
+        currentStatusFilter = status;
+        const filterBtns = ['filterAll', 'filterHealthy', 'filterWarning', 'filterCritical'];
+        filterBtns.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.className = "px-3 py-1 rounded-full text-ink-secondary hover:text-ink-primary transition";
+            }
+        });
+
+        const activeId = status === 'ALL' ? 'filterAll' : (status === 'HEALTHY' ? 'filterHealthy' : (status === 'WARNING' ? 'filterWarning' : 'filterCritical'));
+        const activeBtn = document.getElementById(activeId);
+        if (activeBtn) {
+            activeBtn.className = "px-3 py-1 rounded-full font-medium btn-primary transition shadow-soft-xs";
+        }
+
+        filterRecords();
+    }
+
+    function filterRecords() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.record-row');
+
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            const searchContent = row.getAttribute('data-search').toLowerCase();
+
+            const statusMatches = (currentStatusFilter === 'ALL' || status === currentStatusFilter);
+            const queryMatches = (!query || searchContent.includes(query));
+
+            if (statusMatches && queryMatches) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function exportFleetCSV() {
+        const records = {{ records | tojson if records else '[]' }};
+        if (!records || records.length === 0) {
+            alert('No records available to export.');
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Asset ID,Substation,Voltage Class,Test Date,Health Index,Status,Fault Type,Sub-band,Correlation R2,Max Shift dB,Engineer\n";
+
+        records.forEach(r => {
+            const row = [
+                `"${r.id}"`,
+                `"${r.substation}"`,
+                `"${r.voltage}"`,
+                `"${r.date}"`,
+                r.health,
+                `"${r.status}"`,
+                `"${r.fault_type}"`,
+                `"${r.subband}"`,
+                r.corr,
+                r.shift,
+                `"${r.engineer || ''}"`
+            ];
+            csvContent += row.join(",") + "\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `fleet_fra_records_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+{% endblock %}

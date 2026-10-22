@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ro-terra" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E58B6D"/>
+      <stop offset="100%" stop-color="#B85E42"/>
+    </linearGradient>
+    <linearGradient id="ro-ink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#36332E"/>
+      <stop offset="100%" stop-color="#1A1917"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cardinal Primary Diamond North (Terracotta Light) -->
+  <polygon points="50,6 59,38 50,50 41,38" fill="#CC785C"/>
+  <polygon points="50,6 50,50 41,38" fill="#DE8B70"/>
+
+  <!-- Cardinal Primary Diamond South (Terracotta Deep) -->
+  <polygon points="50,94 41,62 50,50 59,62" fill="url(#ro-terra)"/>
+  <polygon points="50,94 50,50 41,62" fill="#B85E42"/>
+
+  <!-- Cardinal Primary Diamond East (Deep Ink) -->
+  <polygon points="94,50 62,41 50,50 62,59" fill="#1F1E1D"/>
+  <polygon points="94,50 50,50 62,41" fill="#36332E"/>
+
+  <!-- Cardinal Primary Diamond West (Deep Ink Shaded) -->
+  <polygon points="6,50 38,59 50,50 38,41" fill="url(#ro-ink)"/>
+  <polygon points="6,50 50,50 38,41" fill="#141312"/>
+
+  <!-- Diagonal Rays (Secondary Harmonics) -->
+  <!-- North-East Ray -->
+  <polygon points="76,24 58,40 50,50 60,32" fill="#D4A373"/>
+  <polygon points="76,24 50,50 60,32" fill="#CC785C"/>
+
+  <!-- South-West Ray -->
+  <polygon points="24,76 42,60 50,50 40,68" fill="#D4A373"/>
+  <polygon points="24,76 50,50 40,68" fill="#A85437"/>
+
+  <!-- North-West Ray -->
+  <polygon points="24,24 40,32 50,50 32,42" fill="#5C5852"/>
+  <polygon points="24,24 50,50 32,42" fill="#383531"/>
+
+  <!-- South-East Ray -->
+  <polygon points="76,76 60,68 50,50 68,58" fill="#5C5852"/>
+  <polygon points="76,76 50,50 68,58" fill="#242220"/>
+
+  <!-- Central Precision Core Nucleus -->
+  <circle cx="50" cy="50" r="9" fill="#FAF8F5" stroke="#1F1E1D" stroke-width="1.5"/>
+  <circle cx="50" cy="50" r="5" fill="#CC785C"/>
+  <circle cx="50" cy="50" r="2" fill="#FAF8F5"/>
+</svg>

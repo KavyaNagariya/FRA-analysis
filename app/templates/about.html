@@ -1,136 +1,484 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <title>About | Intelligent Diagnostic System</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono&display=swap');
-        
-        body { 
-            background-color: #020617; /* Matches the image's dark bg */
-            color: #e2e8f0; /* Soft white/slate */
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+{% extends "base.html" %}
 
-        /* Futuristic font styles used for labels and technical terms */
-        .tech-font { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.65rem; font-weight: bold; }
-        .text-primary { color: #0ea5e9; } /* Blue/Sky accent color */
-        
-        /* The Card design (mid-slate background with subtle border) */
-        .glass-card { 
-            background-color: rgba(15, 23, 42, 0.6); 
-            border: 1px solid rgba(51, 65, 85, 0.5); 
-            border-radius: 12px;
-            backdrop-filter: blur(8px);
+{% block title %}Standards & SFRA Diagnostic Guide | FRA Intelligence{% endblock %}
+
+{% block extra_head %}
+<!-- KaTeX for crisp mathematical typography -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof renderMathInElement === 'function') {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
         }
-    </style>
-</head>
-<body class="p-8 md:p-16">
-    <div class="max-w-7xl mx-auto">
-        <a href="/" class="tech-font inline-flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition mb-12 text-slate-400">
-            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Dashboard
+    });
+    window.addEventListener("load", function() {
+        if (typeof renderMathInElement === 'function') {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+{% set active_page = 'standards' %}
+
+<div class="max-w-5xl mx-auto space-y-12">
+
+    <!-- EDITORIAL MONOGRAPH HEADER -->
+    <div class="pb-6 border-b border-border-subtle space-y-3">
+        <div class="flex items-center gap-2 font-mono text-xs text-ink-muted uppercase">
+            <span class="w-1.5 h-1.5 rounded-full bg-terracotta"></span>
+            <span>TECHNICAL SPECIFICATION // IEEE STD C57.149 & IEC 60076-18</span>
+        </div>
+        <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium text-ink-primary tracking-tight">
+            Physical Principles & Diagnostic Standards for Sweep Frequency Response Analysis
+        </h1>
+        <p class="text-base text-ink-secondary leading-relaxed font-sans max-w-3xl">
+            A definitive engineering monograph detailing the distributed parameter electrical modeling, frequency sub-band partitioning, mathematical cross-correlation criteria, and mechanical fault detection mechanics for power apparatus.
+        </p>
+
+        <!-- Standard Accreditations -->
+        <div class="flex flex-wrap items-center gap-2 pt-2 text-xs font-mono text-ink-muted">
+            <span class="px-2.5 py-1 bg-surface border border-border-subtle rounded-md shadow-soft-xs text-ink-secondary">IEEE Std C57.149-2012</span>
+            <span class="px-2.5 py-1 bg-surface border border-border-subtle rounded-md shadow-soft-xs text-ink-secondary">IEC 60076-18:2012</span>
+            <span class="px-2.5 py-1 bg-surface border border-border-subtle rounded-md shadow-soft-xs text-ink-secondary">CIGRE TB 342</span>
+            <span class="px-2.5 py-1 bg-surface border border-border-subtle rounded-md shadow-soft-xs text-ink-secondary">DL/T 911-2016</span>
+        </div>
+    </div>
+
+    <!-- QUICK JUMP SUB-NAV -->
+    <div class="bg-surface border border-border-subtle p-2 rounded-xl shadow-soft-xs sticky top-20 z-30 flex items-center gap-1 overflow-x-auto text-xs font-mono text-ink-secondary">
+        <a href="#rlc-ladder" class="px-3 py-1.5 rounded-lg hover:bg-canvas-subtle hover:text-ink-primary transition whitespace-nowrap">
+            §1 RLC Ladder Model
         </a>
+        <a href="#sub-bands" class="px-3 py-1.5 rounded-lg hover:bg-canvas-subtle hover:text-ink-primary transition whitespace-nowrap">
+            §2 Sub-Band Criteria
+        </a>
+        <a href="#mathematics" class="px-3 py-1.5 rounded-lg hover:bg-canvas-subtle hover:text-ink-primary transition whitespace-nowrap">
+            §3 Mathematical Formulations
+        </a>
+        <a href="#fault-matrix" class="px-3 py-1.5 rounded-lg hover:bg-canvas-subtle hover:text-ink-primary transition whitespace-nowrap">
+            §4 Fault Signature Matrix
+        </a>
+        <a href="#simulator" class="px-3 py-1.5 rounded-lg bg-terracotta-tint text-terracotta font-medium hover:bg-terracotta/20 transition whitespace-nowrap ml-auto">
+            §5 Interactive Simulator
+        </a>
+    </div>
 
-        <header class="text-center mb-16">
-            <p class="tech-font text-sky-500 mb-2">ABOUT THE PLATFORM</p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tighter leading-tight mb-4">
-                AI-Based Intelligent <span class="text-primary">Diagnostic</span> System
-            </h1>
-            <p class="text-slate-400 max-w-2xl mx-auto leading-relaxed text-sm md:text-base">
-                Automated analysis of Frequency Response Analysis (FRA) data in power transformers using advanced machine learning and expert system logic.
-            </p>
-        </header>
-
-        <div class="space-y-12 mb-20">
-            <section class="glass-card p-8">
-                <h2 class="tech-font text-sky-400 mb-4">WHAT IS FRA?</h2>
-                <div class="text-sm text-slate-300 space-y-4 leading-relaxed">
-                    <p>Frequency Response Analysis (FRA) is a widely used diagnostic technique for assessing the internal mechanical and electrical condition of power transformers. A low-voltage signal is injected into transformer windings across a wide frequency range (typically 20 Hz to 2 MHz), and the resulting frequency response is recorded.</p>
-                    <p>Any deviation in the response pattern from expected behavior can indicate internal faults such as winding deformation, core displacement, insulation degradation, or structural changes from transportation stresses, short-circuit forces, or aging.</p>
-                </div>
-            </section>
-
-            <section class="glass-card p-8 border-l-4 border-amber-500">
-                <h2 class="tech-font text-amber-400 mb-6">THE CHALLENGE</h2>
-                <ul class="text-sm text-slate-300 space-y-3 list-inside list-disc">
-                    <li>FRA interpretation requires highly experienced engineers to identify subtle curve variations.</li>
-                    <li>Equipment from OMICRON, Megger, and Doble generate data in incompatible formats.</li>
-                    <li>Lack of standardization causes inefficiencies and delayed fault identification.</li>
-                    <li>Manual analysis leads to inconsistencies in maintenance decision-making.</li>
-                </ul>
-            </section>
-
-            <section class="glass-card p-8 border-l-4 border-emerald-500">
-                <h2 class="tech-font text-emerald-400 mb-6">OUR SOLUTION</h2>
-                <p class="text-sm text-slate-300 leading-relaxed mb-6">An AI-powered diagnostic platform that automatically processes and interprets FRA data from multiple vendors. The system uses a universal data parser, CNN-based classification models, and expert system logic to deliver accurate fault detection with actionable maintenance recommendations.</p>
-                <div class="grid grid-cols-2 gap-4 text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-                    <div class="p-3 bg-slate-900 rounded-lg">• Universal Multi-Format Data Ingestion</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• ML-powered Fault Classification</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Real-time Health Scoring</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Automated Maintenance Recommendations</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Interactive Curve Visualization</div>
-                    <div class="p-3 bg-slate-900 rounded-lg">• Historical Trend Analysis</div>
-                </div>
-            </section>
+    <!-- SECTION 1: PHYSICAL PRINCIPLES & DISTRIBUTED RLC LADDER -->
+    <section id="rlc-ladder" class="space-y-6 scroll-mt-32">
+        <div>
+            <div class="text-xs font-mono text-terracotta uppercase tracking-wider font-semibold">Section 01</div>
+            <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary mt-1">
+                Distributed Parameter RLC Ladder Network
+            </h2>
         </div>
 
-        <section class="mb-20">
-            <h2 class="text-2xl font-bold text-center mb-10 text-white tracking-tight">Technology Stack</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div class="glass-card p-6">
-                    <h4 class="tech-font text-sky-400 mb-4">AI / ML</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>Convolutional Neural Networks (CNNs)</li>
-                        <li>Anomaly Detection Algorithms</li>
-                        <li>Pattern Recognition</li>
-                        <li>Transfer Learning</li>
-                    </ul>
-                </div>
-                
-                <div class="glass-card p-6">
-                    <h4 class="tech-font text-sky-400 mb-4">SIGNAL PROCESSING</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>FFT Analysis</li>
-                        <li>Correlation Coefficients</li>
-                        <li>Spectral Deviation Metrics</li>
-                        <li>Cross-Correlation</li>
-                    </ul>
-                </div>
+        <div class="prose max-w-none text-sm text-ink-secondary leading-relaxed font-sans space-y-4">
+            <p>
+                In low-frequency power engineering, a transformer winding is conventionally treated as a lumped inductive element ($L$) with slight series resistance ($R$). However, under high-frequency excitation (20 Hz to 2 MHz), the geometric arrangement of the disk coils, turns, insulation barriers, and tank enclosure behaves as a complex, multi-resonant <strong>distributed parameter ladder network</strong>.
+            </p>
+            <p>
+                Because physical dimensions dictate localized capacitance ($C = \varepsilon A / d$) and inductance ($L = \mu N^2 A / l$), any physical displacement caused by through-fault electromagnetic forces or shipping impacts permanently shifts the transfer function:
+            </p>
+        </div>
 
-                <div class="glass-card p-6">
-                    <h4 class="tech-font text-sky-400 mb-4">DATA HANDLING</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>Universal Format Parser</li>
-                        <li>Multi-Vendor Support</li>
-                        <li>Standardized Data Pipeline</li>
-                        <li>Batch Processing</li>
-                    </ul>
-                </div>
-
-                <div class="glass-card p-6 border-l-4 border-sky-500">
-                    <h4 class="tech-font text-sky-400 mb-4">EXPERT SYSTEM</h4>
-                    <ul class="text-xs text-slate-400 space-y-2 list-inside list-disc">
-                        <li>Rule-Based Inference</li>
-                        <li>Severity Classification</li>
-                        <li>Maintenance Recommendations</li>
-                        <li>Historical Trending</li>
-                    </ul>
-                </div>
-
+        <!-- Distributed RLC Diagram Card (Anthropic Styled SVG) -->
+        <div class="bg-surface border border-border-subtle p-6 rounded-2xl shadow-soft-card space-y-4">
+            <div class="font-serif font-semibold text-base text-ink-primary">
+                Distributed Ladder Representation of Winding Disk Section
             </div>
-        </section>
+            
+            <div class="p-6 bg-canvas-warm rounded-xl border border-border-subtle flex items-center justify-center overflow-x-auto">
+                <svg viewBox="0 0 760 180" class="w-full max-w-2xl text-ink-primary font-mono text-xs select-none">
+                    <!-- Input Terminal -->
+                    <circle cx="40" cy="90" r="5" fill="var(--terracotta)"/>
+                    <text x="35" y="70" text-anchor="middle" fill="var(--terracotta)" font-weight="bold">V_in</text>
+                    <line x1="45" y1="90" x2="90" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
 
-        <footer class="mt-20 pt-8 border-t border-slate-900 text-center">
-            <p class="tech-font text-slate-600 tracking-widest uppercase">FRA DIAGNOSTICS • SECURE INDUSTRIAL INTELLIGENCE</p>
-        </footer>
-    </div>
-    
-    <script>lucide.createIcons();</script>
-</body>
-</html>
+                    <!-- Disk 1 Series Branch -->
+                    <rect x="90" y="80" width="30" height="20" fill="var(--surface)" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <text x="105" y="94" text-anchor="middle" font-size="10" fill="var(--ink-primary)">R_s</text>
+                    <line x1="120" y1="90" x2="145" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+                    
+                    <!-- Inductor Ls -->
+                    <path d="M 145,90 Q 155,75 165,90 Q 175,75 185,90 Q 195,75 205,90" fill="none" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <text x="175" y="65" text-anchor="middle" font-size="10" fill="var(--ink-primary)">L_s1</text>
+                    <line x1="205" y1="90" x2="250" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+
+                    <!-- Series Capacitance Cs in parallel above -->
+                    <line x1="130" y1="90" x2="130" y2="40" stroke="var(--ink-muted)" stroke-width="1.5" stroke-dasharray="3,3"/>
+                    <line x1="130" y1="40" x2="160" y2="40" stroke="var(--ink-muted)" stroke-width="1.5"/>
+                    <line x1="160" y1="30" x2="160" y2="50" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="168" y1="30" x2="168" y2="50" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="168" y1="40" x2="220" y2="40" stroke="var(--ink-muted)" stroke-width="1.5"/>
+                    <line x1="220" y1="40" x2="220" y2="90" stroke="var(--ink-muted)" stroke-width="1.5" stroke-dasharray="3,3"/>
+                    <text x="164" y="24" text-anchor="middle" fill="var(--terracotta)" font-size="10">C_s (Inter-disk)</text>
+
+                    <!-- Shunt Capacitance to Ground Cg -->
+                    <circle cx="250" cy="90" r="3" fill="var(--ink-primary)"/>
+                    <line x1="250" y1="90" x2="250" y2="130" stroke="var(--ink-primary)" stroke-width="1.5"/>
+                    <line x1="240" y1="130" x2="260" y2="130" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="240" y1="138" x2="260" y2="138" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="250" y1="138" x2="250" y2="155" stroke="var(--ink-primary)" stroke-width="1.5"/>
+                    <!-- Ground symbol -->
+                    <line x1="242" y1="155" x2="258" y2="155" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="245" y1="160" x2="255" y2="160" stroke="var(--ink-primary)" stroke-width="1.5"/>
+                    <line x1="248" y1="165" x2="252" y2="165" stroke="var(--ink-primary)" stroke-width="1"/>
+                    <text x="285" y="136" font-size="10" fill="var(--sage)">C_g (To Tank)</text>
+
+                    <!-- Node continuation to Disk 2 -->
+                    <line x1="250" y1="90" x2="310" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+                    
+                    <!-- Disk 2 -->
+                    <rect x="310" y="80" width="30" height="20" fill="var(--surface)" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <text x="325" y="94" text-anchor="middle" font-size="10" fill="var(--ink-primary)">R_s</text>
+                    <line x1="340" y1="90" x2="365" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+                    
+                    <!-- Inductor Ls2 -->
+                    <path d="M 365,90 Q 375,75 385,90 Q 395,75 405,90 Q 415,75 425,90" fill="none" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <text x="395" y="65" text-anchor="middle" font-size="10" fill="var(--ink-primary)">L_s2</text>
+                    <line x1="425" y1="90" x2="480" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+
+                    <!-- Shunt to Core Lm / Cg -->
+                    <circle cx="480" cy="90" r="3" fill="var(--ink-primary)"/>
+                    <line x1="480" y1="90" x2="480" y2="130" stroke="var(--ink-primary)" stroke-width="1.5"/>
+                    <line x1="470" y1="130" x2="490" y2="130" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="470" y1="138" x2="490" y2="138" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="480" y1="138" x2="480" y2="155" stroke="var(--ink-primary)" stroke-width="1.5"/>
+                    <!-- Ground symbol -->
+                    <line x1="472" y1="155" x2="488" y2="155" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <line x1="475" y1="160" x2="485" y2="160" stroke="var(--ink-primary)" stroke-width="1.5"/>
+                    <line x1="478" y1="165" x2="482" y2="165" stroke="var(--ink-primary)" stroke-width="1"/>
+
+                    <!-- Mutual Inductance Arc -->
+                    <path d="M 175,55 Q 285,15 395,55" fill="none" stroke="var(--terracotta)" stroke-width="1.5" stroke-dasharray="4,3"/>
+                    <text x="285" y="28" text-anchor="middle" fill="var(--terracotta)" font-size="10" font-weight="bold">Mutual Inductance M_12</text>
+
+                    <!-- Ellipsis continuation -->
+                    <line x1="480" y1="90" x2="540" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+                    <text x="570" y="94" font-size="16" fill="var(--ink-muted)">. . .</text>
+                    <line x1="600" y1="90" x2="660" y2="90" stroke="var(--ink-primary)" stroke-width="2"/>
+
+                    <!-- Output Terminal -->
+                    <circle cx="665" cy="90" r="5" fill="var(--sage)"/>
+                    <text x="670" y="70" text-anchor="middle" fill="var(--sage)" font-weight="bold">V_out</text>
+                </svg>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs font-sans text-ink-secondary">
+                <div class="p-3 bg-canvas-warm rounded-lg border border-border-subtle">
+                    <strong class="font-mono text-terracotta block mb-1">Series Capacitance ($C_s$)</strong>
+                    Inter-disk and inter-turn insulation geometry. Changes during axial winding compression, disk tilting, or turn telescoping.
+                </div>
+                <div class="p-3 bg-canvas-warm rounded-lg border border-border-subtle">
+                    <strong class="font-mono text-sage block mb-1">Shunt Capacitance ($C_g$)</strong>
+                    Radial distance between winding and core leg or grounded tank wall. Altered during radial hoop buckling or coil bulging.
+                </div>
+                <div class="p-3 bg-canvas-warm rounded-lg border border-border-subtle">
+                    <strong class="font-mono text-ink-primary block mb-1">Mutual Inductance ($M$)</strong>
+                    Magnetic coupling between physical disk coils. Governed by magnetic core permeability and coil alignment.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: STANDARDIZED SUB-BANDS -->
+    <section id="sub-bands" class="space-y-6 scroll-mt-32">
+        <div>
+            <div class="text-xs font-mono text-sage uppercase tracking-wider font-semibold">Section 02</div>
+            <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary mt-1">
+                IEEE C57.149 Standard Sub-Band Partitioning
+            </h2>
+        </div>
+
+        <p class="text-sm text-ink-secondary leading-relaxed font-sans">
+            IEEE Std C57.149 partitions the complete 2 MHz spectrum into three distinct physical diagnostic bands. Each band corresponds to a different dominant circuit regime within the apparatus:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Low Band Card -->
+            <div class="bg-surface border border-border-subtle p-5 rounded-2xl shadow-soft-xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+                    <span class="text-xs font-mono font-semibold text-ochre uppercase">Sub-Band 1</span>
+                    <span class="text-xs font-mono text-ink-muted">&lt; 2 kHz</span>
+                </div>
+                <h3 class="font-serif font-semibold text-lg text-ink-primary">Core & Magnetization</h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Governed primarily by the main core leg open-circuit magnetizing inductance ($L_m$). Parallel resonance zero occurs at the first notch ($f_0$).
+                </p>
+                <div class="pt-2 text-xs font-mono text-ink-muted space-y-1">
+                    <div>• Core sheet displacement</div>
+                    <div>• Grounding strap discontinuity</div>
+                    <div>• Residual remanence flux</div>
+                </div>
+            </div>
+
+            <!-- Mid Band Card -->
+            <div class="bg-surface border border-border-subtle p-5 rounded-2xl shadow-soft-xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+                    <span class="text-xs font-mono font-semibold text-terracotta uppercase">Sub-Band 2</span>
+                    <span class="text-xs font-mono text-ink-muted">2 kHz – 100 kHz</span>
+                </div>
+                <h3 class="font-serif font-semibold text-lg text-ink-primary">Winding Structure</h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Governed by leakage inductance and disk capacitances ($L_s, C_s, C_g$). Contains multiple poles and zeros sensitive to millimeter-level coil shifts.
+                </p>
+                <div class="pt-2 text-xs font-mono text-ink-muted space-y-1">
+                    <div>• Axial coil displacement</div>
+                    <div>• Radial hoop buckling</div>
+                    <div>• Turn-to-turn insulation breakdown</div>
+                </div>
+            </div>
+
+            <!-- High Band Card -->
+            <div class="bg-surface border border-border-subtle p-5 rounded-2xl shadow-soft-xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+                    <span class="text-xs font-mono font-semibold text-sage uppercase">Sub-Band 3</span>
+                    <span class="text-xs font-mono text-ink-muted">&gt; 100 kHz</span>
+                </div>
+                <h3 class="font-serif font-semibold text-lg text-ink-primary">Leads & Bushings</h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Governed by internal connection leads, turret geometries, bushing capacitances ($C_1, C_2$), and tap changer wiring.
+                </p>
+                <div class="pt-2 text-xs font-mono text-ink-muted space-y-1">
+                    <div>• Bushing tap lead looseness</div>
+                    <div>• DETC / OLTC switch misalignment</div>
+                    <div>• Test lead grounding errors</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: MATHEMATICAL FORMULATIONS -->
+    <section id="mathematics" class="space-y-6 scroll-mt-32">
+        <div>
+            <div class="text-xs font-mono text-ink-muted uppercase tracking-wider font-semibold">Section 03</div>
+            <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary mt-1">
+                Mathematical Evaluation Formulations
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Formula 1: Correlation -->
+            <div class="bg-surface border border-border-subtle p-6 rounded-2xl shadow-soft-xs space-y-3">
+                <h3 class="font-serif font-semibold text-base text-ink-primary">
+                    1. Pearson Cross-Correlation Coefficient ($\rho_{xy}$ / $R^2$)
+                </h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Evaluates spectral similarity between baseline $X$ and current sweep $Y$ across $N$ frequency points:
+                </p>
+                <div class="p-4 bg-canvas-warm rounded-xl border border-border-subtle text-ink-primary text-center overflow-x-auto text-sm sm:text-base">
+                    $$\rho_{xy} = \frac{\sum_{i=1}^N (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^N (X_i - \bar{X})^2 \sum_{i=1}^N (Y_i - \bar{Y})^2}}$$
+                </div>
+                <div class="text-xs font-mono text-ink-muted pt-1">
+                    <span>Threshold: $\rho \ge 0.95$ Normal · $0.85 \le \rho < 0.95$ Advisory · $\rho < 0.85$ Severe</span>
+                </div>
+            </div>
+
+            <!-- Formula 2: ASLE -->
+            <div class="bg-surface border border-border-subtle p-6 rounded-2xl shadow-soft-xs space-y-3">
+                <h3 class="font-serif font-semibold text-base text-ink-primary">
+                    2. Absolute Sum of Logarithmic Error (ASLE)
+                </h3>
+                <p class="text-xs text-ink-secondary leading-relaxed font-sans">
+                    Measures decibel deviation across logarithmic frequency intervals:
+                </p>
+                <div class="p-4 bg-canvas-warm rounded-xl border border-border-subtle text-ink-primary text-center overflow-x-auto text-sm sm:text-base">
+                    $$\text{ASLE} = \frac{1}{N} \sum_{i=1}^N \left|20\log_{10}(Y_i) - 20\log_{10}(X_i)\right|$$
+                </div>
+                <div class="text-xs font-mono text-ink-muted pt-1">
+                    <span>Threshold: $\text{ASLE} < 1.0\text{ dB}$ Normal · $\text{ASLE} > 3.0\text{ dB}$ Anomaly</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: FAULT SIGNATURE MATRIX -->
+    <section id="fault-matrix" class="space-y-6 scroll-mt-32">
+        <div>
+            <div class="text-xs font-mono text-crimson uppercase tracking-wider font-semibold">Section 04</div>
+            <h2 class="font-serif text-2xl sm:text-3xl font-medium text-ink-primary mt-1">
+                Mechanical Fault Signature Matrix
+            </h2>
+        </div>
+
+        <div class="border border-border-subtle rounded-xl bg-surface overflow-hidden shadow-soft-card">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-sans">
+                    <thead class="bg-canvas-subtle border-b border-border-subtle font-mono text-[11px] text-ink-muted uppercase">
+                        <tr>
+                            <th class="py-3 px-4 font-semibold">Physical Failure Mode</th>
+                            <th class="py-3 px-4 font-semibold">Primary Band</th>
+                            <th class="py-3 px-4 font-semibold">Circuit Mechanism</th>
+                            <th class="py-3 px-4 font-semibold">Observed Spectral Effect</th>
+                            <th class="py-3 px-4 font-semibold">IEEE Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-subtle">
+                        <tr>
+                            <td class="py-3 px-4 font-medium text-ink-primary">Axial Winding Displacement</td>
+                            <td class="py-3 px-4 font-mono text-terracotta">2 kHz – 100 kHz</td>
+                            <td class="py-3 px-4 text-ink-secondary">Disk compression, altered $C_s, M$</td>
+                            <td class="py-3 px-4 text-ink-secondary">Resonance zeros shift upward, $\Delta\text{dB} > 6$</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-crimson-tint text-crimson border border-crimson-border">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-medium text-ink-primary">Radial Winding Buckling</td>
+                            <td class="py-3 px-4 font-mono text-terracotta">10 kHz – 200 kHz</td>
+                            <td class="py-3 px-4 text-ink-secondary">Hoop stress distortion, altered $C_g$</td>
+                            <td class="py-3 px-4 text-ink-secondary">New anti-resonance notches emerge</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-crimson-tint text-crimson border border-crimson-border">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-medium text-ink-primary">Core Laminate Looseness</td>
+                            <td class="py-3 px-4 font-mono text-ochre">&lt; 2 kHz</td>
+                            <td class="py-3 px-4 text-ink-secondary">Core gap changes, altered $L_m$</td>
+                            <td class="py-3 px-4 text-ink-secondary">First resonance peak shifts $\pm 100\text{ Hz}$</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-ochre-tint text-ochre border border-ochre-border">WARNING</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-medium text-ink-primary">Lead / Bushing Looseness</td>
+                            <td class="py-3 px-4 font-mono text-sage">&gt; 100 kHz</td>
+                            <td class="py-3 px-4 text-ink-secondary">Turret inductance, bushing capacitance</td>
+                            <td class="py-3 px-4 text-ink-secondary">High frequency attenuation tail drift</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-ochre-tint text-ochre border border-ochre-border">WARNING</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-medium text-ink-primary">Healthy Baseline Alignment</td>
+                            <td class="py-3 px-4 font-mono text-sage">All Bands</td>
+                            <td class="py-3 px-4 text-ink-secondary">Nominal geometric parameters</td>
+                            <td class="py-3 px-4 text-ink-secondary">Identical pole/zero tracks ($R^2 \ge 0.95$)</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-sage-tint text-sage border border-sage-border">HEALTHY</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: INTERACTIVE SIMULATOR -->
+    <section id="simulator" class="bg-surface border border-border-subtle p-6 sm:p-8 rounded-2xl shadow-soft-card space-y-6 scroll-mt-32">
+        <div class="border-b border-border-subtle pb-4">
+            <div class="text-xs font-mono text-terracotta uppercase tracking-wider font-semibold">Section 05</div>
+            <h2 class="font-serif text-2xl font-medium text-ink-primary mt-1">
+                Interactive IEEE Sub-Band Evaluation Simulator
+            </h2>
+            <p class="text-xs text-ink-secondary mt-1 font-sans">
+                Adjust correlation and shift parameters below to test the IEEE Std C57.149 classification logic and resulting utility recommendations.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <!-- Controls -->
+            <div class="space-y-5">
+                <div>
+                    <div class="flex items-center justify-between text-xs font-mono mb-2">
+                        <span class="text-ink-secondary">Pearson Cross-Correlation ($R^2$)</span>
+                        <span id="simCorrVal" class="font-bold text-ink-primary text-sm">0.88</span>
+                    </div>
+                    <input type="range" id="simCorr" min="0.50" max="1.00" step="0.01" value="0.88" 
+                           oninput="updateSimulator()" class="w-full accent-terracotta cursor-pointer">
+                    <div class="flex justify-between text-[10px] font-mono text-ink-muted mt-1">
+                        <span>0.50 (Severe)</span>
+                        <span>0.85 (Advisory)</span>
+                        <span>0.95 (Normal)</span>
+                        <span>1.00</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between text-xs font-mono mb-2">
+                        <span class="text-ink-secondary">Peak Decibel Shift ($\Delta\text{dB}$)</span>
+                        <span id="simShiftVal" class="font-bold text-ink-primary text-sm">6.5 dB</span>
+                    </div>
+                    <input type="range" id="simShift" min="0" max="25" step="0.5" value="6.5" 
+                           oninput="updateSimulator()" class="w-full accent-terracotta cursor-pointer">
+                    <div class="flex justify-between text-[10px] font-mono text-ink-muted mt-1">
+                        <span>0 dB (Exact Match)</span>
+                        <span>10 dB</span>
+                        <span>25 dB (High Outage Risk)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Result Card -->
+            <div class="bg-canvas-warm p-6 rounded-xl border border-border-subtle space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono text-ink-muted uppercase">Evaluated Diagnosis</span>
+                    <span id="simStatusPill" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-ochre-tint text-ochre border border-ochre-border">
+                        WARNING
+                    </span>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="text-[10px] font-mono text-ink-muted uppercase">Physical Condition</div>
+                    <div id="simCondition" class="font-serif font-semibold text-lg text-ink-primary">
+                        Moderate Sub-Band Spectral Drift
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="text-[10px] font-mono text-ink-muted uppercase">Utility Recommendation</div>
+                    <p id="simRecommendation" class="text-xs text-ink-secondary font-sans leading-relaxed">
+                        Verify core grounding straps and monitor winding leakage reactance during next maintenance outage.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function updateSimulator() {
+        const corr = parseFloat(document.getElementById('simCorr').value);
+        const shift = parseFloat(document.getElementById('simShift').value);
+
+        document.getElementById('simCorrVal').textContent = corr.toFixed(2);
+        document.getElementById('simShiftVal').textContent = shift.toFixed(1) + ' dB';
+
+        const pill = document.getElementById('simStatusPill');
+        const condition = document.getElementById('simCondition');
+        const rec = document.getElementById('simRecommendation');
+
+        if (corr >= 0.95 && shift < 3.0) {
+            pill.className = "px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-sage-tint text-sage border border-sage-border";
+            pill.textContent = "HEALTHY";
+            condition.textContent = "Nominal Baseline Compliance";
+            rec.textContent = "Signature fully verified against factory baseline. Standard 36-month routine surveillance cycle recommended.";
+        } else if (corr >= 0.85 || shift < 8.0) {
+            pill.className = "px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-ochre-tint text-ochre border border-ochre-border";
+            pill.textContent = "WARNING";
+            condition.textContent = "Moderate Sub-Band Spectral Drift";
+            rec.textContent = "Perform secondary low-voltage short-circuit impedance test and verify core ground continuity.";
+        } else {
+            pill.className = "px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-crimson-tint text-crimson border border-crimson-border";
+            pill.textContent = "CRITICAL";
+            condition.textContent = "Severe Winding / Core Mechanical Deformation";
+            rec.textContent = "Immediate apparatus detanking and internal winding clamp inspection strongly recommended before re-energization.";
+        }
+    }
+</script>
+{% endblock %}
